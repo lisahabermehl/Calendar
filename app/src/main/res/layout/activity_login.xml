@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="onLoginClick"
-        android:text="ENTER" />
+        android:text="LOG IN" />
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:design="http://schemas.android.com/apk/res-auto"
