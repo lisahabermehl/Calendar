@@ -8,18 +8,21 @@ android:layout_height="match_parent">
         android:id="@+id/my_calendar_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onClick="onCalendarClick"
         android:text="MY CALENDAR"/>
 
     <Button
         android:id="@+id/todo_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onClick="onTodoClick"
         android:text="MY TODO's"/>
 
     <Button
-        android:id="@+id/settings"
+        android:id="@+id/settings_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onClick="onSettingsClick"
         android:text="SETTINGS"/>
 
 </LinearLayout>
