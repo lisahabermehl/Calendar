@@ -12,32 +12,22 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity{
 
-    private Button myCalendar;
-    private Button toDo;
-    private Button settings;
-
-    private String string;
-
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        myCalendar = (Button) findViewById(R.id.my_calendar_button);
-        toDo = (Button) findViewById(R.id.todo_button);
-        settings = (Button) findViewById(R.id.settings_button);
-
     }
 
+    // go to MyCalendar
     public void onCalendarClick(View v) {
         startActivity(new Intent(this, MyCalendar.class));
     }
-
+    // go to Todo
     public void onTodoClick(View view) {
         startActivity(new Intent(this, Todo.class));
     }
-
-
+    // go to Settings
     public void onSettingsClick(View view) {
         startActivity(new Intent(this, Settings.class));
     }
+
 }

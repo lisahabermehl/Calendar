@@ -20,10 +20,30 @@ android {
 }
 
 dependencies {
+
+    // force to use latest
+    androidTestCompile 'com.android.support:support-annotations:25.3.1'
+    compile('com.google.code.findbugs:jsr305:2.0.1')
+
+    // existing dependencies
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
     testCompile 'junit:junit:4.12'
+
+    // added these
+    compile 'com.google.android.gms:play-services-auth:11.0.0'
+    compile 'pub.devrel:easypermissions:0.2.1'
+    compile('com.google.api-client:google-api-client-android:1.22.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+    compile('com.google.apis:google-api-services-calendar:v3-rev249-1.22.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+
+    // for the bottom navigation view
+    compile 'com.android.support:design:25.3.1'
+
 }

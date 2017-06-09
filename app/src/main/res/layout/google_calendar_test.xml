@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:design="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <Button
-        android:id="@+id/enterApp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="onLoginClick"
-        android:text="ENTER" />
+        android:text="Call Google Calendar"
+        android:onClick="onGoogleCalendarClick"/>
 
-    <android.support.design.widget.BottomNavigationView
-        android:id="@+id/navigation"
+    <TextView
+        android:id="@+id/mOutputText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        design:menu="@menu/menu" />
+        android:text="Click the button to test the API."/>
 
 </LinearLayout>
