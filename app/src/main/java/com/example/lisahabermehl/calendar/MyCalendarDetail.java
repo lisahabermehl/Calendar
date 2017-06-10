@@ -6,10 +6,10 @@ import android.util.Log;
 import android.widget.TextView;
 
 /**
- * Created by lisahabermehl on 09/06/2017.
+ * Created by lisahabermehl on 10/06/2017.
  */
 
-public class Settings extends AppCompatActivity {
+public class MyCalendarDetail extends AppCompatActivity {
 
     TextView settings;
 
@@ -20,7 +20,7 @@ public class Settings extends AppCompatActivity {
         settings = (TextView) findViewById(R.id.settings);
 
         Bundle extras = getIntent().getExtras();
-        String previousActivity = extras.getString("callingActivity");
+        String previousActivity = extras.getString("something2");
         Log.d(String.valueOf(previousActivity), "THIS2");
 
         settings.setText(previousActivity);
@@ -28,4 +28,3 @@ public class Settings extends AppCompatActivity {
 
     }
 }
-

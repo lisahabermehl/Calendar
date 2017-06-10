@@ -12,9 +12,10 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
 
-import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.*;
 import com.google.api.client.util.DateTime;
 
+import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.*;
 
 import android.Manifest;
@@ -46,6 +47,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -353,24 +355,37 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
             DateTime now = new DateTime(System.currentTimeMillis());
             List<String> eventStrings = new ArrayList<String>();
             Events events = mService.events().list("primary")
-                    .setMaxResults(10)
+                    .setMaxResults(30)
                     .setTimeMin(now)
                     .setOrderBy("startTime")
                     .setSingleEvents(true)
                     .execute();
+            // list with all the events
             List<Event> items = events.getItems();
 
+            // gonna try to get a specific date here
             for (Event event : items) {
-                DateTime start = event.getStart().getDateTime();
-                if (start == null) {
-                    // All-day events don't have start times, so just use
-                    // the start date.
-                    start = event.getStart().getDate();
+                DateTime start = event.getStart().getDate();
+                String startString = String.format("%s", start);
+                if (startString == "2017-06-21") {
+                    eventStrings.add(String.format("%s OM %s", event.getSummary(), start));
+                    Log.d(String.valueOf(startString), "START");
                 }
-                eventStrings.add(
-                        String.format("%s (%s)", event.getSummary(), start));
             }
             return eventStrings;
+
+//            for (Event event : items) {
+//                DateTime start = event.getStart().getDateTime();
+//                if (start == null) {
+//                    // All-day events don't have start times, so just use
+//                    // the start date.
+//                    start = event.getStart().getDate();
+//                }
+//                eventStrings.add(
+//                        String.format("%s (%s)", event.getSummary(), start));
+//                Log.d(String.valueOf(created), "START");
+//            }
+//            return eventStrings;
         }
 
 
@@ -390,16 +405,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
 
 
                 output.add(0, "Data retrieved using the Google Calendar API:");
-//                mOutputText.setText(TextUtils.join("\n", output));
-                String string1 = output.get(0);
-                String string2 = output.get(1);
-                String string3 = output.get(2);
-                Log.d(String.valueOf(string1), "SMTH0");
-                Log.d(String.valueOf(string2), "SMTH1");
-                Log.d(String.valueOf(string3), "SMTH2");
-
-
-                mOutputText.setText(string1);
+                mOutputText.setText(TextUtils.join("\n", output));
             }
         }
 

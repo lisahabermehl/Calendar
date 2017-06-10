@@ -25,6 +25,8 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class MyCalendar extends AppCompatActivity {
 
     CalendarView calendarView;
@@ -43,20 +45,31 @@ public class MyCalendar extends AppCompatActivity {
             @Override
             public void onSelectedDayChange(CalendarView calendarView, int i, int i1, int i2) {
                 dateDisplay.setText("Date: " + i2 + " / " + i1 + " / " + i);
-//                go to a listview with all the things that have to be done on that
 
+
+                String day = Integer.toString(i2);
+                // extra check just to make sure that date will be send correctly to GoogleCalendar
+                if (day.length() == 1) {
+                    day = ("0" + day);
+                }
+                // there seems to be some sort of bug with the months?
+                // it shows the month - 1, fixed this by adding one below
+                String month = Integer.toString(i1 + 1);
+                if (month.length() == 1) {
+                    month = ("0" + month);
+                }
+                String year = Integer.toString(i);
+                String date = year + month + day;
+
+                // go to a listview with all the things that have to be done on that
                 // startActivity and send data
                 Intent newActivity = new Intent(getApplicationContext(), Settings.class);
                 Bundle extras = new Bundle();
 
-//                String test = "something something";
-
-                extras.putInt("callingActivity", i);
-                Log.d(String.valueOf(i), "THIS");
+                extras.putString("callingActivity", date);
+                Log.d(String.valueOf(date), "THIS");
                 newActivity.putExtras(extras);
                 startActivity(newActivity);
-//                startActivity(new Intent(getApplicationContext(), Settings.class));
-
             }
         });
     }
