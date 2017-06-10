@@ -52,6 +52,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -369,21 +371,28 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
             // gonna try to get a specific date here
             for (Event event : items) {
 
+                // get the date
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                Date datum2 = new Date(event.getStart().getDateTime().getValue());
-                String datum3 = dateFormat.format(datum2);
+                Date original = new Date(event.getStart().getDateTime().getValue());
+                String date = dateFormat.format(original);
 
+                // get the time
                 SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-                String tijd = timeFormat.format(datum2);
+                String time = timeFormat.format(original);
 
+                // get the duration
+                DateTime start = event.getStart().getDateTime();
+                String everything = String.valueOf(start);
+                String duration = everything.substring(everything.lastIndexOf("+") + 1);
 
-                String datum5 = "21/06/2017";
+                // date to compare with
+                String dateCompare = "21/06/2017";
 
-                Log.d(String.valueOf(datum3), "datum2");
-                Log.d(String.valueOf(datum5), "datum5");
+                Log.d(String.valueOf(date), "datum2");
+                Log.d(String.valueOf(dateCompare), "datum5");
 
-                if (datum3.equals(datum5)) {
-                    eventStrings.add(String.format("%s OM %s en tijd %s en alles %s", event.getSummary(), datum3, tijd, datum2));
+                if (date.equals(dateCompare)) {
+                    eventStrings.add(String.format("%s OM %s OP %s for %s hours", event.getSummary(), time, date, duration));
                 }
             }
             return eventStrings;
@@ -401,7 +410,6 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
 //            }
 //            return eventStrings;
         }
-
 
         @Override
         protected void onPreExecute() {
