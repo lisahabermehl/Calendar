@@ -365,9 +365,11 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
 
             // gonna try to get a specific date here
             for (Event event : items) {
-                DateTime start = event.getStart().getDate();
+                DateTime start = event.getStart().getDateTime();
                 String startString = String.format("%s", start);
-                if (startString == "2017-06-21") {
+                String cutStartString = startString.substring(0, 10);
+                Log.d(String.valueOf(cutStartString), "START");
+                if (cutStartString == "2017-06-21") {
                     eventStrings.add(String.format("%s OM %s", event.getSummary(), start));
                     Log.d(String.valueOf(startString), "START");
                 }
