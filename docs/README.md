@@ -8,7 +8,7 @@ This app might be handy for people who have a hard time planning their schoolwor
 
 ### Visual sketch
 
-![](docs/img/image.JPG)
+![](docs/img/image.jpg)
 
 ### How does it work?
 Firstly there will be a login screen where the user can log in with Firebase. The idea for using this is that the Todo list items can be stored in Firebase's database. But since it's not really necessary and since it's also possible to do this with the SQLite database, I'll probably skip this login option. After logging in (or not  ;)) the user will end up in the Calendar. 
