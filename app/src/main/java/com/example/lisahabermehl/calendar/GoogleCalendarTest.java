@@ -60,9 +60,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class GoogleCalendarTest extends Activity implements EasyPermissions.PermissionCallbacks {
     GoogleAccountCredential mCredential;
-//    private TextView mOutputText;
     TextView mOutputText;
-    private Button mCallApiButton;
     ProgressDialog mProgress;
 
     static final int REQUEST_ACCOUNT_PICKER = 1000;
@@ -91,11 +89,11 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
-    }
 
-    public void onGoogleCalendarClick(View view) {
-//        startActivity(new Intent(this, MyCalendar.class));
-        getResultsFromApi();
+        String date = getIntent().getExtras().getString("callingActivity");
+        Log.d("DATE: ", date);
+
+        getResultsFromApi(date);
     }
 
     /**
@@ -105,7 +103,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
      * of the preconditions are not satisfied, the app will prompt the user as
      * appropriate.
      */
-    private void getResultsFromApi() {
+    private void getResultsFromApi(String... params) {
         if (! isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
@@ -114,6 +112,8 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
             mOutputText.setText("No network connection available.");
         } else {
             // execute the AsyncTask and give date
+//            String date2 = params[0];
+//            Log.d("STRINGS[0]", date2);
             String date = "21/06/2017";
             new MakeRequestTask(mCredential).execute(date);
         }
@@ -403,6 +403,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 output.add(0, "Data retrieved using the Google Calendar API:");
                 mOutputText.setText(TextUtils.join("\n", output));
             }
+
         }
 
         @Override
