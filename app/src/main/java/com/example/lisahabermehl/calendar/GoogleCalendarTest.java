@@ -47,6 +47,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.sql.Array;
 import java.sql.Time;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -103,18 +105,18 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
      * of the preconditions are not satisfied, the app will prompt the user as
      * appropriate.
      */
-    private void getResultsFromApi(String... params) {
+    private void getResultsFromApi(String date) {
         if (! isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
-            chooseAccount();
+            chooseAccount(date);
         } else if (! isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
         } else {
             // execute the AsyncTask and give date
-//            String date2 = params[0];
-//            Log.d("STRINGS[0]", date2);
-            String date = "21/06/2017";
+            String date2 = date;
+            Log.d("STRINGS[0]", date2);
+//            String date = "21/06/2017";
             new MakeRequestTask(mCredential).execute(date);
         }
     }
@@ -130,14 +132,14 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
      * is granted.
      */
     @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
-    private void chooseAccount() {
+    private void chooseAccount(String date) {
         if (EasyPermissions.hasPermissions(
                 this, Manifest.permission.GET_ACCOUNTS)) {
             String accountName = getPreferences(Context.MODE_PRIVATE)
                     .getString(PREF_ACCOUNT_NAME, null);
             if (accountName != null) {
                 mCredential.setSelectedAccountName(accountName);
-                getResultsFromApi();
+                getResultsFromApi(date);
             } else {
                 // Start a dialog from which the user can choose an account
                 startActivityForResult(
@@ -154,53 +156,55 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
         }
     }
 
-    /**
-     * Called when an activity launched here (specifically, AccountPicker
-     * and authorization) exits, giving you the requestCode you started it with,
-     * the resultCode it returned, and any additional data from it.
-     * @param requestCode code indicating which activity result is incoming.
-     * @param resultCode code indicating the result of the incoming
-     *     activity result.
-     * @param data Intent (containing result data) returned by incoming
-     *     activity result.
-     */
-    @Override
-    protected void onActivityResult(
-            int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
-            case REQUEST_GOOGLE_PLAY_SERVICES:
-                if (resultCode != RESULT_OK) {
-                    mOutputText.setText(
-                            "This app requires Google Play Services. Please install " +
-                                    "Google Play Services on your device and relaunch this app.");
-                } else {
-                    getResultsFromApi();
-                }
-                break;
-            case REQUEST_ACCOUNT_PICKER:
-                if (resultCode == RESULT_OK && data != null &&
-                        data.getExtras() != null) {
-                    String accountName =
-                            data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-                    if (accountName != null) {
-                        SharedPreferences settings =
-                                getPreferences(Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = settings.edit();
-                        editor.putString(PREF_ACCOUNT_NAME, accountName);
-                        editor.apply();
-                        mCredential.setSelectedAccountName(accountName);
-                        getResultsFromApi();
-                    }
-                }
-                break;
-            case REQUEST_AUTHORIZATION:
-                if (resultCode == RESULT_OK) {
-                    getResultsFromApi();
-                }
-                break;
-        }
-    }
+//    /**
+//     * Called when an activity launched here (specifically, AccountPicker
+//     * and authorization) exits, giving you the requestCode you started it with,
+//     * the resultCode it returned, and any additional data from it.
+//     * @param requestCode code indicating which activity result is incoming.
+//     * @param resultCode code indicating the result of the incoming
+//     *     activity result.
+//     * @param data Intent (containing result data) returned by incoming
+//     *     activity result.
+//     */
+//    @Override
+//    protected void onActivityResult(
+//            int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        // GOTTA CHANGE THIS STILL, just a check
+//        String date = "22/06/2017";
+//        switch(requestCode) {
+//            case REQUEST_GOOGLE_PLAY_SERVICES:
+//                if (resultCode != RESULT_OK) {
+//                    mOutputText.setText(
+//                            "This app requires Google Play Services. Please install " +
+//                                    "Google Play Services on your device and relaunch this app.");
+//                } else {
+//                    getResultsFromApi(date);
+//                }
+//                break;
+//            case REQUEST_ACCOUNT_PICKER:
+//                if (resultCode == RESULT_OK && data != null &&
+//                        data.getExtras() != null) {
+//                    String accountName =
+//                            data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+//                    if (accountName != null) {
+//                        SharedPreferences settings =
+//                                getPreferences(Context.MODE_PRIVATE);
+//                        SharedPreferences.Editor editor = settings.edit();
+//                        editor.putString(PREF_ACCOUNT_NAME, accountName);
+//                        editor.apply();
+//                        mCredential.setSelectedAccountName(accountName);
+//                        getResultsFromApi(date);
+//                    }
+//                }
+//                break;
+//            case REQUEST_AUTHORIZATION:
+//                if (resultCode == RESULT_OK) {
+//                    getResultsFromApi(date);
+//                }
+//                break;
+//        }
+//    }
 
     /**
      * Respond to requests for permissions at runtime for API 23 and above.
@@ -323,7 +327,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
         @Override
         protected List<String> doInBackground(String... params) {
             try {
-                List<String> result = getDataFromApi(params);
+                List<String> result = getDataFromApi(params[0]);
                 return result;
 //                return getDataFromApi();
             } catch (Exception e) {
@@ -339,7 +343,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
          * @throws IOException
          */
         // where all the data comes from, try to put these in an SQLite database?
-        private List<String> getDataFromApi(String... params) throws IOException {
+        private List<String> getDataFromApi(String date) throws IOException {
             // List the next 10 events from the primary calendar.
             DateTime now = new DateTime(System.currentTimeMillis());
             List<String> eventStrings = new ArrayList<String>();
@@ -360,25 +364,26 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 // get the date
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 Date original = new Date(event.getStart().getDateTime().getValue());
-                String date = dateFormat.format(original);
+                String dateStart = dateFormat.format(original);
 
                 // get the time
                 SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-                String time = timeFormat.format(original);
+                String timeStart = timeFormat.format(original);
 
-                // get the duration
-                DateTime start = event.getStart().getDateTime();
-                String everything = String.valueOf(start);
-                String duration = everything.substring(everything.lastIndexOf("+") + 1);
+                // get the end date
+                Date originalEnd = new Date(event.getEnd().getDateTime().getValue());
+                String dateEnd = dateFormat.format(originalEnd);
+                String timeEnd = timeFormat.format(originalEnd);
 
                 // date to compare with
-                String dateCompare = params[0];
+                String dateCompare = date;
 
-                Log.d(String.valueOf(date), "datum2");
+                Log.d(String.valueOf(dateStart), "datum2");
                 Log.d(String.valueOf(dateCompare), "datum5");
 
-                if (date.equals(dateCompare)) {
-                    eventStrings.add(String.format("%s OM %s OP %s for %s hours", event.getSummary(), time, date, duration));
+                if (dateStart.equals(dateCompare)) {
+                    eventStrings.add(String.format("%s - %s %s", timeStart, timeEnd, event.getSummary()));
+//                    eventStrings.add(String.format("%s OM %s OP %s for %s hours", event.getSummary(), time, date, duration));
                 }
             }
             return eventStrings;
@@ -400,7 +405,6 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 // so this is where the data from above will be printed on the screen
                 // have to find a way to send this information to an xml file
                 // to update the information on the screen / to update the information of a specific day
-                output.add(0, "Data retrieved using the Google Calendar API:");
                 mOutputText.setText(TextUtils.join("\n", output));
             }
 
