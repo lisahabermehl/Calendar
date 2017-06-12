@@ -79,7 +79,7 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 * show Google Calendar's data in a nice overview
 
 ### Process
-* 
+* just found out that it's also possible to get an URL based on what information you need from Google Calendar. [This website](https://developers.google.com/apis-explorer/#s/calendar/v3/) looks super handy, but I'm not sure if I should spend more time on exploring this other option. Maybe later
 
 ### Important decisions
 * 
