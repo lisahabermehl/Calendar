@@ -45,12 +45,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.sql.Array;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,7 +70,6 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
 
-    private static final String BUTTON_TEXT = "Call Google Calendar API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String[] SCOPES = { CalendarScopes.CALENDAR_READONLY };
 
@@ -81,31 +80,12 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        // make a linear layout, could be done in an xml file
-//        LinearLayout activityLayout = new LinearLayout(this);
-//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-//                LinearLayout.LayoutParams.MATCH_PARENT,
-//                LinearLayout.LayoutParams.MATCH_PARENT);
-//        activityLayout.setLayoutParams(lp);
-//        activityLayout.setOrientation(LinearLayout.VERTICAL);
-//        activityLayout.setPadding(16, 16, 16, 16);
-
-        // ADDED
         setContentView(R.layout.google_calendar_test);
-
-        // ADDED
         mOutputText = (TextView) findViewById(R.id.mOutputText);
 
-        // a separate xml file? just like with the todo_list and todo_items
-        ViewGroup.LayoutParams tlp = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-
+        // let user know that app is fetching data
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("Calling Google Calendar API ...");
-
-//        setContentView(activityLayout);
 
         // Initialize credentials and service object.
         mCredential = GoogleAccountCredential.usingOAuth2(
@@ -133,7 +113,9 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
         } else if (! isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
         } else {
-            new MakeRequestTask(mCredential).execute();
+            // execute the AsyncTask and give date
+            String date = "21/06/2017";
+            new MakeRequestTask(mCredential).execute(date);
         }
     }
 
@@ -321,7 +303,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
      * Placing the API calls in their own task ensures the UI stays responsive.
      */
     // zelfde als GetData AsyncTask in mijn problem set 6
-    private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
+    private class MakeRequestTask extends AsyncTask<String, Void, List<String>> {
         private com.google.api.services.calendar.Calendar mService = null;
         private Exception mLastError = null;
 
@@ -339,9 +321,11 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
          * @param params no parameters needed for this task.
          */
         @Override
-        protected List<String> doInBackground(Void... params) {
+        protected List<String> doInBackground(String... params) {
             try {
-                return getDataFromApi();
+                List<String> result = getDataFromApi(params);
+                return result;
+//                return getDataFromApi();
             } catch (Exception e) {
                 mLastError = e;
                 cancel(true);
@@ -355,7 +339,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
          * @throws IOException
          */
         // where all the data comes from, try to put these in an SQLite database?
-        private List<String> getDataFromApi() throws IOException {
+        private List<String> getDataFromApi(String... params) throws IOException {
             // List the next 10 events from the primary calendar.
             DateTime now = new DateTime(System.currentTimeMillis());
             List<String> eventStrings = new ArrayList<String>();
@@ -367,6 +351,8 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                     .execute();
             // list with all the events
             List<Event> items = events.getItems();
+
+
 
             // gonna try to get a specific date here
             for (Event event : items) {
@@ -386,7 +372,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 String duration = everything.substring(everything.lastIndexOf("+") + 1);
 
                 // date to compare with
-                String dateCompare = "21/06/2017";
+                String dateCompare = params[0];
 
                 Log.d(String.valueOf(date), "datum2");
                 Log.d(String.valueOf(dateCompare), "datum5");
@@ -396,19 +382,6 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 }
             }
             return eventStrings;
-
-//            for (Event event : items) {
-//                DateTime start = event.getStart().getDateTime();
-//                if (start == null) {
-//                    // All-day events don't have start times, so just use
-//                    // the start date.
-//                    start = event.getStart().getDate();
-//                }
-//                eventStrings.add(
-//                        String.format("%s (%s)", event.getSummary(), start));
-//                Log.d(String.valueOf(created), "START");
-//            }
-//            return eventStrings;
         }
 
         @Override

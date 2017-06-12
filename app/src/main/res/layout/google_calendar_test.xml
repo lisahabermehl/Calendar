@@ -8,7 +8,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Call Google Calendar"
+        android:text="Call Google Calendar API"
         android:onClick="onGoogleCalendarClick"/>
 
     <TextView
