@@ -58,7 +58,7 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 **opgelost** door - androidTestCompile 'com.android.support:support-annotations:25.3.1' - toe te voegen in de gradle (app module) om zo te forcen dat de laatste versie van libraries worden gebruikt
 * in de voorbeeldcode van GoogleCalendar worden de resultaten in een List<> teruggestuurd, even kijken hoe dit verwerkt kan worden in de Calendar die ik nu heb
 ### Think, think
-* If you're Todo's are nicely implemented into your Calendar, but then you plan a spontaneous dinner on Saturday which will adjust the whole what Todo and when, but will also result in not finishing something of your Todo list before the deadline you've set: problem or..? Also, if you implement a Todo with a deadline, but there is no way that this Todo will be done in time, do you: ask the user for a new deadline, give suggestions on what activities should be cancelled in order to finish in time, or..?
+* If your Todo's are nicely implemented into your Calendar, but then you plan a spontaneous dinner on Saturday which will adjust the whole what Todo and when, but will also result in not finishing something of your Todo list before the deadline you've set: problem or..? Also, if you implement a Todo with a deadline, but there is no way that this Todo will be done in time, do you: ask the user for a new deadline, give suggestions on what activities should be cancelled in order to finish in time, or..?
 ### Important decisions
 * Buttons and such won't be made in .java but in .xml
 
@@ -73,3 +73,14 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 
 ### Important decisions
 * 
+
+# day 7
+### TODO
+* show Google Calendar's data in a nice overview
+
+### Process
+* 
+
+### Important decisions
+* 
+
