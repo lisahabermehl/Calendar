@@ -37,6 +37,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -356,8 +357,6 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
             // list with all the events
             List<Event> items = events.getItems();
 
-
-
             // gonna try to get a specific date here
             for (Event event : items) {
 
@@ -382,7 +381,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 Log.d(String.valueOf(dateCompare), "datum5");
 
                 if (dateStart.equals(dateCompare)) {
-                    eventStrings.add(String.format("%s - %s %s", timeStart, timeEnd, event.getSummary()));
+                    eventStrings.add(String.format("%s - %s \n%s", timeStart, timeEnd, event.getSummary()));
 //                    eventStrings.add(String.format("%s OM %s OP %s for %s hours", event.getSummary(), time, date, duration));
                 }
             }
@@ -407,7 +406,6 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 // to update the information on the screen / to update the information of a specific day
                 mOutputText.setText(TextUtils.join("\n", output));
             }
-
         }
 
         @Override
