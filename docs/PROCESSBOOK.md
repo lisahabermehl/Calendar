@@ -74,6 +74,11 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 ### Important decisions
 * 
 
+# Focus for this week
+* make Todo list
+* make sure that items of Todo list will be visible in MyCalendar
+* make some restrictions to plan this (e.g. only between 08:00 and 22:00)
+
 # day 7
 ### TODO
 * show Google Calendar's data in a nice overview
@@ -83,11 +88,11 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 * Adjusted the way Google Calendar API's output looks in the app, still basic but will fix that later
 
 ### Important decisions
-* Gonna try to link the Todo list with the Calendar this week, layout will be something for next week
+* gonna try to link the Todo list with the Calendar this week, layout will be something for next week
 
 # day 8
 ### TODO
-* Make Todo list ready to link with MyCalendar
+* make Todo list ready to link with MyCalendar
 
 ### Process
 * "An OAuth2 client already exists for this package name and SHA-1 in another project. You can omit the SHA-1 for now and read more about this situation and how to resolve it." >>> "Authentication: To use Google as an auth provider, you must manually whitelist the client ID from your existing project in the Sign-In configuration." **Problem? Or just don't add SHA-1 to Firebase project?**
