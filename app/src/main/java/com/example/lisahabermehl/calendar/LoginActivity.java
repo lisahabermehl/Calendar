@@ -1,10 +1,11 @@
 package com.example.lisahabermehl.calendar;
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+/**
+ * Everything that has to do with/is need to log a user in.
+ */
+
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+import android.support.v7.app.AppCompatActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -12,11 +13,5 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
     }
-
-    public void onLoginClick(View view) {
-        startActivity(new Intent(this, MainActivity.class));
-    }
-
 }

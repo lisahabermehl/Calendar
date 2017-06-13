@@ -32,10 +32,9 @@
         />
 
     <ListView
-        android:id="@+id/todo_list"
+        android:id="@+id/list_todo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/activity_horizontal_margin"
         />
 
 </LinearLayout>
