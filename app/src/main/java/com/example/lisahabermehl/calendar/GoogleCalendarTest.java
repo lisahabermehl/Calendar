@@ -61,6 +61,11 @@ import java.util.regex.Pattern;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
+/**
+ * I used the following sample code to make this work:
+ * https://developers.google.com/google-apps/calendar/quickstart/android
+ */
+
 public class GoogleCalendarTest extends Activity implements EasyPermissions.PermissionCallbacks {
     GoogleAccountCredential mCredential;
     TextView mOutputText;
