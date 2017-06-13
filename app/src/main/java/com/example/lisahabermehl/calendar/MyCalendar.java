@@ -10,15 +10,11 @@ package com.example.lisahabermehl.calendar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.CalendarView;
-import android.widget.TextView;
-
 
 public class MyCalendar extends AppCompatActivity {
 
     CalendarView calendarView;
-//    TextView dateDisplay;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
