@@ -81,21 +81,21 @@ public class Todo extends AppCompatActivity {
 
                 String colors[] = {"Red","Blue","White","Yellow","Black", "Green","Purple","Orange","Grey"};
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                    .setTitle("NEW TODO");
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//                    .setTitle("New To do");
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                        android.R.layout.simple_spinner_item, colors);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
                 LayoutInflater layoutInflater = LayoutInflater.from(this);
                 final View dialogView = layoutInflater.inflate(R.layout.alert_dialog, null);
-                final EditText input = (EditText) dialogView
-                        .findViewById(R.id.txtConnectedBy);
-
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, colors);
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-                final Spinner spinnercategory = (Spinner) dialogView
-                        .findViewById(R.id.viewSpin);
-                spinnercategory.setAdapter(adapter);
-                spinnercategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                final EditText description = (EditText) dialogView
+                        .findViewById(R.id.new_todo);
+                final Spinner spinner = (Spinner) dialogView
+                        .findViewById(R.id.category);
+                spinner.setAdapter(adapter);
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> arg0, View arg1,
                                                int arg2, long arg3) {
@@ -126,21 +126,6 @@ public class Todo extends AppCompatActivity {
         }
     }
 
-
-//                spinnercategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener());
-
-//                // Array of choices
-//                String colors[] = {"Red","Blue","White","Yellow","Black", "Green","Purple","Orange","Grey"};
-//
-//                // Application of the Array to the Spinner
-//                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this,
-//                        android.R.layout.simple_spinner_item, colors);
-//                spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);// The drop down view
-//
-//                final Spinner sp = new Spinner(this);
-////                sp.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
-//                sp.setAdapter(spinnerArrayAdapter);
-//
 //                final EditText description = new EditText(this);
 //                description.setHint("Description");
 //

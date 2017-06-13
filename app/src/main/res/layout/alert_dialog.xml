@@ -6,16 +6,25 @@
     android:paddingLeft="10dip" >
 
     <EditText
-        android:id="@+id/txtConnectedBy"
-        android:layout_width="76dp"
+        android:id="@+id/new_todo"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="number" >
+        android:textSize="16dp"
+        android:hint="What TODO?"
+        android:textColorHint="@color/common_google_signin_btn_text_light">
     </EditText>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:textStyle="bold"
+        android:text="How much time do you need?"/>
+
     <Spinner
-        android:id="@+id/viewSpin"
+        android:id="@+id/category"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:paddingTop="5dp"/>
 
 </LinearLayout>
