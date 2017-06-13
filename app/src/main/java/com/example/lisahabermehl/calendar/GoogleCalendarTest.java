@@ -91,16 +91,14 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
 
         // let user know that app is fetching data
         mProgress = new ProgressDialog(this);
-        mProgress.setMessage("Calling Google Calendar API ...");
+        mProgress.setMessage("Un momento ...");
 
         // Initialize credentials and service object.
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
 
-        String date = getIntent().getExtras().getString("callingActivity");
-        Log.d("DATE: ", date);
-
+        String date = getIntent().getExtras().getString("date");
         getResultsFromApi(date);
     }
 
@@ -120,9 +118,6 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
             mOutputText.setText("No network connection available.");
         } else {
             // execute the AsyncTask and give date
-            String date2 = date;
-            Log.d("STRINGS[0]", date2);
-//            String date = "21/06/2017";
             new MakeRequestTask(mCredential).execute(date);
         }
     }
@@ -161,56 +156,6 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                     Manifest.permission.GET_ACCOUNTS);
         }
     }
-
-//    /**
-//     * Called when an activity launched here (specifically, AccountPicker
-//     * and authorization) exits, giving you the requestCode you started it with,
-//     * the resultCode it returned, and any additional data from it.
-//     * @param requestCode code indicating which activity result is incoming.
-//     * @param resultCode code indicating the result of the incoming
-//     *     activity result.
-//     * @param data Intent (containing result data) returned by incoming
-//     *     activity result.
-//     */
-//    @Override
-//    protected void onActivityResult(
-//            int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        // GOTTA CHANGE THIS STILL, just a check
-//        String date = "22/06/2017";
-//        switch(requestCode) {
-//            case REQUEST_GOOGLE_PLAY_SERVICES:
-//                if (resultCode != RESULT_OK) {
-//                    mOutputText.setText(
-//                            "This app requires Google Play Services. Please install " +
-//                                    "Google Play Services on your device and relaunch this app.");
-//                } else {
-//                    getResultsFromApi(date);
-//                }
-//                break;
-//            case REQUEST_ACCOUNT_PICKER:
-//                if (resultCode == RESULT_OK && data != null &&
-//                        data.getExtras() != null) {
-//                    String accountName =
-//                            data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-//                    if (accountName != null) {
-//                        SharedPreferences settings =
-//                                getPreferences(Context.MODE_PRIVATE);
-//                        SharedPreferences.Editor editor = settings.edit();
-//                        editor.putString(PREF_ACCOUNT_NAME, accountName);
-//                        editor.apply();
-//                        mCredential.setSelectedAccountName(accountName);
-//                        getResultsFromApi(date);
-//                    }
-//                }
-//                break;
-//            case REQUEST_AUTHORIZATION:
-//                if (resultCode == RESULT_OK) {
-//                    getResultsFromApi(date);
-//                }
-//                break;
-//        }
-//    }
 
     /**
      * Respond to requests for permissions at runtime for API 23 and above.
@@ -312,7 +257,6 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
      * An asynchronous task that handles the Google Calendar API call.
      * Placing the API calls in their own task ensures the UI stays responsive.
      */
-    // zelfde als GetData AsyncTask in mijn problem set 6
     private class MakeRequestTask extends AsyncTask<String, Void, List<String>> {
         private com.google.api.services.calendar.Calendar mService = null;
         private Exception mLastError = null;
@@ -387,7 +331,6 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
 
                 if (dateStart.equals(dateCompare)) {
                     eventStrings.add(String.format("%s - %s \n%s", timeStart, timeEnd, event.getSummary()));
-//                    eventStrings.add(String.format("%s OM %s OP %s for %s hours", event.getSummary(), time, date, duration));
                 }
             }
             return eventStrings;

@@ -18,7 +18,7 @@ import android.widget.TextView;
 public class MyCalendar extends AppCompatActivity {
 
     CalendarView calendarView;
-    TextView dateDisplay;
+//    TextView dateDisplay;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -26,14 +26,9 @@ public class MyCalendar extends AppCompatActivity {
         setContentView(R.layout.simple_calendar);
 
         calendarView = (CalendarView) findViewById(R.id.calendarView);
-        dateDisplay = (TextView) findViewById(R.id.date_display);
-        dateDisplay.setText("Date: ");
-
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(CalendarView calendarView, int i, int i1, int i2) {
-                dateDisplay.setText("Date: " + i2 + " / " + i1 + " / " + i);
-
                 // make a string of the day
                 String day = Integer.toString(i2);
                 // extra check just to make sure that date will be send correctly to GoogleCalendar
@@ -50,14 +45,11 @@ public class MyCalendar extends AppCompatActivity {
                 String year = Integer.toString(i);
                 String date = day + "/" + month + "/" + year;
 
-
-                // go to a listview with all the things that have to be done on that
-                // startActivity and send data
+                // startActivity to show activities on a specific day
                 Intent newActivity = new Intent(getApplicationContext(), GoogleCalendarTest.class);
                 Bundle extras = new Bundle();
 
-                extras.putString("callingActivity", date);
-                Log.d(String.valueOf(date), "THIS");
+                extras.putString("date", date);
                 newActivity.putExtras(extras);
                 startActivity(newActivity);
             }

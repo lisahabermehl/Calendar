@@ -18,14 +18,6 @@ public class Settings extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         settings = (TextView) findViewById(R.id.settings);
-
-        Bundle extras = getIntent().getExtras();
-        String previousActivity = extras.getString("callingActivity");
-        Log.d(String.valueOf(previousActivity), "THIS2");
-
-        settings.setText(previousActivity);
-
-
     }
 }
 
