@@ -1,3 +1,5 @@
+[![BCH compliance](https://bettercodehub.com/edge/badge/lisahabermehl/Calendar?branch=master)](https://bettercodehub.com/)
+
 ## Project proposal
 
 ### Goal
