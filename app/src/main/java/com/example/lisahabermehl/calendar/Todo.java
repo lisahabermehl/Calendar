@@ -10,15 +10,19 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -74,30 +78,112 @@ public class Todo extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_add_task:
-                final EditText taskEditText = new EditText(this);
-                AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Add a new task").setView(taskEditText).setPositiveButton("ADD", new DialogInterface.OnClickListener(){
+
+                String colors[] = {"Red","Blue","White","Yellow","Black", "Green","Purple","Orange","Grey"};
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                    .setTitle("NEW TODO");
+
+                LayoutInflater layoutInflater = LayoutInflater.from(this);
+                final View dialogView = layoutInflater.inflate(R.layout.alert_dialog, null);
+                final EditText input = (EditText) dialogView
+                        .findViewById(R.id.txtConnectedBy);
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, colors);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                final Spinner spinnercategory = (Spinner) dialogView
+                        .findViewById(R.id.viewSpin);
+                spinnercategory.setAdapter(adapter);
+                spinnercategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which){
-                        String task = String.valueOf(taskEditText.getText());
-//                        taskEditText.getText().clear();
-                        SQLiteDatabase db = mHelper.getWritableDatabase();
-                        ContentValues values = new ContentValues();
-                        values.put(TaskContract.TaskEntry.COL_TASK_TITLE, task);
-                        db.insertWithOnConflict(TaskContract.TaskEntry.TABLE,
-                                null,
-                                values,
-                                SQLiteDatabase.CONFLICT_REPLACE);
-                        db.close();
-                        updateUI();
+                    public void onItemSelected(AdapterView<?> arg0, View arg1,
+                                               int arg2, long arg3) {
+
                     }
-                })
-                        .setNegativeButton("CANCEL", null).create();
-                dialog.show();
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> arg0) {
+
+                    }
+                });
+
+                builder
+                        .setView(dialogView)
+                        .setPositiveButton("ADD",
+                        new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface dialog, int id) {
+
+                            }
+                        })
+                        .setNegativeButton("CANCEL", null)
+                        .create()
+                        .show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
+//                spinnercategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener());
+
+//                // Array of choices
+//                String colors[] = {"Red","Blue","White","Yellow","Black", "Green","Purple","Orange","Grey"};
+//
+//                // Application of the Array to the Spinner
+//                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this,
+//                        android.R.layout.simple_spinner_item, colors);
+//                spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);// The drop down view
+//
+//                final Spinner sp = new Spinner(this);
+////                sp.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
+//                sp.setAdapter(spinnerArrayAdapter);
+//
+//                final EditText description = new EditText(this);
+//                description.setHint("Description");
+//
+//                final AlertDialog.Builder builder = new AlertDialog.Builder(this)
+//                        .setTitle("New TODO")
+//                        .setView(description)
+//                        .setView(sp)
+//                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//
+//                    }
+//                });
+//                builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        dialogInterface.cancel();
+//                    }
+//                });
+//                builder.show();
+
+//                final EditText taskEditText = new EditText(this);
+//                AlertDialog dialog = new AlertDialog.Builder(this)
+//                        .setTitle("Add a new task")
+//                        .setView(taskEditText)
+//                        .setPositiveButton("ADD", new DialogInterface.OnClickListener(){
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which){
+//                        String task = String.valueOf(taskEditText.getText());
+//                        SQLiteDatabase db = mHelper.getWritableDatabase();
+//                        ContentValues values = new ContentValues();
+//                        values.put(TaskContract.TaskEntry.COL_TASK_TITLE, task);
+//                        db.insertWithOnConflict(TaskContract.TaskEntry.TABLE,
+//                                null,
+//                                values,
+//                                SQLiteDatabase.CONFLICT_REPLACE);
+//                        db.close();
+//                        updateUI();
+//                    }
+//                })
+//                        .setNegativeButton("CANCEL", null).create();
+//                dialog.show();
+
 
     // move the code that was logging the tasks into the following method
     // instead of logging the tasks we will add m into an arraylist of strings
