@@ -80,7 +80,17 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 
 ### Process
 * just found out that it's also possible to get an URL based on what information you need from Google Calendar. [This website](https://developers.google.com/apis-explorer/#s/calendar/v3/) looks super handy, but I'm not sure if I should spend more time on exploring this other option. Maybe later
+* Adjusted the way Google Calendar API's output looks in the app, still basic but will fix that later
+
+### Important decisions
+* Gonna try to link the Todo list with the Calendar this week, layout will be something for next week
+
+# day 8
+### TODO
+* Make Todo list ready to link with MyCalendar
+
+### Process
+* "An OAuth2 client already exists for this package name and SHA-1 in another project. You can omit the SHA-1 for now and read more about this situation and how to resolve it." >>> "Authentication: To use Google as an auth provider, you must manually whitelist the client ID from your existing project in the Sign-In configuration." **Problem? Or just don't add SHA-1 to Firebase project?**
 
 ### Important decisions
 * 
-
