@@ -3,6 +3,7 @@ package com.example.lisahabermehl.calendar;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +27,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.sql.Array;
 import java.util.ArrayList;
 
 /**
@@ -41,9 +43,12 @@ public class Todo extends AppCompatActivity {
 
     // this arrayadapter will help populate the listview with data
     private ArrayAdapter<String> mAdapter;
+
     // add an instance of the ListView
     private ListView mTaskListView;
 //    private EditText taskEditText;
+
+    public String duration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,14 +84,11 @@ public class Todo extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_add_task:
 
-                String colors[] = {"Red","Blue","White","Yellow","Black", "Green","Purple","Orange","Grey"};
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//                    .setTitle("New To do");
-
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                        android.R.layout.simple_spinner_item, colors);
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//                String colors[] = {"Red","Blue","White","Yellow","Black", "Green","Purple","Orange","Grey"};
+//
+//                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+//                        android.R.layout.simple_spinner_item, colors);
+//                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
                 LayoutInflater layoutInflater = LayoutInflater.from(this);
                 final View dialogView = layoutInflater.inflate(R.layout.alert_dialog, null);
@@ -94,12 +96,25 @@ public class Todo extends AppCompatActivity {
                         .findViewById(R.id.new_todo);
                 final Spinner spinner = (Spinner) dialogView
                         .findViewById(R.id.category);
+
+                ArrayList<String> categories = new ArrayList<String>();
+                categories.add("Red");
+                categories.add("Blue");
+                categories.add("White");
+//
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                        android.R.layout.simple_spinner_dropdown_item, categories);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
                 spinner.setAdapter(adapter);
                 spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
-                    public void onItemSelected(AdapterView<?> arg0, View arg1,
-                                               int arg2, long arg3) {
-
+                    public void onItemSelected(AdapterView<?> parent, View view,
+                                               int pos, long id) {
+                        Toast.makeText(parent.getContext(),
+                                "OnItemSelectedListener : " + parent.getItemAtPosition(pos).toString(),
+                                Toast.LENGTH_LONG).show();
+                        duration = spinner.getItemAtPosition(pos).toString();
                     }
 
                     @Override
@@ -108,16 +123,34 @@ public class Todo extends AppCompatActivity {
                     }
                 });
 
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//                    .setTitle("New To do");
                 builder
                         .setView(dialogView)
                         .setPositiveButton("ADD",
                         new DialogInterface.OnClickListener() {
 
                             public void onClick(DialogInterface dialog, int id) {
+                                String task = String.valueOf(description.getText());
 
+                                SQLiteDatabase db = mHelper.getWritableDatabase();
+
+                                ContentValues values = new ContentValues();
+                                values.put(TaskContract.TaskEntry.COL_TASK_TITLE, task);
+                                db.insertWithOnConflict(TaskContract.TaskEntry.TABLE,
+                                        null,
+                                        values,
+                                        SQLiteDatabase.CONFLICT_REPLACE);
+                                db.close();
+                                updateUI();
                             }
                         })
-                        .setNegativeButton("CANCEL", null)
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        })
                         .create()
                         .show();
                 return true;
@@ -126,48 +159,7 @@ public class Todo extends AppCompatActivity {
         }
     }
 
-//                final EditText description = new EditText(this);
-//                description.setHint("Description");
-//
-//                final AlertDialog.Builder builder = new AlertDialog.Builder(this)
-//                        .setTitle("New TODO")
-//                        .setView(description)
-//                        .setView(sp)
-//                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//
-//                    }
-//                });
-//                builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        dialogInterface.cancel();
-//                    }
-//                });
-//                builder.show();
 
-//                final EditText taskEditText = new EditText(this);
-//                AlertDialog dialog = new AlertDialog.Builder(this)
-//                        .setTitle("Add a new task")
-//                        .setView(taskEditText)
-//                        .setPositiveButton("ADD", new DialogInterface.OnClickListener(){
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which){
-//                        String task = String.valueOf(taskEditText.getText());
-//                        SQLiteDatabase db = mHelper.getWritableDatabase();
-//                        ContentValues values = new ContentValues();
-//                        values.put(TaskContract.TaskEntry.COL_TASK_TITLE, task);
-//                        db.insertWithOnConflict(TaskContract.TaskEntry.TABLE,
-//                                null,
-//                                values,
-//                                SQLiteDatabase.CONFLICT_REPLACE);
-//                        db.close();
-//                        updateUI();
-//                    }
-//                })
-//                        .setNegativeButton("CANCEL", null).create();
-//                dialog.show();
 
 
     // move the code that was logging the tasks into the following method
@@ -179,14 +171,34 @@ public class Todo extends AppCompatActivity {
     // so we add it in two places: onCreate() and after adding a new task using the AlertDialog
     private void updateUI() {
         final ArrayList<String> taskList = new ArrayList<>();
+
         SQLiteDatabase db = mHelper.getReadableDatabase();
+
         Cursor cursor = db.query(TaskContract.TaskEntry.TABLE,
-                new String[]{TaskContract.TaskEntry._ID, TaskContract.TaskEntry.COL_TASK_TITLE},
+                new String[]{TaskContract.TaskEntry._ID,
+                        TaskContract.TaskEntry.COL_TASK_TITLE},
                 null, null, null, null, null);
         while (cursor.moveToNext()) {
             int idx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
             taskList.add(cursor.getString(idx));
         }
+
+////        ArrayList<CustomObject> objects = new ArrayList<CustomObject>();
+////        CustomAdapter customAdapter = new CustomAdapter(this, objects);
+////        listView.setAdapter(customAdapter);
+//
+//        if (mAdapter == null) {
+//            mAdapter = new ArrayList<TaskObject>();
+//            TaskAdapter taskAdapter = new TaskAdapter(this, taskList);
+//            mTaskListView.setAdapter(mAdapter);
+//
+////            taskAdapter.notifyDataSetChanged();
+//        }
+//        else {
+//            mAdapter.clear();
+//            mAdapter.addAll(taskList);
+//            mAdapter.notifyDataSetChanged();
+//        }
 
         if (mAdapter == null) {
             mAdapter = new ArrayAdapter<>(this,
@@ -199,8 +211,6 @@ public class Todo extends AppCompatActivity {
             mAdapter.addAll(taskList);
             mAdapter.notifyDataSetChanged();
         }
-
-
 
         cursor.close();
         db.close();
