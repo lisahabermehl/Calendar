@@ -45,6 +45,7 @@ public class Todo extends AppCompatActivity {
 
     // this arrayadapter will help populate the listview with data
     private ArrayAdapter<String> mAdapter;
+    private TaskAdapter taskAdapter;
 
     // add an instance of the ListView
     private ListView mTaskListView;
@@ -62,10 +63,10 @@ public class Todo extends AppCompatActivity {
         // initialize the reference by adding:
         mTaskListView = (ListView) findViewById(R.id.list_todo);
         mTaskListView.setLongClickable(true);
-        mTaskListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+        mTaskListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view,
-                                           int position, long id){
+                                           int position, long id) {
                 deleteTask(view);
                 return true;
             }
@@ -125,25 +126,25 @@ public class Todo extends AppCompatActivity {
                 builder
                         .setView(dialogView)
                         .setPositiveButton("ADD",
-                        new DialogInterface.OnClickListener() {
+                                new DialogInterface.OnClickListener() {
 
-                            public void onClick(DialogInterface dialog, int id) {
-                                String task = String.valueOf(description.getText());
-                                String time = String.valueOf(duration.getText());
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        String task = String.valueOf(description.getText());
+                                        String time = String.valueOf(duration.getText());
 
-                                SQLiteDatabase db = mHelper.getWritableDatabase();
+                                        SQLiteDatabase db = mHelper.getWritableDatabase();
 
-                                ContentValues values = new ContentValues();
-                                values.put(TaskContract.TaskEntry.COL_TASK_TITLE, task);
-                                values.put(TaskContract.TaskEntry.COL_TASK_DURATION, time);
-                                db.insertWithOnConflict(TaskContract.TaskEntry.TABLE,
-                                        null,
-                                        values,
-                                        SQLiteDatabase.CONFLICT_REPLACE);
-                                db.close();
-                                updateUI();
-                            }
-                        })
+                                        ContentValues values = new ContentValues();
+                                        values.put(TaskContract.TaskEntry.COL_TASK_TITLE, task);
+                                        values.put(TaskContract.TaskEntry.COL_TASK_DURATION, time);
+                                        db.insertWithOnConflict(TaskContract.TaskEntry.TABLE,
+                                                null,
+                                                values,
+                                                SQLiteDatabase.CONFLICT_REPLACE);
+                                        db.close();
+                                        updateUI();
+                                    }
+                                })
                         .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -157,9 +158,6 @@ public class Todo extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-
-
 
     // move the code that was logging the tasks into the following method
     // instead of logging the tasks we will add m into an arraylist of strings
@@ -175,53 +173,28 @@ public class Todo extends AppCompatActivity {
                         TaskContract.TaskEntry.COL_TASK_TITLE,
                         TaskContract.TaskEntry.COL_TASK_DURATION},
                 null, null, null, null, null);
+
+        ArrayList<TaskObject> taskObject = new ArrayList<>();
+
         while (cursor.moveToNext()) {
-
+            int idx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
+            int idxx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_DURATION);
+            TaskObject to = new TaskObject(cursor.getString(idx), cursor.getString(idxx));
+            taskObject.add(to);
         }
-        
-        final TaskObject taskObject[] = new TaskObject[]{};
-                while (cursor.moveToNext()) {
-                    int idx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
-                    int idxx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_DURATION);
-                    new TaskObject(cursor.getString(idx), cursor.getString(idxx));
-                }
 
+        ListView listView = (ListView) findViewById(R.id.list_todo);
 
-
-//        final ArrayList<String> taskList = new ArrayList<>();
-//
-//        SQLiteDatabase db = mHelper.getReadableDatabase();
-//
-//        Cursor cursor = db.query(TaskContract.TaskEntry.TABLE,
-//                new String[]{TaskContract.TaskEntry._ID,
-//                        TaskContract.TaskEntry.COL_TASK_TITLE,
-//                        TaskContract.TaskEntry.COL_TASK_DURATION},
-//                null, null, null, null, null);
-//        while (cursor.moveToNext()) {
-//            int idx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
-//            taskList.add(cursor.getString(idx));
-//        }
-
-//        ArrayList<CustomObject> objects = new ArrayList<CustomObject>();
-//        CustomAdapter customAdapter = new CustomAdapter(this, objects);
-//        listView.setAdapter(customAdapter);
-
-//        if (mAdapter == null) {
-//
-//            TaskAdapter taskAdapter = new TaskAdapter(this, R.layout.todo_item, taskList);
-//
-//            mAdapter = new ArrayList<TaskObject>();
-//            TaskAdapter taskAdapter = new TaskAdapter(this, taskList);
-//            mTaskListView.setAdapter(mAdapter);
-//
-////            taskAdapter.notifyDataSetChanged();
-//        }
-//        else {
-//            mAdapter.clear();
-//            mAdapter.addAll(taskList);
-//            mAdapter.notifyDataSetChanged();
-//        }
-
+        if (taskAdapter == null) {
+            taskAdapter = new TaskAdapter(this, 3, taskObject);
+            mTaskListView.setAdapter(taskAdapter);
+        } else {
+            taskAdapter.clear();
+            taskAdapter.addAll(taskObject);
+            taskAdapter.notifyDataSetChanged();
+        }
+        cursor.close();
+        db.close();
 
 //        if (mAdapter == null) {
 //            mAdapter = new ArrayAdapter<>(this,
@@ -238,7 +211,7 @@ public class Todo extends AppCompatActivity {
 //        cursor.close();
 //        db.close();
     }
-}
+
 
     public void deleteTask(View view) {
         View parent = (View) view.getParent();

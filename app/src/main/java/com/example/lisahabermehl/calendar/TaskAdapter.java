@@ -12,16 +12,16 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 /**
- * Created by lisahabermehl on 14/06/2017.
+ * https://www.sitepoint.com/custom-data-layouts-with-your-own-android-arrayadapter/
  */
 
 public class TaskAdapter extends ArrayAdapter<TaskObject> {
 
     Context context;
     int layoutResourceId;
-    TaskObject data[] = null;
+    ArrayList<TaskObject> data = null;
 
-    public TaskAdapter(Context context, int layoutResourceId, TaskObject[] data) {
+    public TaskAdapter(Context context, int layoutResourceId, ArrayList<TaskObject> data) {
         super(context, layoutResourceId, data);
         this.layoutResourceId = layoutResourceId;
         this.context = context;
@@ -30,36 +30,18 @@ public class TaskAdapter extends ArrayAdapter<TaskObject> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View row = convertView;
-        WeatherHolder holder = null;
+        TaskObject taskObject = data.get(position);
 
-        if(row == null)
-        {
-            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-            row = inflater.inflate(layoutResourceId, parent, false);
+        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+        View view = layoutInflater.inflate(R.layout.todo_item, null);
 
-            holder = new WeatherHolder();
-            holder.imgIcon = (TextView)row.findViewById(R.id.task_title);
-            holder.txtTitle = (TextView)row.findViewById(R.id.task_duration);
+        TextView description = (TextView) view.findViewById(R.id.task_title);
+        TextView duration = (TextView) view.findViewById(R.id.task_duration);
 
-            row.setTag(holder);
-        }
-        else
-        {
-            holder = (WeatherHolder)row.getTag();
-        }
+        description.setText(taskObject.getTask());
+        duration.setText(taskObject.getDuration());
 
-        TaskObject weather = data[position];
-        holder.txtTitle.setText(weather.getTask());
-        holder.imgIcon.setText(weather.getDuration());
-
-        return row;
-    }
-
-    static class WeatherHolder
-    {
-        TextView imgIcon;
-        TextView txtTitle;
+        return view;
     }
 }
 
