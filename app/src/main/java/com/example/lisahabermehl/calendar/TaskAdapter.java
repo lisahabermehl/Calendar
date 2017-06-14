@@ -1,9 +1,11 @@
 package com.example.lisahabermehl.calendar;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
@@ -13,47 +15,51 @@ import java.util.ArrayList;
  * Created by lisahabermehl on 14/06/2017.
  */
 
-public class TaskAdapter extends BaseAdapter {
+public class TaskAdapter extends ArrayAdapter<TaskObject> {
 
-    private LayoutInflater layoutInflater;
-    private ArrayList<TaskObject> objects;
+    Context context;
+    int layoutResourceId;
+    TaskObject data[] = null;
 
-    private class ViewHolder {
-        TextView textView1;
-        TextView textView2;
+    public TaskAdapter(Context context, int layoutResourceId, TaskObject[] data) {
+        super(context, layoutResourceId, data);
+        this.layoutResourceId = layoutResourceId;
+        this.context = context;
+        this.data = data;
     }
 
-    public TaskAdapter(Context context, ArrayList<TaskObject> objects) {
-        layoutInflater = LayoutInflater.from(context);
-        this.objects = objects;
-    }
-
-    public int getCount() {
-        return objects.size();
-    }
-
-    public TaskObject getItem(int position) {
-        return objects.get(position);
-    }
-
-    public long getItemId(int position) {
-        return position;
-    }
-
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder = null;
-        if(convertView == null) {
-            holder = new ViewHolder();
-            convertView = layoutInflater.inflate(R.layout.todo_item, null);
-            holder.textView1 = (TextView) convertView.findViewById(R.id.task_title);
-            holder.textView2 = (TextView) convertView.findViewById(R.id.task_duration);
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
+        View row = convertView;
+        WeatherHolder holder = null;
+
+        if(row == null)
+        {
+            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
+            row = inflater.inflate(layoutResourceId, parent, false);
+
+            holder = new WeatherHolder();
+            holder.imgIcon = (TextView)row.findViewById(R.id.task_title);
+            holder.txtTitle = (TextView)row.findViewById(R.id.task_duration);
+
+            row.setTag(holder);
         }
-        holder.textView1.setText(objects.get(position).getDuration());
-        holder.textView2.setText(objects.get(position).getTask());
-        return convertView;
+        else
+        {
+            holder = (WeatherHolder)row.getTag();
+        }
+
+        TaskObject weather = data[position];
+        holder.txtTitle.setText(weather.getTask());
+        holder.imgIcon.setText(weather.getDuration());
+
+        return row;
+    }
+
+    static class WeatherHolder
+    {
+        TextView imgIcon;
+        TextView txtTitle;
     }
 }
 

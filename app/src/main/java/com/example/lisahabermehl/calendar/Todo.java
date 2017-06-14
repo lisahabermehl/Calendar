@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.BaseColumns;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import android.widget.Toast;
 
 import java.sql.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * https://www.sitepoint.com/starting-android-development-creating-todo-app/
@@ -84,47 +86,42 @@ public class Todo extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_add_task:
 
-//                String colors[] = {"Red","Blue","White","Yellow","Black", "Green","Purple","Orange","Grey"};
-//
-//                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-//                        android.R.layout.simple_spinner_item, colors);
-//                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
                 LayoutInflater layoutInflater = LayoutInflater.from(this);
+
                 final View dialogView = layoutInflater.inflate(R.layout.alert_dialog, null);
                 final EditText description = (EditText) dialogView
                         .findViewById(R.id.new_todo);
-                final Spinner spinner = (Spinner) dialogView
-                        .findViewById(R.id.category);
+                final EditText duration = (EditText) dialogView
+                        .findViewById(R.id.time_needed);
 
-                ArrayList<String> categories = new ArrayList<String>();
-                categories.add("Red");
-                categories.add("Blue");
-                categories.add("White");
+
+//                final Spinner spinner = (Spinner) dialogView
+//                        .findViewById(R.id.category);
+//                ArrayList<String> categories = new ArrayList<String>();
+//                categories.add("Article");
+//                categories.add("Book");
 //
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                        android.R.layout.simple_spinner_dropdown_item, categories);
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-                spinner.setAdapter(adapter);
-                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view,
-                                               int pos, long id) {
-                        Toast.makeText(parent.getContext(),
-                                "OnItemSelectedListener : " + parent.getItemAtPosition(pos).toString(),
-                                Toast.LENGTH_LONG).show();
-                        duration = spinner.getItemAtPosition(pos).toString();
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> arg0) {
-
-                    }
-                });
+//                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+//                        android.R.layout.simple_spinner_item, categories);
+//                adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+//                spinner.setAdapter(adapter);
+//                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//                    @Override
+//                    public void onItemSelected(AdapterView<?> parent, View view,
+//                                               int pos, long id) {
+//                        Toast.makeText(parent.getContext(),
+//                                "OnItemSelectedListener : " + parent.getItemAtPosition(pos).toString(),
+//                                Toast.LENGTH_LONG).show();
+//                        duration = spinner.getItemAtPosition(pos).toString();
+//                    }
+//
+//                    @Override
+//                    public void onNothingSelected(AdapterView<?> arg0) {
+//
+//                    }
+//                });
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//                    .setTitle("New To do");
                 builder
                         .setView(dialogView)
                         .setPositiveButton("ADD",
@@ -132,11 +129,13 @@ public class Todo extends AppCompatActivity {
 
                             public void onClick(DialogInterface dialog, int id) {
                                 String task = String.valueOf(description.getText());
+                                String time = String.valueOf(duration.getText());
 
                                 SQLiteDatabase db = mHelper.getWritableDatabase();
 
                                 ContentValues values = new ContentValues();
                                 values.put(TaskContract.TaskEntry.COL_TASK_TITLE, task);
+                                values.put(TaskContract.TaskEntry.COL_TASK_DURATION, time);
                                 db.insertWithOnConflict(TaskContract.TaskEntry.TABLE,
                                         null,
                                         values,
@@ -170,24 +169,47 @@ public class Todo extends AppCompatActivity {
     // to see the updated data you need to call the updateUI method every time the underlying data of the app changes
     // so we add it in two places: onCreate() and after adding a new task using the AlertDialog
     private void updateUI() {
-        final ArrayList<String> taskList = new ArrayList<>();
-
         SQLiteDatabase db = mHelper.getReadableDatabase();
-
         Cursor cursor = db.query(TaskContract.TaskEntry.TABLE,
                 new String[]{TaskContract.TaskEntry._ID,
-                        TaskContract.TaskEntry.COL_TASK_TITLE},
+                        TaskContract.TaskEntry.COL_TASK_TITLE,
+                        TaskContract.TaskEntry.COL_TASK_DURATION},
                 null, null, null, null, null);
         while (cursor.moveToNext()) {
-            int idx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
-            taskList.add(cursor.getString(idx));
-        }
 
-////        ArrayList<CustomObject> objects = new ArrayList<CustomObject>();
-////        CustomAdapter customAdapter = new CustomAdapter(this, objects);
-////        listView.setAdapter(customAdapter);
+        }
+        
+        final TaskObject taskObject[] = new TaskObject[]{};
+                while (cursor.moveToNext()) {
+                    int idx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
+                    int idxx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_DURATION);
+                    new TaskObject(cursor.getString(idx), cursor.getString(idxx));
+                }
+
+
+
+//        final ArrayList<String> taskList = new ArrayList<>();
 //
+//        SQLiteDatabase db = mHelper.getReadableDatabase();
+//
+//        Cursor cursor = db.query(TaskContract.TaskEntry.TABLE,
+//                new String[]{TaskContract.TaskEntry._ID,
+//                        TaskContract.TaskEntry.COL_TASK_TITLE,
+//                        TaskContract.TaskEntry.COL_TASK_DURATION},
+//                null, null, null, null, null);
+//        while (cursor.moveToNext()) {
+//            int idx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
+//            taskList.add(cursor.getString(idx));
+//        }
+
+//        ArrayList<CustomObject> objects = new ArrayList<CustomObject>();
+//        CustomAdapter customAdapter = new CustomAdapter(this, objects);
+//        listView.setAdapter(customAdapter);
+
 //        if (mAdapter == null) {
+//
+//            TaskAdapter taskAdapter = new TaskAdapter(this, R.layout.todo_item, taskList);
+//
 //            mAdapter = new ArrayList<TaskObject>();
 //            TaskAdapter taskAdapter = new TaskAdapter(this, taskList);
 //            mTaskListView.setAdapter(mAdapter);
@@ -200,21 +222,23 @@ public class Todo extends AppCompatActivity {
 //            mAdapter.notifyDataSetChanged();
 //        }
 
-        if (mAdapter == null) {
-            mAdapter = new ArrayAdapter<>(this,
-                    R.layout.todo_item, // what view to use for the items
-                    R.id.task_title, // where to put the String of data
-                    taskList); // where to get all the data
-            mTaskListView.setAdapter(mAdapter); // set it as the adapter of the listview instance
-        } else {
-            mAdapter.clear();
-            mAdapter.addAll(taskList);
-            mAdapter.notifyDataSetChanged();
-        }
 
-        cursor.close();
-        db.close();
+//        if (mAdapter == null) {
+//            mAdapter = new ArrayAdapter<>(this,
+//                    R.layout.todo_item, // what view to use for the items
+//                    R.id.task_title, // where to put the String of data
+//                    taskList); // where to get all the data
+//            mTaskListView.setAdapter(mAdapter); // set it as the adapter of the listview instance
+//        } else {
+//            mAdapter.clear();
+////            mAdapter.addAll(taskList);
+////            mAdapter.notifyDataSetChanged();
+////        }
+//
+//        cursor.close();
+//        db.close();
     }
+}
 
     public void deleteTask(View view) {
         View parent = (View) view.getParent();

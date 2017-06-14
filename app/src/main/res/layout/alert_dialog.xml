@@ -21,11 +21,17 @@
         android:textStyle="bold"
         android:text="How much time do you need?"/>
 
-    <Spinner
-        android:id="@+id/category"
-        android:layout_width="fill_parent"
+    <EditText
+        android:id="@+id/time_needed"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="5dp"/>
+        android:inputType="number"/>
+
+    <!--<Spinner-->
+        <!--android:id="@+id/category"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:paddingTop="5dp"/>-->
 
 
 </LinearLayout>
