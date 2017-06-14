@@ -104,7 +104,7 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 # day 9
 ### TODO
 * make Todo list ready to link with MyCalendar: a column for user to give time needed for a task, 
-* user should be able to drag items in todo list according to importance / according to what tasks he/she wants to finish first: https://github.com/woxblom/DragListView
+* user should be able to drag items in todo list according to importance / according to what tasks he/she wants to finish first: https://github.com/bauerca/drag-sort-listview
 ### Process
 * the Todo list that I want to make consists of a description of the task and the time needed, but this means that two TextViews need to be updated when a new task is added. It's not possible to do this within an xml file, since the ArrayAdapter doesn't have this option. So I should make my own adapter in another .java file. Gonna use this explanation: https://stackoverflow.com/questions/11106418/how-to-set-adapter-in-case-of-multiple-textviews-per-listview
 
