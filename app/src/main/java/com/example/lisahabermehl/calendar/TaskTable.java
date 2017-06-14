@@ -6,8 +6,8 @@ import android.provider.BaseColumns;
  * Created by lisahabermehl on 22/11/16.
  */
 
-public class TaskContract {
-    public static final String DB_NAME = "com.aziflaj.todolist.db";
+public class TaskTable {
+    public static final String DB_NAME = "com.lisahabermehl.todo.db";
     public static final int DB_VERSION = 3;
 
     public class TaskEntry implements BaseColumns {
@@ -15,5 +15,4 @@ public class TaskContract {
         public static final String COL_TASK_TITLE = "title";
         public static final String COL_TASK_DURATION = "duration";
     }
-
 }

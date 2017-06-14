@@ -7,26 +7,22 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class TaskDbHelper extends SQLiteOpenHelper {
 
     public TaskDbHelper(Context context){
-        super(context, TaskContract.DB_NAME, null, TaskContract.DB_VERSION);
+        super(context, TaskTable.DB_NAME, null, TaskTable.DB_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-//        String createTable = "CREATE TABLE IF NOT EXISTS " + TaskContract.TaskEntry.TABLE + " ( " +
-//                TaskContract.TaskEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-//                TaskContract.TaskEntry.COL_TASK_TITLE + " TEXT NOT NULL);";
-
-        String createTable = "CREATE TABLE IF NOT EXISTS " + TaskContract.TaskEntry.TABLE + " ( " +
-                TaskContract.TaskEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                TaskContract.TaskEntry.COL_TASK_TITLE + " TEXT NOT NULL, " +
-                TaskContract.TaskEntry.COL_TASK_DURATION + " TEXT NOT NULL);";
+        String createTable = "CREATE TABLE IF NOT EXISTS " + TaskTable.TaskEntry.TABLE + " ( " +
+                TaskTable.TaskEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                TaskTable.TaskEntry.COL_TASK_TITLE + " TEXT NOT NULL, " +
+                TaskTable.TaskEntry.COL_TASK_DURATION + " TEXT NOT NULL);";
 
         db.execSQL(createTable);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TaskContract.TaskEntry.TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + TaskTable.TaskEntry.TABLE);
         onCreate(db);
     }
 }

@@ -10,9 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16dp"
-        android:hint="What TODO?"
-        android:textColorHint="@color/common_google_signin_btn_text_light">
-    </EditText>
+        android:hint="What TODO?"/>
+
 
     <TextView
         android:layout_width="match_parent"

@@ -3,34 +3,22 @@ package com.example.lisahabermehl.calendar;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteCursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.provider.BaseColumns;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.ContextMenu;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * https://www.sitepoint.com/starting-android-development-creating-todo-app/
@@ -105,9 +93,9 @@ public class Todo extends AppCompatActivity {
                                         SQLiteDatabase db = mHelper.getWritableDatabase();
 
                                         ContentValues values = new ContentValues();
-                                        values.put(TaskContract.TaskEntry.COL_TASK_TITLE, task);
-                                        values.put(TaskContract.TaskEntry.COL_TASK_DURATION, time);
-                                        db.insertWithOnConflict(TaskContract.TaskEntry.TABLE,
+                                        values.put(TaskTable.TaskEntry.COL_TASK_TITLE, task);
+                                        values.put(TaskTable.TaskEntry.COL_TASK_DURATION, time);
+                                        db.insertWithOnConflict(TaskTable.TaskEntry.TABLE,
                                                 null,
                                                 values,
                                                 SQLiteDatabase.CONFLICT_REPLACE);
@@ -138,17 +126,17 @@ public class Todo extends AppCompatActivity {
     // so we add it in two places: onCreate() and after adding a new task using the AlertDialog
     private void updateUI() {
         SQLiteDatabase db = mHelper.getReadableDatabase();
-        Cursor cursor = db.query(TaskContract.TaskEntry.TABLE,
-                new String[]{TaskContract.TaskEntry._ID,
-                        TaskContract.TaskEntry.COL_TASK_TITLE,
-                        TaskContract.TaskEntry.COL_TASK_DURATION},
+        Cursor cursor = db.query(TaskTable.TaskEntry.TABLE,
+                new String[]{TaskTable.TaskEntry._ID,
+                        TaskTable.TaskEntry.COL_TASK_TITLE,
+                        TaskTable.TaskEntry.COL_TASK_DURATION},
                 null, null, null, null, null);
 
         ArrayList<TaskObject> taskObject = new ArrayList<>();
 
         while (cursor.moveToNext()) {
-            int idx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
-            int idxx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_DURATION);
+            int idx = cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_TITLE);
+            int idxx = cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DURATION);
             TaskObject to = new TaskObject(cursor.getString(idx), cursor.getString(idxx));
             taskObject.add(to);
         }
@@ -170,8 +158,8 @@ public class Todo extends AppCompatActivity {
         TextView taskTextView = (TextView) parent.findViewById(R.id.task_title);
         String task = String.valueOf(taskTextView.getText());
         SQLiteDatabase db = mHelper.getWritableDatabase();
-        db.delete(TaskContract.TaskEntry.TABLE,
-                TaskContract.TaskEntry.COL_TASK_TITLE + " = ?",
+        db.delete(TaskTable.TaskEntry.TABLE,
+                TaskTable.TaskEntry.COL_TASK_TITLE + " = ?",
                 new String[]{task});
         db.close();
         updateUI();

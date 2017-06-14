@@ -23,9 +23,11 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -39,6 +41,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -70,6 +73,10 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
     GoogleAccountCredential mCredential;
     TextView mOutputText;
     ProgressDialog mProgress;
+    MyCalendarDbHelper myCalendarDbHelper;
+    private MyCalendarAdapter myCalendarAdapter;
+    Context context;
+    private ListView listView;
 
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     static final int REQUEST_AUTHORIZATION = 1001;
@@ -87,7 +94,9 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.google_calendar_test);
+
         mOutputText = (TextView) findViewById(R.id.mOutputText);
+        listView = (ListView) findViewById(R.id.list_calendar);
 
         // let user know that app is fetching data
         mProgress = new ProgressDialog(this);
@@ -98,6 +107,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
 
+        // get the date that user selected
         String date = getIntent().getExtras().getString("date");
         getResultsFromApi(date);
     }
@@ -277,9 +287,8 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
         @Override
         protected List<String> doInBackground(String... params) {
             try {
-                List<String> result = getDataFromApi(params[0]);
-                return result;
-//                return getDataFromApi();
+//                List<MyCalendarObject> result = getDataFromApi(params[0]);
+                return getDataFromApi(params[0]);
             } catch (Exception e) {
                 mLastError = e;
                 cancel(true);
@@ -296,13 +305,17 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
         private List<String> getDataFromApi(String date) throws IOException {
             // List the next 10 events from the primary calendar.
             DateTime now = new DateTime(System.currentTimeMillis());
-            List<String> eventStrings = new ArrayList<String>();
+
+//            List<MyCalendarObject> myCalendarObject = new ArrayList<MyCalendarObject>();
+            List<String> eventStrings = new ArrayList<>();
+
             Events events = mService.events().list("primary")
                     .setMaxResults(30)
                     .setTimeMin(now)
                     .setOrderBy("startTime")
                     .setSingleEvents(true)
                     .execute();
+
             // list with all the events
             List<Event> items = events.getItems();
 
@@ -323,6 +336,9 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 String dateEnd = dateFormat.format(originalEnd);
                 String timeEnd = timeFormat.format(originalEnd);
 
+                // what is the activity about
+                String activity = event.getSummary();
+
                 // date to compare with
                 String dateCompare = date;
 
@@ -330,7 +346,23 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 Log.d(String.valueOf(dateCompare), "datum5");
 
                 if (dateStart.equals(dateCompare)) {
-                    eventStrings.add(String.format("%s - %s \n%s", timeStart, timeEnd, event.getSummary()));
+                    eventStrings.add(String.format("%s - %s \n%s", timeStart, timeEnd, activity));
+
+//                    // add the above to DB
+//                    SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
+//
+//                    ContentValues values = new ContentValues();
+//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_TITLE, activity);
+//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_DATE, dateStart);
+//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_START, timeStart);
+//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_END, timeEnd);
+//
+//                    // add new values to table
+//                    db.insertWithOnConflict(TaskTable.TaskEntry.TABLE,
+//                            null,
+//                            values,
+//                            SQLiteDatabase.CONFLICT_REPLACE);
+//                    db.close();
                 }
             }
             return eventStrings;
@@ -349,10 +381,20 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
             if (output == null || output.size() == 0) {
                 mOutputText.setText("No results returned.");
             } else {
-                // so this is where the data from above will be printed on the screen
-                // have to find a way to send this information to an xml file
-                // to update the information on the screen / to update the information of a specific day
+//                // so this is where the data from above will be printed on the screen
+//                // have to find a way to send this information to an xml file
+//                // to update the information on the screen / to update the information of a specific day
                 mOutputText.setText(TextUtils.join("\n", output));
+
+//                if (myCalendarAdapter == null) {
+//                    myCalendarAdapter = new MyCalendarAdapter(context, 3, output);
+//                    listView.setAdapter(myCalendarAdapter);
+//                } else {
+//                    myCalendarAdapter.clear();
+//                    myCalendarAdapter.addAll(output);
+//                    myCalendarAdapter.notifyDataSetChanged();
+//                }
+
             }
         }
 
