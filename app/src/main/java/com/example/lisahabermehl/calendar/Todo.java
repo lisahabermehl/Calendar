@@ -35,8 +35,6 @@ import java.util.List;
 /**
  * https://www.sitepoint.com/starting-android-development-creating-todo-app/
  */
-// edittext empty'en
-// enter in plaats van button klikken
 
 public class Todo extends AppCompatActivity {
 
@@ -49,7 +47,6 @@ public class Todo extends AppCompatActivity {
 
     // add an instance of the ListView
     private ListView mTaskListView;
-//    private EditText taskEditText;
 
     public String duration;
 
@@ -94,33 +91,6 @@ public class Todo extends AppCompatActivity {
                         .findViewById(R.id.new_todo);
                 final EditText duration = (EditText) dialogView
                         .findViewById(R.id.time_needed);
-
-
-//                final Spinner spinner = (Spinner) dialogView
-//                        .findViewById(R.id.category);
-//                ArrayList<String> categories = new ArrayList<String>();
-//                categories.add("Article");
-//                categories.add("Book");
-//
-//                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-//                        android.R.layout.simple_spinner_item, categories);
-//                adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-//                spinner.setAdapter(adapter);
-//                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//                    @Override
-//                    public void onItemSelected(AdapterView<?> parent, View view,
-//                                               int pos, long id) {
-//                        Toast.makeText(parent.getContext(),
-//                                "OnItemSelectedListener : " + parent.getItemAtPosition(pos).toString(),
-//                                Toast.LENGTH_LONG).show();
-//                        duration = spinner.getItemAtPosition(pos).toString();
-//                    }
-//
-//                    @Override
-//                    public void onNothingSelected(AdapterView<?> arg0) {
-//
-//                    }
-//                });
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder
@@ -183,8 +153,6 @@ public class Todo extends AppCompatActivity {
             taskObject.add(to);
         }
 
-        ListView listView = (ListView) findViewById(R.id.list_todo);
-
         if (taskAdapter == null) {
             taskAdapter = new TaskAdapter(this, 3, taskObject);
             mTaskListView.setAdapter(taskAdapter);
@@ -195,23 +163,7 @@ public class Todo extends AppCompatActivity {
         }
         cursor.close();
         db.close();
-
-//        if (mAdapter == null) {
-//            mAdapter = new ArrayAdapter<>(this,
-//                    R.layout.todo_item, // what view to use for the items
-//                    R.id.task_title, // where to put the String of data
-//                    taskList); // where to get all the data
-//            mTaskListView.setAdapter(mAdapter); // set it as the adapter of the listview instance
-//        } else {
-//            mAdapter.clear();
-////            mAdapter.addAll(taskList);
-////            mAdapter.notifyDataSetChanged();
-////        }
-//
-//        cursor.close();
-//        db.close();
     }
-
 
     public void deleteTask(View view) {
         View parent = (View) view.getParent();
