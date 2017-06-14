@@ -96,6 +96,11 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 
 ### Process
 * "An OAuth2 client already exists for this package name and SHA-1 in another project. You can omit the SHA-1 for now and read more about this situation and how to resolve it." >>> "Authentication: To use Google as an auth provider, you must manually whitelist the client ID from your existing project in the Sign-In configuration." **Problem? Or just don't add SHA-1 to Firebase project?**
+* made an AlertDialog + SQLiteDatabase for user to add a new task
 
 ### Important decisions
 * 
+
+# day 9
+### TODO
+* make Todo list ready to link with MyCalendar: a column for user to give time needed for a task, 
