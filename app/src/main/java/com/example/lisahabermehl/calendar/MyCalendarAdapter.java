@@ -34,11 +34,15 @@ public class MyCalendarAdapter extends ArrayAdapter<MyCalendarObject> {
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.calendar_item, null);
 
-        TextView description = (TextView) view.findViewById(R.id.calendar_activity);
-        TextView duration = (TextView) view.findViewById(R.id.calendar_date);
+        TextView activity = (TextView) view.findViewById(R.id.calendar_activity);
+        TextView date = (TextView) view.findViewById(R.id.calendar_date);
+        TextView start = (TextView) view.findViewById(R.id.calendar_start);
+        TextView end = (TextView) view.findViewById(R.id.calendar_end);
 
-        description.setText(myCalendarObject.getActivity());
-        duration.setText(myCalendarObject.getDate());
+        activity.setText(myCalendarObject.getActivity());
+        date.setText(myCalendarObject.getDate());
+        start.setText(myCalendarObject.getStart());
+        end.setText(myCalendarObject.getEnd());
 
         return view;
     }

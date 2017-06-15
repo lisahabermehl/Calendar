@@ -21,4 +21,22 @@
         android:textSize="20sp"
         android:longClickable="true"/>
 
+    <TextView
+        android:id="@+id/calendar_start"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:gravity="center_vertical"
+        android:textSize="20sp"
+        android:longClickable="true"/>
+
+    <TextView
+        android:id="@+id/calendar_end"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_gravity="right"
+        android:textSize="20sp"
+        android:longClickable="true"/>
+
 </RelativeLayout>
