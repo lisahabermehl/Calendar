@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class MyCalendarDbHelper extends SQLiteOpenHelper {
 
     public MyCalendarDbHelper(Context context){
-        super(context, TaskTable.DB_NAME, null, TaskTable.DB_VERSION);
+        super(context, MyCalendarTable.DB_NAME, null, MyCalendarTable.DB_VERSION);
     }
 
     @Override

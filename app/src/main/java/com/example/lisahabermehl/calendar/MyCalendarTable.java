@@ -9,7 +9,7 @@ import android.provider.BaseColumns;
 public class MyCalendarTable {
 
     public static final String DB_NAME = "com.lisahabermehl.calendar.db";
-    public static final int DB_VERSION = 4;
+    public static final int DB_VERSION = 5;
 
     public class CalendarEntry implements BaseColumns {
         public static final String TABLE = "calendar";

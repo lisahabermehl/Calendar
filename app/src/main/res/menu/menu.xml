@@ -2,16 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/menu_home"
-        android:icon="@drawable/calendar" />
-        />
-    <item
-        android:id="@+id/menu_search"
-        android:icon="@drawable/todo" />
-        />
+        android:id="@+id/menu_calendar"
+        android:icon="@drawable/calendar"
+        android:title="Calendar"
+        android:onClick="onOptionsItemSelected"/>
 
     <item
-        android:id="@+id/menu_notifications"
-        android:icon="@drawable/ic_action_name" />
+        android:id="@+id/menu_todo"
+        android:icon="@drawable/todo"
+        android:title="Todo"/>
+
+
+    <item
+        android:id="@+id/menu_settings"
+        android:icon="@drawable/ic_action_name"
+        android:title="Settings"/>
 
 </menu>

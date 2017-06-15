@@ -97,6 +97,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
 
         mOutputText = (TextView) findViewById(R.id.mOutputText);
         listView = (ListView) findViewById(R.id.list_calendar);
+        myCalendarDbHelper = new MyCalendarDbHelper(this);
 
         // let user know that app is fetching data
         mProgress = new ProgressDialog(this);
@@ -319,6 +320,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
             // list with all the events
             List<Event> items = events.getItems();
 
+
             // gonna try to get a specific date here
             for (Event event : items) {
 
@@ -346,23 +348,24 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 Log.d(String.valueOf(dateCompare), "datum5");
 
                 if (dateStart.equals(dateCompare)) {
-                    eventStrings.add(String.format("%s - %s \n%s", timeStart, timeEnd, activity));
+                    eventStrings.add(String.format("%s_%s_%s_%s", activity, dateStart, timeStart, timeEnd));
 
-//                    // add the above to DB
-//                    SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
-//
-//                    ContentValues values = new ContentValues();
-//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_TITLE, activity);
-//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_DATE, dateStart);
-//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_START, timeStart);
-//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_END, timeEnd);
-//
-//                    // add new values to table
-//                    db.insertWithOnConflict(TaskTable.TaskEntry.TABLE,
-//                            null,
-//                            values,
-//                            SQLiteDatabase.CONFLICT_REPLACE);
-//                    db.close();
+//                     add the above to DB
+                    SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
+
+                    ContentValues values = new ContentValues();
+                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_TITLE, activity);
+                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_DATE, dateStart);
+                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_START, timeStart);
+                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_END, timeEnd);
+                    Log.d("ACTIVITY", activity);
+
+                    // add new values to table
+                    db.insertWithOnConflict(MyCalendarTable.CalendarEntry.TABLE,
+                            null,
+                            values,
+                            SQLiteDatabase.CONFLICT_REPLACE);
+                    db.close();
                 }
             }
             return eventStrings;
@@ -384,7 +387,28 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
 //                // so this is where the data from above will be printed on the screen
 //                // have to find a way to send this information to an xml file
 //                // to update the information on the screen / to update the information of a specific day
+
+//                String one = TextUtils.join("\n", output);
+
+
                 mOutputText.setText(TextUtils.join("\n", output));
+
+//                    // add the above to DB
+//                    SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
+//
+//                    ContentValues values = new ContentValues();
+//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_TITLE, activity);
+//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_DATE, dateStart);
+//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_START, timeStart);
+//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_END, timeEnd);
+//                    Log.d("ACTIVITY", activity);
+//
+//                    // add new values to table
+//                    db.insertWithOnConflict(MyCalendarTable.CalendarEntry.TABLE,
+//                            null,
+//                            values,
+//                            SQLiteDatabase.CONFLICT_REPLACE);
+//                    db.close();
 
 //                if (myCalendarAdapter == null) {
 //                    myCalendarAdapter = new MyCalendarAdapter(context, 3, output);
