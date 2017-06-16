@@ -335,7 +335,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
                 String timeStart = timeFormat.format(original);
 
-                // get the end date
+                // get the end time (and date?)
                 Date originalEnd = new Date(event.getEnd().getDateTime().getValue());
                 String dateEnd = dateFormat.format(originalEnd);
                 String timeEnd = timeFormat.format(originalEnd);
@@ -412,48 +412,31 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                     MyCalendarObject to = new MyCalendarObject(cursor.getString(idx),
                             cursor.getString(idxx), cursor.getString(idxxx), cursor.getString(idxxxx));
                     calendarObjects.add(to);
+
                     Log.d("COUNT", Integer.toString(calendarObjects.size()));
                 }
                 Log.d("COUNT2", Integer.toString(calendarObjects.size()));
 
-
-//                // so this is where the data from above will be printed on the screen
-//                // have to find a way to send this information to an xml file
-//                // to update the information on the screen / to update the information of a specific day
-
 //                String one = TextUtils.join("\n", output);
-
-
 //                mOutputText.setText(TextUtils.join("\n", output));
 
-//                    // add the above to DB
-//                    SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
+//                for(int j = 0; j < calendarObjects.size(); j++) {
+//                    if (calendarObjects.get(j) != null) {
 //
-//                    ContentValues values = new ContentValues();
-//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_TITLE, activity);
-//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_DATE, dateStart);
-//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_START, timeStart);
-//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_END, timeEnd);
-//                    Log.d("ACTIVITY", activity);
-//
-//                    // add new values to table
-//                    db.insertWithOnConflict(MyCalendarTable.CalendarEntry.TABLE,
-//                            null,
-//                            values,
-//                            SQLiteDatabase.CONFLICT_REPLACE);
+                        if (myCalendarAdapter == null) {
+                            myCalendarAdapter = new MyCalendarAdapter(GoogleCalendarTest.this, 0, calendarObjects);
+                            listView.setAdapter(myCalendarAdapter);
+                        } else {
+                            myCalendarAdapter.clear();
+                            myCalendarAdapter.addAll(calendarObjects);
+                            myCalendarAdapter.notifyDataSetChanged();
+                        }
+//                    } else {
+//                        Log.d("NULL", "NOOOO");
+//                    }
 //                    db.close();
-
-//                if (myCalendarAdapter == null) {
-//                    myCalendarAdapter = new MyCalendarAdapter(context, 0, calendarObjects);
-//                    listView.setAdapter(myCalendarAdapter);
-//                } else {
-//                    myCalendarAdapter.clear();
-//                    myCalendarAdapter.addAll(calendarObjects);
-//                    myCalendarAdapter.notifyDataSetChanged();
+//                    cursor.close();
 //                }
-//                db.close();
-//                cursor.close();
-
             }
         }
 
