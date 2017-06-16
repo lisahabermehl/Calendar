@@ -2,11 +2,15 @@ package com.example.lisahabermehl.calendar;
 
 import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,6 +31,8 @@ import java.util.ArrayList;
 public class Todo extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+
+    BottomNavigationView bottomNavigationView;
     private TaskDbHelper mHelper;
 
     // this arrayadapter will help populate the listview with data
@@ -42,6 +48,27 @@ public class Todo extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.todo_list);
+
+        // https://stackoverflow.com/questions/36060883/how-to-implement-bottom-navigation-tab-as-per-the-google-new-guideline
+        bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener
+                (new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.menu_calendar:
+                                Log.d("CALENDAR", "YES");
+                                startActivity(new Intent(Todo.this, MyCalendar.class));
+                            case R.id.menu_todo:
+                                Log.d("TODO", "YES");
+                                startActivity(new Intent(Todo.this, Todo.class));
+                            case R.id.menu_settings:
+                                Log.d("SETTINGS", "YES");
+                                startActivity(new Intent(Todo.this, Settings.class));
+                        }
+                        return true;
+                    }
+                });
 
         mHelper = new TaskDbHelper(this);
 

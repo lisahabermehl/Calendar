@@ -29,8 +29,7 @@
         android:id="@+id/navigation"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
-        design:menu="@menu/menu"
-        android:onClick="onCalendarClick"/>
+        design:menu="@menu/menu" />
 
     </LinearLayout>
 
