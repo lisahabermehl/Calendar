@@ -8,35 +8,24 @@ package com.example.lisahabermehl.calendar;
 
 
 import android.app.ActivityManager;
-import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.MenuItemHoverListener;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.CalendarView;
-import android.widget.EditText;
 
 public class MyCalendar extends AppCompatActivity {
 
     CalendarView calendarView;
-    BottomNavigationView bottomNavigationView;
-    ActivityManager activityManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.simple_calendar);
+        setContentView(R.layout.calendar_main);
 
         calendarView = (CalendarView) findViewById(R.id.calendarView);
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
@@ -67,27 +56,5 @@ public class MyCalendar extends AppCompatActivity {
                 startActivity(newActivity);
             }
         });
-
-        // https://stackoverflow.com/questions/36060883/how-to-implement-bottom-navigation-tab-as-per-the-google-new-guideline
-        bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener
-                (new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.menu_calendar:
-                        Log.d("CALENDAR", "YES");
-                        startActivity(new Intent(MyCalendar.this, MyCalendar.class));
-                    case R.id.menu_todo:
-                        Log.d("TODO", "YES");
-                        startActivity(new Intent(MyCalendar.this, Todo.class));
-                    case R.id.menu_settings:
-                        Log.d("SETTINGS", "YES");
-                        startActivity(new Intent(MyCalendar.this, Settings.class));
-                }
-                return true;
-            }
-        });
     }
-
 }
