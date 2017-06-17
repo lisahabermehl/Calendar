@@ -39,7 +39,7 @@ public class TaskAdapter extends ArrayAdapter<TaskObject> {
         TextView deadline = (TextView) view.findViewById(R.id.task_deadline);
 
         description.setText(taskObject.getTask());
-        duration.setText(taskObject.getDuration());
+        duration.setText(taskObject.getDuration() + " minutes");
         deadline.setText(taskObject.getDeadline());
 
         return view;

@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -76,8 +77,10 @@ public class Todo extends AppCompatActivity {
                 final View dialogView = layoutInflater.inflate(R.layout.alert_dialog, null);
                 final EditText description = (EditText) dialogView
                         .findViewById(R.id.new_todo);
-                final TimePicker duration = (TimePicker) dialogView
+                final EditText duration = (EditText) dialogView
                         .findViewById(R.id.time_needed);
+                final DatePicker deadline = (DatePicker) dialogView
+                        .findViewById(R.id.task_deadline);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder
@@ -86,13 +89,18 @@ public class Todo extends AppCompatActivity {
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         String task = String.valueOf(description.getText());
-                                        String time = String.valueOf(duration.getBaseline());
+                                        String time = String.valueOf(duration.getText());
+                                        int day = deadline.getDayOfMonth();
+                                        int month = deadline.getMonth();
+                                        int year = deadline.getYear();
+                                        String deadline = String.valueOf(year + "-" + month + "-" + day);
 
                                         SQLiteDatabase db = mHelper.getWritableDatabase();
 
                                         ContentValues values = new ContentValues();
                                         values.put(TaskTable.TaskEntry.COL_TASK_TITLE, task);
                                         values.put(TaskTable.TaskEntry.COL_TASK_DURATION, time);
+                                        values.put(TaskTable.TaskEntry.COL_TASK_DEADLINE, deadline);
                                         db.insertWithOnConflict(TaskTable.TaskEntry.TABLE,
                                                 null,
                                                 values,
