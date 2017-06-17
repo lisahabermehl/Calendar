@@ -109,3 +109,22 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 * the Todo list that I want to make consists of a description of the task and the time needed, but this means that two TextViews need to be updated when a new task is added. It's not possible to do this within an xml file, since the ArrayAdapter doesn't have this option. So I should make my own adapter in another .java file. Gonna use this explanation: https://stackoverflow.com/questions/11106418/how-to-set-adapter-in-case-of-multiple-textviews-per-listview
 * so I made a TaskObject with an adapter, works fine, but when I tried to adjust MyCalendar to how I implemented my Todo list/Tasks (object that defines the task/calendar, adapter that helps updating the UI, a TaskTable.java that defines all the names/variables in a table, and a DbHelper that creates or updates the table). It seems like it doesn't work because I'm trying to make the table while I'm still in an AsyncTask? Because when I add the piece of code that makes the table, the GoogleCalendar API returns null, if I remove just this little piece of code I get an output.
 
+# day 10
+### TODO
+* 
+### Process
+* (so I forgot to initialize an new MyCalendarDbHelper....... that's why it didn't work -.-)
+### Important decisions
+* instead of trying to fix everything at the same time, I'm gonna fix the calendar first (ArrayAdapter) and how I'm going to manage the data. After that I can start thinking about the algoritm to plan/make suggestions for Todo items in the calendar
+* also, start thinking about when to sync data from GoogleCalendar
+
+# day 11
+### TODO
+* 
+### Process
+* MyCalendarAdapter works!
+### Important decisions
+* 
+### Think, think
+* what happens if someone wants to make a new activity, but making this new activity will lead to not finishing a Todo before the deadline. Should there be a check to see if it's possible to move this to another moment, and a warning to let the user know that he/she won't be able to finish in time (based on the time needed and deadline), and give user the option to: (1) say yes, this new activity is more important than finishing in time or (2) say no, maybe I shouldn't plan this activity because this Todo really has to be done in time
+
