@@ -5,22 +5,19 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import java.util.ArrayList;
 
@@ -64,7 +61,7 @@ public class Todo extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
+        inflater.inflate(R.menu.menu_todo, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -79,7 +76,7 @@ public class Todo extends AppCompatActivity {
                 final View dialogView = layoutInflater.inflate(R.layout.alert_dialog, null);
                 final EditText description = (EditText) dialogView
                         .findViewById(R.id.new_todo);
-                final EditText duration = (EditText) dialogView
+                final TimePicker duration = (TimePicker) dialogView
                         .findViewById(R.id.time_needed);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -87,10 +84,9 @@ public class Todo extends AppCompatActivity {
                         .setView(dialogView)
                         .setPositiveButton("ADD",
                                 new DialogInterface.OnClickListener() {
-
                                     public void onClick(DialogInterface dialog, int id) {
                                         String task = String.valueOf(description.getText());
-                                        String time = String.valueOf(duration.getText());
+                                        String time = String.valueOf(duration.getBaseline());
 
                                         SQLiteDatabase db = mHelper.getWritableDatabase();
 
@@ -114,6 +110,12 @@ public class Todo extends AppCompatActivity {
                         .create()
                         .show();
                 return true;
+            case R.id.menu_calendar:
+                startActivity(new Intent(this, MyCalendar.class));
+                return true;
+            case R.id.menu_todo:
+                startActivity(new Intent(this, Todo.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -131,7 +133,8 @@ public class Todo extends AppCompatActivity {
         Cursor cursor = db.query(TaskTable.TaskEntry.TABLE,
                 new String[]{TaskTable.TaskEntry._ID,
                         TaskTable.TaskEntry.COL_TASK_TITLE,
-                        TaskTable.TaskEntry.COL_TASK_DURATION},
+                        TaskTable.TaskEntry.COL_TASK_DURATION,
+                        TaskTable.TaskEntry.COL_TASK_DEADLINE},
                 null, null, null, null, null);
 
         ArrayList<TaskObject> taskObject = new ArrayList<>();
@@ -139,7 +142,8 @@ public class Todo extends AppCompatActivity {
         while (cursor.moveToNext()) {
             int idx = cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_TITLE);
             int idxx = cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DURATION);
-            TaskObject to = new TaskObject(cursor.getString(idx), cursor.getString(idxx));
+            int idxxx = cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DEADLINE);
+            TaskObject to = new TaskObject(cursor.getString(idx), cursor.getString(idxx), cursor.getString(idxxx));
             taskObject.add(to);
         }
 

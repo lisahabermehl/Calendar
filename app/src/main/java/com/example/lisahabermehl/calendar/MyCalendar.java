@@ -7,18 +7,20 @@ package com.example.lisahabermehl.calendar;
  */
 
 
-import android.app.ActivityManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CalendarView;
 import android.widget.ListView;
 
@@ -43,6 +45,8 @@ public class MyCalendar extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.list_calendar);
         myCalendarDbHelper = new MyCalendarDbHelper(this);
+
+
 
         updateUI();
 
@@ -80,6 +84,71 @@ public class MyCalendar extends AppCompatActivity {
 //}
 
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_calendar, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_search:
+                LayoutInflater layoutInflater = LayoutInflater.from(this);
+                final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_search, null);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder
+                        .setView(dialogView)
+                        .setPositiveButton("SEARCH", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        })
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        })
+                        .create()
+                        .show();
+                return true;
+            case R.id.menu_day:
+                LayoutInflater layoutInflaterDay = LayoutInflater.from(this);
+                final View dialogViewDay = layoutInflaterDay.inflate(R.layout.calendar_main, null);
+
+                AlertDialog.Builder builderDay = new AlertDialog.Builder(this);
+                builderDay
+                        .setView(dialogViewDay)
+                        .setPositiveButton("SELECT DATE", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        })
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        })
+                        .create()
+                        .show();
+                return true;
+            case R.id.menu_calendar:
+                startActivity(new Intent(this, MyCalendar.class));
+                return true;
+            case R.id.menu_todo:
+                startActivity(new Intent(this, Todo.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 
 
     private void updateUI(){
@@ -90,7 +159,8 @@ public class MyCalendar extends AppCompatActivity {
                         MyCalendarTable.CalendarEntry.COL_CAL_DATE,
                         MyCalendarTable.CalendarEntry.COL_CAL_START,
                         MyCalendarTable.CalendarEntry.COL_CAL_END},
-                null, null, null, null, MyCalendarTable.CalendarEntry.COL_CAL_DATE + ", " + MyCalendarTable.CalendarEntry.COL_CAL_START + " ASC");
+                null, null, null, null, MyCalendarTable.CalendarEntry.COL_CAL_DATE + ", " +
+                        MyCalendarTable.CalendarEntry.COL_CAL_START + " ASC");
 
         ArrayList<MyCalendarObject> calendarObjects = new ArrayList<>();
 

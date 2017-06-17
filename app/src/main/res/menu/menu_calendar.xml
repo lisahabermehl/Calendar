@@ -1,0 +1,25 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MyCalendar" >
+    <item
+        android:id="@+id/menu_search"
+        app:showAsAction="always"
+        android:icon="@drawable/search"
+        android:title="VIEW"/>
+    <item
+        android:id="@+id/menu_day"
+        app:showAsAction="always"
+        android:icon="@drawable/calendar"
+        android:title="SEARCH"/>
+    <item
+        android:id="@+id/menu_calendar"
+        android:orderInCategory="1"
+        app:showAsAction="never"
+        android:title="My Calendar"/>
+    <item
+        android:id="@+id/menu_todo"
+        android:orderInCategory="2"
+        app:showAsAction="never"
+        android:title="My Todo List"/>
+</menu>

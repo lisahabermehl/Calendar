@@ -5,13 +5,18 @@
     android:orientation="vertical"
     android:paddingLeft="10dip" >
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:textStyle="bold"
+        android:text="What TODO?"/>
+
     <EditText
         android:id="@+id/new_todo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16dp"
-        android:hint="What TODO?"/>
-
+        android:textSize="16dp" />
 
     <TextView
         android:layout_width="match_parent"
@@ -20,11 +25,24 @@
         android:textStyle="bold"
         android:text="How much time do you need?"/>
 
-    <EditText
+    <TimePicker
         android:id="@+id/time_needed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="number"/>
+        android:textSize="16dp"
+        android:textStyle="bold"
+        android:text="When is the deadline?"/>
+
+    <DatePicker
+        android:id="@+id/simpleDatePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:calendarViewShown="false"
+        android:datePickerMode="spinner"/>
 
     <!--<Spinner-->
         <!--android:id="@+id/category"-->
