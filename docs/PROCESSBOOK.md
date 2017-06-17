@@ -132,4 +132,6 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 ### TODO
 * MyCalendar works, Todo works, so now I should fix seeing activities from one day when clicking on a specific day OR make sure that all activities from GoogleCalendar are visible in an organised overview, one long list (and give the user the option to scroll to down to another date by clicking on a date in the calendar)
 ### Process
-* 
+* results are shown in descending order by date and time
+### Think, think
+* how are you supposed to check for activities with the same name, date and time? With other words: how are you supposed to check if the values in different columns in one row are exactly the same as the values in different columns in another row?
