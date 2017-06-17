@@ -32,47 +32,22 @@ public class Todo extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    BottomNavigationView bottomNavigationView;
     private TaskDbHelper mHelper;
 
     // this arrayadapter will help populate the listview with data
-    private ArrayAdapter<String> mAdapter;
     private TaskAdapter taskAdapter;
 
     // add an instance of the ListView
     private ListView mTaskListView;
-
-    public String duration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.todo_list);
 
-        // https://stackoverflow.com/questions/36060883/how-to-implement-bottom-navigation-tab-as-per-the-google-new-guideline
-        bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener
-                (new BottomNavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.menu_calendar:
-                                Log.d("CALENDAR", "YES");
-                                startActivity(new Intent(Todo.this, MyCalendar.class));
-                            case R.id.menu_todo:
-                                Log.d("TODO", "YES");
-                                startActivity(new Intent(Todo.this, Todo.class));
-                            case R.id.menu_settings:
-                                Log.d("SETTINGS", "YES");
-                                startActivity(new Intent(Todo.this, Settings.class));
-                        }
-                        return true;
-                    }
-                });
-
         mHelper = new TaskDbHelper(this);
 
-        // initialize the reference by adding:
+        // initialize the list
         mTaskListView = (ListView) findViewById(R.id.list_todo);
         mTaskListView.setLongClickable(true);
         mTaskListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {

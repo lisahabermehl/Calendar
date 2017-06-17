@@ -2,6 +2,11 @@ package com.example.lisahabermehl.calendar;
 
 import android.provider.BaseColumns;
 
+import com.google.api.client.util.DateTime;
+
+import java.sql.Date;
+import java.sql.Time;
+
 /**
  * Created by lisahabermehl on 14/06/2017.
  */
@@ -9,7 +14,7 @@ import android.provider.BaseColumns;
 public class MyCalendarTable {
 
     public static final String DB_NAME = "com.lisahabermehl.calendar.db";
-    public static final int DB_VERSION = 5;
+    public static final int DB_VERSION = 6;
 
     public class CalendarEntry implements BaseColumns {
         public static final String TABLE = "calendar";

@@ -21,6 +21,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -30,6 +31,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -54,7 +57,6 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
     ProgressDialog mProgress;
     MyCalendarDbHelper myCalendarDbHelper;
     MyCalendarAdapter myCalendarAdapter;
-    Context context;
     private ListView listView;
 
     static final int REQUEST_ACCOUNT_PICKER = 1000;
@@ -75,7 +77,6 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
         setContentView(R.layout.calendar_list);
 
         mOutputText = (TextView) findViewById(R.id.mOutputText);
-
         listView = (ListView) findViewById(R.id.list_calendar);
 
         myCalendarDbHelper = new MyCalendarDbHelper(this);
@@ -305,7 +306,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
             for (Event event : items) {
 
                 // get the date
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date original = new Date(event.getStart().getDateTime().getValue());
                 String dateStart = dateFormat.format(original);
 
@@ -327,10 +328,10 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 Log.d(String.valueOf(dateStart), "datum2");
                 Log.d(String.valueOf(dateCompare), "datum5");
 
-                if (dateStart.equals(dateCompare)) {
-                    eventStrings.add(String.format("%s_%s_%s_%s", activity, dateStart, timeStart, timeEnd));
+//                if (dateStart.equals(dateCompare)) {
+//                    eventStrings.add(String.format("%s_%s_%s_%s", activity, dateStart, timeStart, timeEnd));
 
-////                     add the above to DB
+//                    // add the above to DB
 //                    SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
 //
 //                    ContentValues values = new ContentValues();
@@ -346,7 +347,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
 //                            values,
 //                            SQLiteDatabase.CONFLICT_REPLACE);
 //                    db.close();
-                }
+////                }
             }
             return eventStrings;
         }
@@ -366,13 +367,14 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
             } else {
 
                 SQLiteDatabase db = myCalendarDbHelper.getReadableDatabase();
+
                 Cursor cursor = db.query(MyCalendarTable.CalendarEntry.TABLE,
                         new String[]{TaskTable.TaskEntry._ID,
                                 MyCalendarTable.CalendarEntry.COL_CAL_TITLE,
                                 MyCalendarTable.CalendarEntry.COL_CAL_DATE,
                                 MyCalendarTable.CalendarEntry.COL_CAL_START,
                                 MyCalendarTable.CalendarEntry.COL_CAL_END},
-                        null, null, null, null, null);
+                        null, null, null, null, MyCalendarTable.CalendarEntry.COL_CAL_DATE + "ASC");
 
                 ArrayList<MyCalendarObject> calendarObjects = new ArrayList<>();
 
@@ -395,26 +397,15 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 }
                 Log.d("COUNT2", Integer.toString(calendarObjects.size()));
 
-//                String one = TextUtils.join("\n", output);
-//                mOutputText.setText(TextUtils.join("\n", output));
-
-//                for(int j = 0; j < calendarObjects.size(); j++) {
-//                    if (calendarObjects.get(j) != null) {
-//
-                        if (myCalendarAdapter == null) {
-                            myCalendarAdapter = new MyCalendarAdapter(GoogleCalendarTest.this, 0, calendarObjects);
-                            listView.setAdapter(myCalendarAdapter);
-                        } else {
-                            myCalendarAdapter.clear();
-                            myCalendarAdapter.addAll(calendarObjects);
-                            myCalendarAdapter.notifyDataSetChanged();
-                        }
-//                    } else {
-//                        Log.d("NULL", "NOOOO");
-//                    }
-//                    db.close();
-//                    cursor.close();
-//                }
+                if (myCalendarAdapter == null) {
+                    myCalendarAdapter = new MyCalendarAdapter(GoogleCalendarTest.this, 0, calendarObjects);
+                    listView.setAdapter(myCalendarAdapter);
+                } else {
+                    myCalendarAdapter.clear();
+                    myCalendarAdapter.addAll(calendarObjects);
+                    myCalendarAdapter.notifyDataSetChanged();
+                }
+                cursor.close();
             }
         }
 
