@@ -128,3 +128,8 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 ### Think, think
 * what happens if someone wants to make a new activity, but making this new activity will lead to not finishing a Todo before the deadline. Should there be a check to see if it's possible to move this to another moment, and a warning to let the user know that he/she won't be able to finish in time (based on the time needed and deadline), and give user the option to: (1) say yes, this new activity is more important than finishing in time or (2) say no, maybe I shouldn't plan this activity because this Todo really has to be done in time
 
+# day 12
+### TODO
+* MyCalendar works, Todo works, so now I should fix seeing activities from one day when clicking on a specific day OR make sure that all activities from GoogleCalendar are visible in an organised overview, one long list (and give the user the option to scroll to down to another date by clicking on a date in the calendar)
+### Process
+* 
