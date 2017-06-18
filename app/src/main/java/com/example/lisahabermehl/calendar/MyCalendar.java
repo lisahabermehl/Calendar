@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CalendarView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -36,6 +37,15 @@ public class MyCalendar extends AppCompatActivity {
 
     Context context;
 
+    int time_end_mins = 0;
+    int time_end_hour = 0;
+    int time_end = 0;
+    int time_start_mins;
+    int time_start_hour;
+    String date_old = "nog niks";
+    String date_new;
+
+    String time2;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,43 +54,12 @@ public class MyCalendar extends AppCompatActivity {
         setContentView(R.layout.calendar_list);
 
         listView = (ListView) findViewById(R.id.list_calendar);
+
         myCalendarDbHelper = new MyCalendarDbHelper(this);
 
         updateUI();
 
-//        calendarView = (CalendarView) findViewById(R.id.calendarView);
-//        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-//            @Override
-//            public void onSelectedDayChange(CalendarView calendarView, int i, int i1, int i2) {
-//                // make a string of the day
-//                String day = Integer.toString(i2);
-//                // extra check just to make sure that date will be send correctly to GoogleCalendar
-//                if (day.length() == 1) {
-//                    day = ("0" + day);
-//                }
-//
-//                // the first month is 0, but in Google Calendar this is 1
-//                // so +1
-//                String month = Integer.toString(i1 + 1);
-//                if (month.length() == 1) {
-//                    month = ("0" + month);
-//                }
-//                String year = Integer.toString(i);
-//                String date = year + "-" + month + "-" + day;
-//
-//                // startActivity to show activities on a specific day
-//                Intent newActivity = new Intent(getApplicationContext(), GoogleCalendarTest.class);
-//                Bundle extras = new Bundle();
-//
-//                extras.putString("date", date);
-//                newActivity.putExtras(extras);
-//                startActivity(newActivity);
-//
-//                }
-//        });
     }
-//}
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -93,48 +72,10 @@ public class MyCalendar extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_search:
-                LayoutInflater layoutInflater = LayoutInflater.from(this);
-                final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_search, null);
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder
-                        .setView(dialogView)
-                        .setPositiveButton("SEARCH", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                            }
-                        })
-                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                            }
-                        })
-                        .create()
-                        .show();
                 return true;
             case R.id.menu_day:
-                LayoutInflater layoutInflaterDay = LayoutInflater.from(this);
-                final View dialogViewDay = layoutInflaterDay.inflate(R.layout.calendar_main, null);
-
-                AlertDialog.Builder builderDay = new AlertDialog.Builder(this);
-                builderDay
-                        .setView(dialogViewDay)
-                        .setPositiveButton("SELECT DATE", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                            }
-                        })
-                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                            }
-                        })
-                        .create()
-                        .show();
+                selectDate();
                 return true;
             case R.id.menu_calendar:
                 startActivity(new Intent(this, MyCalendar.class));
@@ -166,18 +107,56 @@ public class MyCalendar extends AppCompatActivity {
             int idxx = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_DATE);
             int idxxx = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START);
             int idxxxx = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END);
+
             Log.d("ID", cursor.getString(id));
             Log.d("ACTIVITY", cursor.getString(idx));
             Log.d("DATE", cursor.getString(idxx));
             Log.d("START", cursor.getString(idxxx));
             Log.d("END", cursor.getString(idxxxx));
+
             MyCalendarObject to = new MyCalendarObject(cursor.getString(idx),
                     cursor.getString(idxx), cursor.getString(idxxx), cursor.getString(idxxxx));
             calendarObjects.add(to);
 
+            String time = cursor.getString(idxxx);
+            date_new = cursor.getString(idxx);
+            time2 = cursor.getString(idxxxx);
+
+            String[] time_split = time.split(":");
+            time_start_hour = Integer.valueOf(time_split[0]);
+            time_start_mins = Integer.valueOf(time_split[1]);
+
+            Log.d("START HOUR", String.valueOf(time_start_hour));
+            Log.d("START MINS", String.valueOf(time_start_mins));
+
+            int time_start = (time_start_hour * 60) + time_start_mins;
+            int time_gap = time_start - time_end;
+
+            Log.d("TIME START", String.valueOf(time_start));
+            Log.d("TIME END", String.valueOf(time_end));
+            Log.d("TIME GAP", String.valueOf(time_gap));
+
+
+            if (date_new.equals(date_old)) {
+                if(time_gap > 15) {
+                    MyCalendarObject to2 = new MyCalendarObject("TEST", cursor.getString(idxx),
+                            String.valueOf(time_start), String.valueOf(time_start + 30));
+                    Log.d("HE GOT HERE", "YAY");
+                    calendarObjects.add(to2);
+                }
+            }
+
+            date_old = cursor.getString(idxx);
+
             Log.d("COUNT", Integer.toString(calendarObjects.size()));
         }
         Log.d("COUNT2", Integer.toString(calendarObjects.size()));
+
+
+        String[] time_split_end = time2.split(":");
+        time_end_hour = Integer.valueOf(time_split_end[0]);
+        time_end_mins = Integer.valueOf(time_split_end[1]);
+        time_end = (time_end_hour * 60) + time_end_mins;
 
         if (myCalendarAdapter == null) {
             myCalendarAdapter = new MyCalendarAdapter(this, 0, calendarObjects);
@@ -189,5 +168,29 @@ public class MyCalendar extends AppCompatActivity {
         }
         cursor.close();
         db.close();
+    }
+
+    private void selectDate() {
+        LayoutInflater layoutInflaterDay = LayoutInflater.from(this);
+        final View dialogViewDay = layoutInflaterDay.inflate(R.layout.calendar_main, null);
+
+        AlertDialog.Builder builderDay = new AlertDialog.Builder(this);
+        builderDay
+                .setView(dialogViewDay)
+                .setPositiveButton("SELECT DATE", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create()
+                .show();
+
     }
 }

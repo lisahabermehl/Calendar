@@ -28,14 +28,9 @@ import java.util.ArrayList;
 
 public class Todo extends AppCompatActivity {
 
-    private static final String TAG = "MainActivity";
-
     private TaskDbHelper mHelper;
-
-    // this arrayadapter will help populate the listview with data
     private TaskAdapter taskAdapter;
 
-    // add an instance of the ListView
     private ListView mTaskListView;
 
     @Override
@@ -71,52 +66,7 @@ public class Todo extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_add_task:
-
-                LayoutInflater layoutInflater = LayoutInflater.from(this);
-
-                final View dialogView = layoutInflater.inflate(R.layout.alert_dialog, null);
-                final EditText description = (EditText) dialogView
-                        .findViewById(R.id.new_todo);
-                final EditText duration = (EditText) dialogView
-                        .findViewById(R.id.time_needed);
-                final DatePicker deadline = (DatePicker) dialogView
-                        .findViewById(R.id.task_deadline);
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder
-                        .setView(dialogView)
-                        .setPositiveButton("ADD",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        String task = String.valueOf(description.getText());
-                                        String time = String.valueOf(duration.getText());
-                                        int day = deadline.getDayOfMonth();
-                                        int month = deadline.getMonth();
-                                        int year = deadline.getYear();
-                                        String deadline = String.valueOf(year + "-" + month + "-" + day);
-
-                                        SQLiteDatabase db = mHelper.getWritableDatabase();
-
-                                        ContentValues values = new ContentValues();
-                                        values.put(TaskTable.TaskEntry.COL_TASK_TITLE, task);
-                                        values.put(TaskTable.TaskEntry.COL_TASK_DURATION, time);
-                                        values.put(TaskTable.TaskEntry.COL_TASK_DEADLINE, deadline);
-                                        db.insertWithOnConflict(TaskTable.TaskEntry.TABLE,
-                                                null,
-                                                values,
-                                                SQLiteDatabase.CONFLICT_REPLACE);
-                                        db.close();
-                                        updateUI();
-                                    }
-                                })
-                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
-                            }
-                        })
-                        .create()
-                        .show();
+                addTask();
                 return true;
             case R.id.menu_calendar:
                 startActivity(new Intent(this, MyCalendar.class));
@@ -128,11 +78,6 @@ public class Todo extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-    // move the code that was logging the tasks into the following method
-    // instead of logging the tasks we will add m into an arraylist of strings
-    // checks if mAdapter is created or not
-    // if it isn't we'll create and set it as the adapter of the listview
 
     // to see the updated data you need to call the updateUI method every time the underlying data of the app changes
     // so we add it in two places: onCreate() and after adding a new task using the AlertDialog
@@ -165,6 +110,54 @@ public class Todo extends AppCompatActivity {
         }
         cursor.close();
         db.close();
+    }
+
+    private void addTask() {
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+
+        final View dialogView = layoutInflater.inflate(R.layout.alert_dialog, null);
+        final EditText description = (EditText) dialogView
+                .findViewById(R.id.new_todo);
+        final EditText duration = (EditText) dialogView
+                .findViewById(R.id.time_needed);
+        final DatePicker deadline = (DatePicker) dialogView
+                .findViewById(R.id.task_deadline);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder
+                .setView(dialogView)
+                .setPositiveButton("ADD",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                String task = String.valueOf(description.getText());
+                                String time = String.valueOf(duration.getText());
+                                int day = deadline.getDayOfMonth();
+                                int month = deadline.getMonth();
+                                int year = deadline.getYear();
+                                String deadline = String.valueOf(year + "-" + month + "-" + day);
+
+                                SQLiteDatabase db = mHelper.getWritableDatabase();
+
+                                ContentValues values = new ContentValues();
+                                values.put(TaskTable.TaskEntry.COL_TASK_TITLE, task);
+                                values.put(TaskTable.TaskEntry.COL_TASK_DURATION, time);
+                                values.put(TaskTable.TaskEntry.COL_TASK_DEADLINE, deadline);
+                                db.insertWithOnConflict(TaskTable.TaskEntry.TABLE,
+                                        null,
+                                        values,
+                                        SQLiteDatabase.CONFLICT_REPLACE);
+                                db.close();
+                                updateUI();
+                            }
+                        })
+                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                })
+                .create()
+                .show();
     }
 
     public void deleteTask(View view) {
