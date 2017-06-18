@@ -138,4 +138,7 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 
 # day 13
 ### TODO
-* Could use this: https://stackoverflow.com/questions/4777272/android-listview-with-different-layouts-for-each-row to fix the layout for the calendar view OR make an expandable listview something?
+* could use this: https://stackoverflow.com/questions/4777272/android-listview-with-different-layouts-for-each-row to fix the layout for the calendar view OR make an expandable listview something?
+
+### Process
+* tried to fix the calendar's layout by making two different xml files for an item in the calendar listview. But somehow the if-else statement doesn't work in the arrayadapter's getview. The one that's called first will show but with the other one the values seem to be passed as "null" and doesn't show anything in the listview. Except for when the value of a textview is initialized in the xml file itself.
