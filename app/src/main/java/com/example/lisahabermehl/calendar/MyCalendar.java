@@ -46,8 +46,6 @@ public class MyCalendar extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.list_calendar);
         myCalendarDbHelper = new MyCalendarDbHelper(this);
 
-
-
         updateUI();
 
 //        calendarView = (CalendarView) findViewById(R.id.calendarView);
@@ -148,8 +146,6 @@ public class MyCalendar extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-
 
     private void updateUI(){
         SQLiteDatabase db = myCalendarDbHelper.getReadableDatabase();

@@ -6,20 +6,25 @@
         android:id="@+id/menu_search"
         app:showAsAction="always"
         android:icon="@drawable/search"
-        android:title="VIEW"/>
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        android:title="Search"/>
+    <item
+        android:id="@+id/action_add_task"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="Add Task"
+        app:showAsAction="always" />
     <item
         android:id="@+id/menu_day"
-        app:showAsAction="always"
-        android:icon="@drawable/calendar"
-        android:title="SEARCH"/>
+        android:orderInCategory="1"
+        android:title="Select date"/>
     <item
         android:id="@+id/menu_calendar"
-        android:orderInCategory="1"
+        android:orderInCategory="2"
         app:showAsAction="never"
         android:title="My Calendar"/>
     <item
         android:id="@+id/menu_todo"
-        android:orderInCategory="2"
+        android:orderInCategory="3"
         app:showAsAction="never"
         android:title="My Todo List"/>
 </menu>
