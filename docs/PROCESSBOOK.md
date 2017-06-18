@@ -135,3 +135,7 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 * results are shown in descending order by date and time
 ### Think, think
 * how are you supposed to check for activities with the same name, date and time? With other words: how are you supposed to check if the values in different columns in one row are exactly the same as the values in different columns in another row?
+
+# day 13
+### TODO
+* Could use this: https://stackoverflow.com/questions/4777272/android-listview-with-different-layouts-for-each-row to fix the layout for the calendar view OR make an expandable listview something?
