@@ -328,9 +328,9 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 Log.d(String.valueOf(dateStart), "datum2");
                 Log.d(String.valueOf(dateCompare), "datum5");
 
-//                if (dateStart.equals(dateCompare)) {
+////                if (dateStart.equals(dateCompare)) {
 //                    eventStrings.add(String.format("%s_%s_%s_%s", activity, dateStart, timeStart, timeEnd));
-
+//
 //                    // add the above to DB
 //                    SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
 //
@@ -374,7 +374,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                                 MyCalendarTable.CalendarEntry.COL_CAL_DATE,
                                 MyCalendarTable.CalendarEntry.COL_CAL_START,
                                 MyCalendarTable.CalendarEntry.COL_CAL_END},
-                        null, null, null, null, MyCalendarTable.CalendarEntry.COL_CAL_DATE + "ASC");
+                        null, null, null, null, MyCalendarTable.CalendarEntry.COL_CAL_DATE + " ASC");
 
                 ArrayList<MyCalendarObject> calendarObjects = new ArrayList<>();
 
