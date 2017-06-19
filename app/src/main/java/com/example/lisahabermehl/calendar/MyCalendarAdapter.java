@@ -44,23 +44,23 @@ public class MyCalendarAdapter extends ArrayAdapter<MyCalendarObject> {
         TextView start = (TextView) view.findViewById(R.id.calendar_start);
         TextView end = (TextView) view.findViewById(R.id.calendar_end);
 
-        dateTwo = myCalendarObject.getDate();
-        Log.d("ACT 2", dateTwo);
+//        dateTwo = myCalendarObject.getDate();
+//        Log.d("ACT 2", dateTwo);
 
-        if (dateOne.equals(dateTwo)) {
+//        if (dateOne.equals(dateTwo)) {
             date.setText(myCalendarObject.getDate());
             activity.setText(myCalendarObject.getActivity());
             start.setText(myCalendarObject.getStart());
             end.setText(myCalendarObject.getEnd());
-        }
-        else {
-            activity.setText(myCalendarObject.getActivity());
-            start.setText(myCalendarObject.getStart());
-            end.setText(myCalendarObject.getEnd());
-        }
+//        }
+//        else {
+//            activity.setText(myCalendarObject.getActivity());
+//            start.setText(myCalendarObject.getStart());
+//            end.setText(myCalendarObject.getEnd());
+//        }
 
-        dateOne = myCalendarObject.getDate();
-        Log.d("ACT 1", dateOne);
+//        dateOne = myCalendarObject.getDate();
+//        Log.d("ACT 1", dateOne);
 
         return view;
     }
