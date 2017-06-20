@@ -92,6 +92,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
 
+
         // get the date that user selected
         getResultsFromApi();
     }
@@ -111,8 +112,16 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
         } else if (! isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
         } else {
+
+            Intent intent = getIntent();
+            Bundle extras = intent.getExtras();
             String[] passing = new String[4];
-            passing[0] = "get";
+            passing[0] = extras.getString("zero");
+            if (passing[0] == "add") {
+                passing[1] = extras.getString("one");
+                passing[2] = extras.getString("two");
+                passing[3] = extras.getString("three");
+            }
 
             // execute the AsyncTask and give date
             new MakeRequestTask(mCredential).execute(passing);
@@ -399,7 +408,6 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                     e.printStackTrace();
                 }
         }
-
 
         @Override
         protected void onPreExecute() {
