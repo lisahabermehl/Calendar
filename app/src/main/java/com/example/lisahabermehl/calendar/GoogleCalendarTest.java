@@ -340,6 +340,8 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
                     Date startDate = simpleDateFormat.parse(params[2]);
                     Date endDate = simpleDateFormat.parse(params[3]);
+                    Log.d("Startdate", String.valueOf(startDate));
+                    Log.d("Enddate", String.valueOf(endDate));
 
                     return insertEvent(title, startDate, endDate);
                 } catch (ParseException e) {
@@ -450,7 +452,10 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
 
             if(mService!=null)
                 try {
+                    Log.d("Added?", "big chance");
                     mService.events().insert(calendarId, event).execute();
+                    Log.d("Added?", "bigger chance");
+//                    Log.d("HTML", event.getHtmlLink());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -472,7 +477,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 mOutputText.setText("No results returned.");
             } else {
                 mOutputText.setText(String.valueOf(output));
-                startActivity(new Intent(GoogleCalendarTest.this, MyCalendar.class));
+//                startActivity(new Intent(GoogleCalendarTest.this, MyCalendar.class));
             }
         }
 

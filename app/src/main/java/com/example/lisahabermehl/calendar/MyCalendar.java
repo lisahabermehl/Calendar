@@ -23,10 +23,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CalendarView;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.sql.Date;
 import java.util.ArrayList;
 
 public class MyCalendar extends AppCompatActivity {
@@ -93,6 +97,9 @@ public class MyCalendar extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_search:
 
+                return true;
+            case R.id.insert_event:
+                insertEvent();
                 return true;
             case R.id.menu_day:
                 selectDate();
@@ -241,6 +248,60 @@ public class MyCalendar extends AppCompatActivity {
 //        db.close();
 //        updateUI();
 //    }
+
+    private void insertEvent() {
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_insert_event, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder
+                .setView(dialogView)
+                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast.makeText(MyCalendar.this, "Okeee dan", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setPositiveButton("INSERT EVENT", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        EditText editText = (EditText) dialogView.findViewById(R.id.event_title);
+                        String title = editText.getText().toString();
+
+                        DatePicker datePicker = (DatePicker) dialogView.findViewById(R.id.event_date_start);
+                        String day = String.valueOf(datePicker.getDayOfMonth());
+                        String month = String.valueOf(datePicker.getMonth());
+                        String year = String.valueOf(datePicker.getYear());
+
+                        EditText startTime = (EditText) dialogView.findViewById(R.id.event_time_start);
+                        EditText endTime = (EditText) dialogView.findViewById(R.id.event_time_end);
+
+                        String startTim = startTime.getText().toString();
+                        String endTim = endTime.getText().toString();
+
+                        String start = year + "/" + month + "/" + day + " " +
+                                startTim;
+                        String end = year + "/" + month + "/" + day + " " +
+                                endTim;
+
+                        // startActivity to show activities on a specific day
+                        Intent newActivity = new Intent(getApplicationContext(), GoogleCalendarTest.class);
+                        Bundle extras = new Bundle();
+
+                        extras.putString("zero", "add");
+                        extras.putString("one", title);
+                        extras.putString("two", start);
+                        extras.putString("three", end);
+                        newActivity.putExtras(extras);
+                        startActivity(newActivity);
+                    }
+                })
+                .create()
+                .show();
+
+    }
 
     private void selectDate() {
         LayoutInflater layoutInflaterDay = LayoutInflater.from(this);
