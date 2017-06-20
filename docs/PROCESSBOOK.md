@@ -142,3 +142,23 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 
 ### Process
 * tried to fix the calendar's layout by making two different xml files for an item in the calendar listview. But somehow the if-else statement doesn't work in the arrayadapter's getview. The one that's called first will show but with the other one the values seem to be passed as "null" and doesn't show anything in the listview. Except for when the value of a textview is initialized in the xml file itself.
+
+### Think, think
+### Important decisions
+
+# day 14 
+### TODO
+### Process
+### Think, think
+* Het is makkelijker om de calendar te syncen door alle values te verwijderen en deze weer opnieuw op te halen van google calendar. Maar daarom ook de beslissing genomen om de kalender alleen voor 3 maanden te kunnen gebruiken. MAW op basis van drie maanden worden de todos ingepland, obv drie maanden kunnen er todos aangemaakt worden dan ook? Of kunnen users todos voor ver in de toekomst aanmaken en dan wordt het gewoon ingepland met het idee van “dit kan wel zo laat mogelijk”
+* Nog steeds de mogelijkheid toevoegen om activiteiten aan Google Calendar toe te voegen? Voordeel hiervan is dat de user een melding krijgt dat die in de knoop komt met het afronden van een todo item door het toevoegen van deze nieuwe activiteit
+* Is het mogelijk om de id steeds naar 0 te resetten als de calendar gesyncd wordt?
+### Important decisions
+* Ook een optie maken om in te stellen voor welke periode je suggesties wilt krijgen voor je todo lijst: drie maanden? Of misschien is het op dit moment wel handig omdat de tentamenweek er bijna is over drie weken, dan zou je het kunnen instellen op drie weken
+
+# day 15
+### TODO
+* 
+### Process
+### Think, think
+### Important decisions
