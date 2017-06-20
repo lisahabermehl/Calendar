@@ -250,13 +250,14 @@ public class MyCalendar extends AppCompatActivity {
 //    }
 
     private void insertEvent() {
-        LayoutInflater layoutInflater = LayoutInflater.from(this);
-        final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_insert_event, null);
+
+        final TextView textView = new TextView(this);
+        textView.setText("Test test");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder
-                .setView(dialogView)
+                .setView(textView)
                 .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -266,36 +267,16 @@ public class MyCalendar extends AppCompatActivity {
                 .setPositiveButton("INSERT EVENT", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-
-                        EditText editText = (EditText) dialogView.findViewById(R.id.event_title);
-                        String title = editText.getText().toString();
-
-                        DatePicker datePicker = (DatePicker) dialogView.findViewById(R.id.event_date_start);
-                        String day = String.valueOf(datePicker.getDayOfMonth());
-                        String month = String.valueOf(datePicker.getMonth());
-                        String year = String.valueOf(datePicker.getYear());
-
-                        EditText startTime = (EditText) dialogView.findViewById(R.id.event_time_start);
-                        EditText endTime = (EditText) dialogView.findViewById(R.id.event_time_end);
-
-                        String startTim = startTime.getText().toString();
-                        String endTim = endTime.getText().toString();
-
-                        String start = year + "/" + month + "/" + day + " " +
-                                startTim;
-                        String end = year + "/" + month + "/" + day + " " +
-                                endTim;
-
-                        // startActivity to show activities on a specific day
-                        Intent newActivity = new Intent(getApplicationContext(), GoogleCalendarTest.class);
+                        Intent intent = new Intent(getApplicationContext(), GoogleCalendarTest.class);
                         Bundle extras = new Bundle();
 
                         extras.putString("zero", "add");
-                        extras.putString("one", title);
-                        extras.putString("two", start);
-                        extras.putString("three", end);
-                        newActivity.putExtras(extras);
-                        startActivity(newActivity);
+                        extras.putString("one", "New new new");
+                        extras.putString("two", "2017/07/02 21:00");
+                        extras.putString("three", "2017/07/02 22:00");
+
+                        intent.putExtras(extras);
+                        startActivity(intent);
                     }
                 })
                 .create()
