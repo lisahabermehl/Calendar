@@ -59,8 +59,8 @@ public class Settings extends AppCompatActivity {
         Bundle extras = new Bundle();
         extras.putString("zero", "add");
         extras.putString("one", "Yay, I've added a new activity");
-        extras.putString("two", "2017-07-04 21:00");
-        extras.putString("three", "2017-07-04 22:00");
+        extras.putString("two", "2017/07/04 21:00");
+        extras.putString("three", "2017/07/04 22:00");
         intent.putExtras(extras);
         startActivity(intent);
     }

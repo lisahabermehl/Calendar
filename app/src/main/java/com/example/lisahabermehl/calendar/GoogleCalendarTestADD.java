@@ -1,33 +1,12 @@
 package com.example.lisahabermehl.calendar;
 
-import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
-import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.ExponentialBackOff;
-
-import com.google.api.services.calendar.*;
-import com.google.api.client.util.DateTime;
-
-import com.google.api.services.calendar.model.*;
-
 import android.Manifest;
-import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -35,10 +14,23 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.TextView;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.DateTime;
+import com.google.api.client.util.ExponentialBackOff;
+import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.Events;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -56,7 +48,7 @@ import pub.devrel.easypermissions.EasyPermissions;
  * https://developers.google.com/google-apps/calendar/quickstart/android
  */
 
-public class GoogleCalendarTest extends Activity implements EasyPermissions.PermissionCallbacks {
+public class GoogleCalendarTestADD extends Activity implements EasyPermissions.PermissionCallbacks {
     GoogleAccountCredential mCredential;
     TextView mOutputText;
     ProgressDialog mProgress;
@@ -94,6 +86,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
+
 
         // get the date that user selected
         getResultsFromApi();
@@ -259,59 +252,11 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
             final int connectionStatusCode) {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         Dialog dialog = apiAvailability.getErrorDialog(
-                GoogleCalendarTest.this,
+                GoogleCalendarTestADD.this,
                 connectionStatusCode,
                 REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
     }
-
-    /**
-     -//     * Called when an activity launched here (specifically, AccountPicker
-     -//     * and authorization) exits, giving you the requestCode you started it with,
-     -//     * the resultCode it returned, and any additional data from it.
-     -//     * @param requestCode code indicating which activity result is incoming.
-     -//     * @param resultCode code indicating the result of the incoming
-     -//     *     activity result.
-     -//     * @param data Intent (containing result data) returned by incoming
-     -//     *     activity result.
-     -//     */
-        @Override
-        protected void onActivityResult(
-                int requestCode, int resultCode, Intent data) {
-            super.onActivityResult(requestCode, resultCode, data);
-            switch(requestCode) {
-                case REQUEST_GOOGLE_PLAY_SERVICES:
-                    if (resultCode != RESULT_OK) {
-                        mOutputText.setText(
-                                "This app requires Google Play Services. Please install " +
-                                        "Google Play Services on your device and relaunch this app.");
-                    } else {
-                        getResultsFromApi();
-                    }
-                    break;
-                case REQUEST_ACCOUNT_PICKER:
-                    if (resultCode == RESULT_OK && data != null &&
-                            data.getExtras() != null) {
-                        String accountName =
-                                data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-                        if (accountName != null) {
-                            SharedPreferences settings =
-                                    getPreferences(Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editor = settings.edit();
-                            editor.putString(PREF_ACCOUNT_NAME, accountName);
-                            editor.apply();
-                            mCredential.setSelectedAccountName(accountName);
-                            getResultsFromApi();
-                        }
-                    }
-                    break;
-                case REQUEST_AUTHORIZATION:
-                    if (resultCode == RESULT_OK) {
-                        getResultsFromApi();
-                    }
-                    break;
-            }
-        }
 
     /**
      * An asynchronous task that handles the Google Calendar API call.
@@ -324,12 +269,10 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
         MakeRequestTask(GoogleAccountCredential credential) {
             HttpTransport transport = AndroidHttp.newCompatibleTransport();
             JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-
             mService = new com.google.api.services.calendar.Calendar.Builder(
                     transport, jsonFactory, credential)
                     .setApplicationName("Google Calendar API Android Quickstart")
                     .build();
-
         }
 
         /**
@@ -469,12 +412,14 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
 
             String calendarId = "primary";
 
-            try {
-                event = mService.events().insert(calendarId, event).execute();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.printf("Event created: %s\n", event.getHtmlLink());
+            if(mService!=null)
+                try {
+                    Log.d("INSERTED?", "I guess he did");
+                    mService.events().insert(calendarId, event).execute();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
         }
 
         @Override
@@ -491,7 +436,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 mOutputText.setText("No results returned.");
             }
             else {
-                startActivity(new Intent(GoogleCalendarTest.this, MyCalendar.class));
+                startActivity(new Intent(GoogleCalendarTestADD.this, MyCalendar.class));
             }
         }
 
@@ -506,7 +451,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
                     startActivityForResult(
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
-                            GoogleCalendarTest.REQUEST_AUTHORIZATION);
+                            GoogleCalendarTestADD.REQUEST_AUTHORIZATION);
                 } else {
                     mOutputText.setText("The following error occurred:\n"
                             + mLastError.getMessage());
