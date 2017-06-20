@@ -58,4 +58,11 @@
         android:text="SYNC CALENDAR"
         android:onClick="syncCalendar"/>
 
+    <Button
+        android:id="@+id/add_activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ADD ACTIVITY"
+        android:onClick="addActivity"/>
+
 </LinearLayout>

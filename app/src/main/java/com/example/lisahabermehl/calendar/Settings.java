@@ -49,7 +49,26 @@ public class Settings extends AppCompatActivity {
         SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
         db.delete(MyCalendarTable.CalendarEntry.TABLE, null, null);
 
-        startActivity(new Intent(this, GoogleCalendarTest.class));
+        Intent intent = new Intent(this, GoogleCalendarTest.class);
+        Bundle extras = new Bundle();
+
+        extras.putString("zero", "get");
+
+        intent.putExtras(extras);
+        startActivity(intent);
+    }
+
+    public void addActivity(View view) {
+        Intent intent = new Intent(this, GoogleCalendarTest.class);
+        Bundle extras = new Bundle();
+
+        extras.putString("zero", "add");
+        extras.putString("one", "New new new");
+        extras.putString("two", "2017/07/02 21:00");
+        extras.putString("three", "2017/07/02 22:00");
+
+        intent.putExtras(extras);
+        startActivity(intent);
     }
 
     public void editBedtimeStart(View view) {

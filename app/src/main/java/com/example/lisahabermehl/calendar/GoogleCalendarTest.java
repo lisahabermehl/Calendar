@@ -86,7 +86,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
         myCalendarDbHelper = new MyCalendarDbHelper(this);
         myCalendar = new MyCalendar();
 
-        // let user know that app is fetching data
+        // let user know that app is fetching data/adding data
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("Un momento ...");
 
@@ -114,8 +114,18 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
         } else if (! isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
         } else {
+
+            Intent intent = getIntent();
+            Bundle extras = intent.getExtras();
+            String[] passing = new String[4];
+
+            passing[0] = extras.getString("zero");
+            passing[1] = extras.getString("one");
+            passing[2] = extras.getString("two");
+            passing[3] = extras.getString("three");
+
             // execute the AsyncTask and give date
-            new MakeRequestTask(mCredential).execute();
+            new MakeRequestTask(mCredential).execute(passing);
         }
     }
 
@@ -314,7 +324,6 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                     transport, jsonFactory, credential)
                     .setApplicationName("Google Calendar API Android Quickstart")
                     .build();
-
         }
 
         /**
@@ -323,11 +332,27 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
          */
         @Override
         protected List<String> doInBackground(String... params) {
-            try {
-                return getDataFromApi();
-            } catch (IOException e) {
-                e.printStackTrace();
-                cancel(true);
+
+            if (params[0].equals("add")) {
+
+                try {
+                    String title = params[1];
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+                    Date startDate = simpleDateFormat.parse(params[2]);
+                    Date endDate = simpleDateFormat.parse(params[3]);
+
+                    return insertEvent(title, startDate, endDate);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (params[0].equals("get")) {
+                try {
+                    return getDataFromApi();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    cancel(true);
+                }
             }
             return null;
         }
@@ -339,111 +364,99 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
          */
         // where all the data comes from, try to put these in an SQLite database?
         private List<String> getDataFromApi() throws IOException {
-//            // List the next 10 events from the primary calendar.
-//            DateTime now = new DateTime(System.currentTimeMillis());
-//
+            // List the next 10 events from the primary calendar.
+            DateTime now = new DateTime(System.currentTimeMillis());
+
             List<String> eventStrings = new ArrayList<>();
-//
-//            Events events = mService.events().list("primary")
-//                    .setMaxResults(30)
-//                    .setTimeMin(now)
-//                    .setOrderBy("startTime")
-//                    .setSingleEvents(true)
-//                    .execute();
-//
-//            // list with all the events
-//            List<Event> items = events.getItems();
-//
-//            // gonna try to get a specific date here
-//            for (Event event : items) {
-//
-//                // get the date
-//                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//                Date original = new Date(event.getStart().getDateTime().getValue());
-//                String dateStart = dateFormat.format(original);
-//
-//                // get the time
-//                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-//                String timeStart = timeFormat.format(original);
-//
-//                // get the end time (and date?)
-//                Date originalEnd = new Date(event.getEnd().getDateTime().getValue());
-//                String dateEnd = dateFormat.format(originalEnd);
-//                String timeEnd = timeFormat.format(originalEnd);
-//
-//                // what is the activity about
-//                String activity = event.getSummary();
-//
-//                eventStrings.add(String.format("%s - %s \n%s", timeStart, timeEnd, activity));
-//
-//                // add the above to DB
-//                SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
-//
-//                ContentValues values = new ContentValues();
-//                values.put(MyCalendarTable.CalendarEntry.COL_CAL_TITLE, activity);
-//                values.put(MyCalendarTable.CalendarEntry.COL_CAL_DATE, dateStart);
-//                values.put(MyCalendarTable.CalendarEntry.COL_CAL_START, timeStart);
-//                values.put(MyCalendarTable.CalendarEntry.COL_CAL_END, timeEnd);
-//                Log.d("ACTIVITY", activity);
-//
-//                // add new values to table
-//                db.insertWithOnConflict(MyCalendarTable.CalendarEntry.TABLE,
-//                        null,
-//                        values,
-//                        SQLiteDatabase.CONFLICT_REPLACE);
-//                db.close();
-//
-//            }
-//            return eventStrings;
 
+            Events events = mService.events().list("primary")
+                    .setMaxResults(30)
+                    .setTimeMin(now)
+                    .setOrderBy("startTime")
+                    .setSingleEvents(true)
+                    .execute();
 
+            // list with all the events
+            List<Event> items = events.getItems();
 
-            try {
-                DateTime startDateTime;
-                DateTime endDateTime;
-                Date startDate;
-                Date endDate;
-                String des = "New new new";
+            // gonna try to get a specific date here
+            for (Event event : items) {
 
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+                // get the date
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date original = new Date(event.getStart().getDateTime().getValue());
+                String dateStart = dateFormat.format(original);
 
-                startDate = simpleDateFormat.parse("2017/07/01 21:00");
-                endDate = simpleDateFormat.parse("2017/07/01 22:00");
+                // get the time
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+                String timeStart = timeFormat.format(original);
 
-                eventStrings.add(String.format("%s\n%s\n%s", des, String.valueOf(startDate), String.valueOf(endDate)));
+                // get the end time (and date?)
+                Date originalEnd = new Date(event.getEnd().getDateTime().getValue());
+                String dateEnd = dateFormat.format(originalEnd);
+                String timeEnd = timeFormat.format(originalEnd);
 
-                startDateTime = new DateTime(startDate);
-                endDateTime = new DateTime(endDate);
+                // what is the activity about
+                String activity = event.getSummary();
 
-                EventDateTime start = new EventDateTime()
-                        .setDateTime(startDateTime);
-                EventDateTime end = new EventDateTime()
-                        .setDateTime(endDateTime);
-                Event event = new Event()
-                        .setSummary(des)
-                        .setStart(start)
-                        .setEnd(end);
+                eventStrings.add(String.format("%s - %s \n%s", timeStart, timeEnd, activity));
 
-                Log.d("Start date", String.valueOf(startDate));
-                Log.d("End date", String.valueOf(endDate));
-                Log.d("Start datetime", String.valueOf(startDateTime));
-                Log.d("End datetime", String.valueOf(endDateTime));
+                // add the above to DB
+                SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
 
-                String calendarId = "primary";
+                ContentValues values = new ContentValues();
+                values.put(MyCalendarTable.CalendarEntry.COL_CAL_TITLE, activity);
+                values.put(MyCalendarTable.CalendarEntry.COL_CAL_DATE, dateStart);
+                values.put(MyCalendarTable.CalendarEntry.COL_CAL_START, timeStart);
+                values.put(MyCalendarTable.CalendarEntry.COL_CAL_END, timeEnd);
+                Log.d("ACTIVITY", activity);
 
-                if(mService!=null)
-                    try {
-                        mService.events().insert(calendarId, event).execute();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-            } catch (ParseException e) {
-                e.printStackTrace();
+                // add new values to table
+                db.insertWithOnConflict(MyCalendarTable.CalendarEntry.TABLE,
+                        null,
+                        values,
+                        SQLiteDatabase.CONFLICT_REPLACE);
+                db.close();
+
             }
-
             return eventStrings;
-
         }
+
+        private List<String> insertEvent(String des, Date startDate, Date endDate) {
+            DateTime startDateTime;
+            DateTime endDateTime;
+
+            startDateTime = new DateTime(startDate);
+            endDateTime = new DateTime(endDate);
+
+            List<String> eventStrings = new ArrayList<>();
+            eventStrings.add(String.format("%s\n%s\n%s", des, String.valueOf(startDateTime), String.valueOf(endDateTime)));
+
+            EventDateTime start = new EventDateTime()
+                    .setDateTime(startDateTime);
+            EventDateTime end = new EventDateTime()
+                    .setDateTime(endDateTime);
+            Event event = new Event()
+                    .setSummary(des)
+                    .setStart(start)
+                    .setEnd(end);
+
+            Log.d("Start date", String.valueOf(startDate));
+            Log.d("End date", String.valueOf(endDate));
+            Log.d("Start datetime", String.valueOf(startDateTime));
+            Log.d("End datetime", String.valueOf(endDateTime));
+
+            String calendarId = "primary";
+
+            if(mService!=null)
+                try {
+                    mService.events().insert(calendarId, event).execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            return eventStrings;
+        }
+
 
         @Override
         protected void onPreExecute() {
