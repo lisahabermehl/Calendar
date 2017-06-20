@@ -37,8 +37,6 @@ public class MyCalendar extends AppCompatActivity {
     MyCalendarAdapter myCalendarAdapter;
     ListView listView;
 
-    Context context;
-
     int start_hour;
     int start_mins;
     int time_start;
@@ -134,19 +132,14 @@ public class MyCalendar extends AppCompatActivity {
             String date_string = cursor.getString(date);
             String start_string = cursor.getString(start);
             String end_string = cursor.getString(end);
-            Log.d("ID", cursor.getString(id));
-            Log.d("ACTIVITY", cursor.getString(title));
-            Log.d("DATE", cursor.getString(date));
-            Log.d("START", cursor.getString(start));
-            Log.d("END", cursor.getString(end));
+//            Log.d("ID", cursor.getString(id));
+//            Log.d("ACTIVITY", cursor.getString(title));
+//            Log.d("DATE", cursor.getString(date));
+//            Log.d("START", cursor.getString(start));
+//            Log.d("END", cursor.getString(end));
 
-//            MyCalendarObject to = new MyCalendarObject(cursor.getString(title),
-//                    cursor.getString(date), cursor.getString(start), cursor.getString(end));
-//            calendarObjects.add(to);
             MyCalendarObject to = new MyCalendarObject(title_string,
                     date_string, start_string, end_string);
-//            calendarObjects.add(to);
-
 
             String[] start_split = start_string.split(":");
             start_hour = Integer.valueOf(start_split[0]);
@@ -210,6 +203,9 @@ public class MyCalendar extends AppCompatActivity {
                 MyCalendarObject to_gap_morning = new MyCalendarObject("Gap morning", date_string,
                         String.valueOf(time_gap_morning), String.valueOf(time_gap_morning_hour));
 
+                Log.d("EVENING", String.valueOf(time_gap_evening));
+                Log.d("MORNING", String.valueOf(time_gap_morning));
+
                 time_end_old = time_end;
                 date_old = date_new;
                 calendarObjects.add(to_gap_evening);
@@ -220,8 +216,6 @@ public class MyCalendar extends AppCompatActivity {
             Log.d("COUNT", Integer.toString(calendarObjects.size()));
         }
         Log.d("COUNT2", Integer.toString(calendarObjects.size()));
-
-
 
         if (myCalendarAdapter == null) {
             myCalendarAdapter = new MyCalendarAdapter(this, 0, calendarObjects);
@@ -280,6 +274,5 @@ public class MyCalendar extends AppCompatActivity {
                 })
                 .create()
                 .show();
-
     }
 }

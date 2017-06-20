@@ -51,4 +51,11 @@
         android:text="SET TIME"
         android:onClick="editBedtimeEnd"/>
 
+    <Button
+        android:id="@+id/sync_calendar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SYNC CALENDAR"
+        android:onClick="syncCalendar"/>
+
 </LinearLayout>

@@ -23,6 +23,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
@@ -56,8 +57,8 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
     TextView mOutputText;
     ProgressDialog mProgress;
     MyCalendarDbHelper myCalendarDbHelper;
-    MyCalendarAdapter myCalendarAdapter;
-    private ListView listView;
+
+    MyCalendar myCalendar;
 
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     static final int REQUEST_AUTHORIZATION = 1001;
@@ -77,9 +78,9 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
         setContentView(R.layout.calendar_list);
 
         mOutputText = (TextView) findViewById(R.id.mOutputText);
-        listView = (ListView) findViewById(R.id.list_calendar);
 
         myCalendarDbHelper = new MyCalendarDbHelper(this);
+        myCalendar = new MyCalendar();
 
         // let user know that app is fetching data
         mProgress = new ProgressDialog(this);
@@ -91,8 +92,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 .setBackOff(new ExponentialBackOff());
 
         // get the date that user selected
-        String date = getIntent().getExtras().getString("date");
-        getResultsFromApi(date);
+        getResultsFromApi();
     }
 
     /**
@@ -102,16 +102,16 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
      * of the preconditions are not satisfied, the app will prompt the user as
      * appropriate.
      */
-    private void getResultsFromApi(String date) {
+    public void getResultsFromApi() {
         if (! isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
-            chooseAccount(date);
+            chooseAccount();
         } else if (! isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
         } else {
             // execute the AsyncTask and give date
-            new MakeRequestTask(mCredential).execute(date);
+            new MakeRequestTask(mCredential).execute();
         }
     }
 
@@ -126,14 +126,14 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
      * is granted.
      */
     @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
-    private void chooseAccount(String date) {
+    private void chooseAccount() {
         if (EasyPermissions.hasPermissions(
                 this, Manifest.permission.GET_ACCOUNTS)) {
             String accountName = getPreferences(Context.MODE_PRIVATE)
                     .getString(PREF_ACCOUNT_NAME, null);
             if (accountName != null) {
                 mCredential.setSelectedAccountName(accountName);
-                getResultsFromApi(date);
+                getResultsFromApi();
             } else {
                 // Start a dialog from which the user can choose an account
                 startActivityForResult(
@@ -269,9 +269,15 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
          */
         @Override
         protected List<String> doInBackground(String... params) {
+            if (params[0].equals("add")) {
+                String des = params[1];
+                DateTime startDate = ;
+
+                insertEvent(params[1]);
+            }
+            else if (params[0].equals("get"))
             try {
-//                List<MyCalendarObject> result = getDataFromApi(params[0]);
-                return getDataFromApi(params[0]);
+                return getDataFromApi();
             } catch (Exception e) {
                 mLastError = e;
                 cancel(true);
@@ -285,11 +291,10 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
          * @throws IOException
          */
         // where all the data comes from, try to put these in an SQLite database?
-        private List<String> getDataFromApi(String date) throws IOException {
+        private List<String> getDataFromApi() throws IOException {
             // List the next 10 events from the primary calendar.
             DateTime now = new DateTime(System.currentTimeMillis());
 
-//            List<MyCalendarObject> myCalendarObject = new ArrayList<MyCalendarObject>();
             List<String> eventStrings = new ArrayList<>();
 
             Events events = mService.events().list("primary")
@@ -322,35 +327,47 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 // what is the activity about
                 String activity = event.getSummary();
 
-                // date to compare with
-                String dateCompare = date;
+                    // add the above to DB
+                    SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
 
-                Log.d(String.valueOf(dateStart), "datum2");
-                Log.d(String.valueOf(dateCompare), "datum5");
+                    ContentValues values = new ContentValues();
+                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_TITLE, activity);
+                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_DATE, dateStart);
+                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_START, timeStart);
+                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_END, timeEnd);
+                    Log.d("ACTIVITY", activity);
 
-////                if (dateStart.equals(dateCompare)) {
-//                    eventStrings.add(String.format("%s_%s_%s_%s", activity, dateStart, timeStart, timeEnd));
-//
-//                    // add the above to DB
-//                    SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
-//
-//                    ContentValues values = new ContentValues();
-//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_TITLE, activity);
-//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_DATE, dateStart);
-//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_START, timeStart);
-//                    values.put(MyCalendarTable.CalendarEntry.COL_CAL_END, timeEnd);
-//                    Log.d("ACTIVITY", activity);
-//
-//                    // add new values to table
-//                    db.insertWithOnConflict(MyCalendarTable.CalendarEntry.TABLE,
-//                            null,
-//                            values,
-//                            SQLiteDatabase.CONFLICT_REPLACE);
-//                    db.close();
-////                }
+                    // add new values to table
+                    db.insertWithOnConflict(MyCalendarTable.CalendarEntry.TABLE,
+                            null,
+                            values,
+                            SQLiteDatabase.CONFLICT_REPLACE);
+                    db.close();
+
             }
             return eventStrings;
         }
+
+        private void insertEvent(String des, DateTime startDate, DateTime endDate) {
+            EventDateTime start = new EventDateTime()
+                    .setDateTime(startDate);
+            EventDateTime end = new EventDateTime()
+                    .setDateTime(endDate);
+            Event event = new Event()
+                    .setDescription(des)
+                    .setStart(start)
+                    .setEnd(end);
+
+            String calendarId = "primary";
+
+            if(mService!=null)
+                try {
+                    mService.events().insert(calendarId, event).setSendNotifications(true).execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
+
 
         @Override
         protected void onPreExecute() {
@@ -365,47 +382,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
             if (output == null || output.size() == 0) {
                 mOutputText.setText("No results returned.");
             } else {
-
-                SQLiteDatabase db = myCalendarDbHelper.getReadableDatabase();
-
-                Cursor cursor = db.query(MyCalendarTable.CalendarEntry.TABLE,
-                        new String[]{TaskTable.TaskEntry._ID,
-                                MyCalendarTable.CalendarEntry.COL_CAL_TITLE,
-                                MyCalendarTable.CalendarEntry.COL_CAL_DATE,
-                                MyCalendarTable.CalendarEntry.COL_CAL_START,
-                                MyCalendarTable.CalendarEntry.COL_CAL_END},
-                        null, null, null, null, MyCalendarTable.CalendarEntry.COL_CAL_DATE + " ASC");
-
-                ArrayList<MyCalendarObject> calendarObjects = new ArrayList<>();
-
-                while (cursor.moveToNext()) {
-                    int id = cursor.getColumnIndex(MyCalendarTable.CalendarEntry._ID);
-                    int idx = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_TITLE);
-                    int idxx = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_DATE);
-                    int idxxx = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START);
-                    int idxxxx = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END);
-                    Log.d("ID", cursor.getString(id));
-                    Log.d("ACTIVITY", cursor.getString(idx));
-                    Log.d("DATE", cursor.getString(idxx));
-                    Log.d("START", cursor.getString(idxxx));
-                    Log.d("END", cursor.getString(idxxxx));
-                    MyCalendarObject to = new MyCalendarObject(cursor.getString(idx),
-                            cursor.getString(idxx), cursor.getString(idxxx), cursor.getString(idxxxx));
-                    calendarObjects.add(to);
-
-                    Log.d("COUNT", Integer.toString(calendarObjects.size()));
-                }
-                Log.d("COUNT2", Integer.toString(calendarObjects.size()));
-
-                if (myCalendarAdapter == null) {
-                    myCalendarAdapter = new MyCalendarAdapter(GoogleCalendarTest.this, 0, calendarObjects);
-                    listView.setAdapter(myCalendarAdapter);
-                } else {
-                    myCalendarAdapter.clear();
-                    myCalendarAdapter.addAll(calendarObjects);
-                    myCalendarAdapter.notifyDataSetChanged();
-                }
-                cursor.close();
+                startActivity(new Intent(GoogleCalendarTest.this, MyCalendar.class));
             }
         }
 

@@ -1,7 +1,10 @@
 package com.example.lisahabermehl.calendar;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -23,8 +26,14 @@ public class Settings extends AppCompatActivity {
 
     Button edit_bedtime_start;
     Button edit_bedtime_end;
+    Button sync_calendar;
 
     DialogInterface dialogInterface;
+
+    MyCalendarDbHelper myCalendarDbHelper;
+    GoogleCalendarTest googleCalendarTest;
+
+    Context context;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,8 +41,15 @@ public class Settings extends AppCompatActivity {
 
         edit_bedtime_start = (Button) findViewById(R.id.edit_bedtime_start);
         edit_bedtime_end = (Button) findViewById(R.id.edit_bedtime_end);
+        sync_calendar = (Button) findViewById(R.id.sync_calendar);
+    }
 
+    public void syncCalendar(View view) {
+        myCalendarDbHelper = new MyCalendarDbHelper(this);
+        SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
+        db.delete(MyCalendarTable.CalendarEntry.TABLE, null, null);
 
+        startActivity(new Intent(this, GoogleCalendarTest.class));
     }
 
     public void editBedtimeStart(View view) {
