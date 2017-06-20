@@ -27,7 +27,6 @@ public class Settings extends AppCompatActivity {
     Button edit_bedtime_start;
     Button edit_bedtime_end;
     Button sync_calendar;
-    Button add_event;
 
     DialogInterface dialogInterface;
 
@@ -43,7 +42,6 @@ public class Settings extends AppCompatActivity {
         edit_bedtime_start = (Button) findViewById(R.id.edit_bedtime_start);
         edit_bedtime_end = (Button) findViewById(R.id.edit_bedtime_end);
         sync_calendar = (Button) findViewById(R.id.sync_calendar);
-        add_event = (Button) findViewById(R.id.add_event);
     }
 
     public void syncCalendar(View view) {
@@ -52,17 +50,6 @@ public class Settings extends AppCompatActivity {
         db.delete(MyCalendarTable.CalendarEntry.TABLE, null, null);
 
         startActivity(new Intent(this, GoogleCalendarTest.class));
-    }
-
-    public void addEvent(View view) {
-        Intent intent = new Intent(this, GoogleCalendarTest.class);
-        Bundle extras = new Bundle();
-        extras.putString("zero", "add");
-        extras.putString("one", "Yay, I've added a new activity");
-        extras.putString("two", "2017/07/04 21:00");
-        extras.putString("three", "2017/07/04 22:00");
-        intent.putExtras(extras);
-        startActivity(intent);
     }
 
     public void editBedtimeStart(View view) {

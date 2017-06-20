@@ -1,6 +1,5 @@
 package com.example.lisahabermehl.calendar;
 
-import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -13,7 +12,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
 
-import com.google.api.services.calendar.*;
+import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.client.util.DateTime;
 
 import com.google.api.services.calendar.model.*;
@@ -23,52 +22,43 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Log;
+import android.text.TextUtils;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-/**
- * I used the following sample code to make this work:
- * https://developers.google.com/google-apps/calendar/quickstart/android
- */
-
-public class GoogleCalendarTest extends Activity implements EasyPermissions.PermissionCallbacks {
+public class Test extends Activity
+        implements EasyPermissions.PermissionCallbacks {
     GoogleAccountCredential mCredential;
-    TextView mOutputText;
+    private TextView mOutputText;
+    private Button mCallApiButton;
     ProgressDialog mProgress;
-    MyCalendarDbHelper myCalendarDbHelper;
-
-    MyCalendar myCalendar;
 
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     static final int REQUEST_AUTHORIZATION = 1001;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
 
+    private static final String BUTTON_TEXT = "Call Google Calendar API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String[] SCOPES = { CalendarScopes.CALENDAR };
 
@@ -79,25 +69,52 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.calendar_list);
+        LinearLayout activityLayout = new LinearLayout(this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        activityLayout.setLayoutParams(lp);
+        activityLayout.setOrientation(LinearLayout.VERTICAL);
+        activityLayout.setPadding(16, 16, 16, 16);
 
-        mOutputText = (TextView) findViewById(R.id.mOutputText);
+        ViewGroup.LayoutParams tlp = new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
 
-        myCalendarDbHelper = new MyCalendarDbHelper(this);
-        myCalendar = new MyCalendar();
+        mCallApiButton = new Button(this);
+        mCallApiButton.setText(BUTTON_TEXT);
+        mCallApiButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCallApiButton.setEnabled(false);
+                mOutputText.setText("");
+                getResultsFromApi();
+                mCallApiButton.setEnabled(true);
+            }
+        });
+        activityLayout.addView(mCallApiButton);
 
-        // let user know that app is fetching data
+        mOutputText = new TextView(this);
+        mOutputText.setLayoutParams(tlp);
+        mOutputText.setPadding(16, 16, 16, 16);
+        mOutputText.setVerticalScrollBarEnabled(true);
+        mOutputText.setMovementMethod(new ScrollingMovementMethod());
+        mOutputText.setText(
+                "Click the \'" + BUTTON_TEXT +"\' button to test the API.");
+        activityLayout.addView(mOutputText);
+
         mProgress = new ProgressDialog(this);
-        mProgress.setMessage("Un momento ...");
+        mProgress.setMessage("Calling Google Calendar API ...");
+
+        setContentView(activityLayout);
 
         // Initialize credentials and service object.
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
-
-        // get the date that user selected
-        getResultsFromApi();
     }
+
+
 
     /**
      * Attempt to call the API, after verifying that all the preconditions are
@@ -106,7 +123,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
      * of the preconditions are not satisfied, the app will prompt the user as
      * appropriate.
      */
-    public void getResultsFromApi() {
+    private void getResultsFromApi() {
         if (! isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
@@ -114,7 +131,6 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
         } else if (! isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
         } else {
-            // execute the AsyncTask and give date
             new MakeRequestTask(mCredential).execute();
         }
     }
@@ -145,12 +161,60 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                         REQUEST_ACCOUNT_PICKER);
             }
         } else {
-//             Request the GET_ACCOUNTS permission via a user dialog
+            // Request the GET_ACCOUNTS permission via a user dialog
             EasyPermissions.requestPermissions(
                     this,
                     "This app needs to access your Google account (via Contacts).",
                     REQUEST_PERMISSION_GET_ACCOUNTS,
                     Manifest.permission.GET_ACCOUNTS);
+        }
+    }
+
+    /**
+     * Called when an activity launched here (specifically, AccountPicker
+     * and authorization) exits, giving you the requestCode you started it with,
+     * the resultCode it returned, and any additional data from it.
+     * @param requestCode code indicating which activity result is incoming.
+     * @param resultCode code indicating the result of the incoming
+     *     activity result.
+     * @param data Intent (containing result data) returned by incoming
+     *     activity result.
+     */
+    @Override
+    protected void onActivityResult(
+            int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case REQUEST_GOOGLE_PLAY_SERVICES:
+                if (resultCode != RESULT_OK) {
+                    mOutputText.setText(
+                            "This app requires Google Play Services. Please install " +
+                                    "Google Play Services on your device and relaunch this app.");
+                } else {
+                    getResultsFromApi();
+                }
+                break;
+            case REQUEST_ACCOUNT_PICKER:
+                if (resultCode == RESULT_OK && data != null &&
+                        data.getExtras() != null) {
+                    String accountName =
+                            data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                    if (accountName != null) {
+                        SharedPreferences settings =
+                                getPreferences(Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString(PREF_ACCOUNT_NAME, accountName);
+                        editor.apply();
+                        mCredential.setSelectedAccountName(accountName);
+                        getResultsFromApi();
+                    }
+                }
+                break;
+            case REQUEST_AUTHORIZATION:
+                if (resultCode == RESULT_OK) {
+                    getResultsFromApi();
+                }
+                break;
         }
     }
 
@@ -244,77 +308,27 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
             final int connectionStatusCode) {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         Dialog dialog = apiAvailability.getErrorDialog(
-                GoogleCalendarTest.this,
+                Test.this,
                 connectionStatusCode,
                 REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
     }
 
     /**
-     * Called when an activity launched here (specifically, AccountPicker
-     * and authorization) exits, giving you the requestCode you started it with,
-     * the resultCode it returned, and any additional data from it.
-     * @param requestCode code indicating which activity result is incoming.
-     * @param resultCode code indicating the result of the incoming
-     *     activity result.
-     * @param data Intent (containing result data) returned by incoming
-     *     activity result.
-     */
-        @Override
-        protected void onActivityResult(
-                int requestCode, int resultCode, Intent data) {
-            super.onActivityResult(requestCode, resultCode, data);
-            switch(requestCode) {
-                case REQUEST_GOOGLE_PLAY_SERVICES:
-                    if (resultCode != RESULT_OK) {
-                        mOutputText.setText(
-                                "This app requires Google Play Services. Please install " +
-                                        "Google Play Services on your device and relaunch this app.");
-                    } else {
-                        getResultsFromApi();
-                    }
-                    break;
-                case REQUEST_ACCOUNT_PICKER:
-                    if (resultCode == RESULT_OK && data != null &&
-                            data.getExtras() != null) {
-                        String accountName =
-                                data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-                        if (accountName != null) {
-                            SharedPreferences settings =
-                                    getPreferences(Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editor = settings.edit();
-                            editor.putString(PREF_ACCOUNT_NAME, accountName);
-                            editor.apply();
-                            mCredential.setSelectedAccountName(accountName);
-                            getResultsFromApi();
-                        }
-                    }
-                    break;
-                case REQUEST_AUTHORIZATION:
-                    if (resultCode == RESULT_OK) {
-                        getResultsFromApi();
-                    }
-                    break;
-            }
-        }
-
-    /**
      * An asynchronous task that handles the Google Calendar API call.
      * Placing the API calls in their own task ensures the UI stays responsive.
      */
-    private class MakeRequestTask extends AsyncTask<String, Void, List<String>> {
+    private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
         private com.google.api.services.calendar.Calendar mService = null;
         private Exception mLastError = null;
 
         MakeRequestTask(GoogleAccountCredential credential) {
             HttpTransport transport = AndroidHttp.newCompatibleTransport();
             JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-
             mService = new com.google.api.services.calendar.Calendar.Builder(
                     transport, jsonFactory, credential)
                     .setApplicationName("Google Calendar API Android Quickstart")
                     .build();
-
         }
 
         /**
@@ -322,14 +336,14 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
          * @param params no parameters needed for this task.
          */
         @Override
-        protected List<String> doInBackground(String... params) {
+        protected List<String> doInBackground(Void... params) {
             try {
                 return getDataFromApi();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                mLastError = e;
                 cancel(true);
+                return null;
             }
-            return null;
         }
 
         /**
@@ -337,113 +351,31 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
          * @return List of Strings describing returned events.
          * @throws IOException
          */
-        // where all the data comes from, try to put these in an SQLite database?
         private List<String> getDataFromApi() throws IOException {
-//            // List the next 10 events from the primary calendar.
-//            DateTime now = new DateTime(System.currentTimeMillis());
-//
-            List<String> eventStrings = new ArrayList<>();
-//
-//            Events events = mService.events().list("primary")
-//                    .setMaxResults(30)
-//                    .setTimeMin(now)
-//                    .setOrderBy("startTime")
-//                    .setSingleEvents(true)
-//                    .execute();
-//
-//            // list with all the events
-//            List<Event> items = events.getItems();
-//
-//            // gonna try to get a specific date here
-//            for (Event event : items) {
-//
-//                // get the date
-//                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//                Date original = new Date(event.getStart().getDateTime().getValue());
-//                String dateStart = dateFormat.format(original);
-//
-//                // get the time
-//                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-//                String timeStart = timeFormat.format(original);
-//
-//                // get the end time (and date?)
-//                Date originalEnd = new Date(event.getEnd().getDateTime().getValue());
-//                String dateEnd = dateFormat.format(originalEnd);
-//                String timeEnd = timeFormat.format(originalEnd);
-//
-//                // what is the activity about
-//                String activity = event.getSummary();
-//
-//                eventStrings.add(String.format("%s - %s \n%s", timeStart, timeEnd, activity));
-//
-//                // add the above to DB
-//                SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
-//
-//                ContentValues values = new ContentValues();
-//                values.put(MyCalendarTable.CalendarEntry.COL_CAL_TITLE, activity);
-//                values.put(MyCalendarTable.CalendarEntry.COL_CAL_DATE, dateStart);
-//                values.put(MyCalendarTable.CalendarEntry.COL_CAL_START, timeStart);
-//                values.put(MyCalendarTable.CalendarEntry.COL_CAL_END, timeEnd);
-//                Log.d("ACTIVITY", activity);
-//
-//                // add new values to table
-//                db.insertWithOnConflict(MyCalendarTable.CalendarEntry.TABLE,
-//                        null,
-//                        values,
-//                        SQLiteDatabase.CONFLICT_REPLACE);
-//                db.close();
-//
-//            }
-//            return eventStrings;
+            // List the next 10 events from the primary calendar.
+            DateTime now = new DateTime(System.currentTimeMillis());
+            List<String> eventStrings = new ArrayList<String>();
+            Events events = mService.events().list("primary")
+                    .setMaxResults(10)
+                    .setTimeMin(now)
+                    .setOrderBy("startTime")
+                    .setSingleEvents(true)
+                    .execute();
+            List<Event> items = events.getItems();
 
-
-
-            try {
-                DateTime startDateTime;
-                DateTime endDateTime;
-                Date startDate;
-                Date endDate;
-                String des = "New new new";
-
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-
-                startDate = simpleDateFormat.parse("2017/07/01 21:00");
-                endDate = simpleDateFormat.parse("2017/07/01 22:00");
-
-                eventStrings.add(String.format("%s\n%s\n%s", des, String.valueOf(startDate), String.valueOf(endDate)));
-
-                startDateTime = new DateTime(startDate);
-                endDateTime = new DateTime(endDate);
-
-                EventDateTime start = new EventDateTime()
-                        .setDateTime(startDateTime);
-                EventDateTime end = new EventDateTime()
-                        .setDateTime(endDateTime);
-                Event event = new Event()
-                        .setSummary(des)
-                        .setStart(start)
-                        .setEnd(end);
-
-                Log.d("Start date", String.valueOf(startDate));
-                Log.d("End date", String.valueOf(endDate));
-                Log.d("Start datetime", String.valueOf(startDateTime));
-                Log.d("End datetime", String.valueOf(endDateTime));
-
-                String calendarId = "primary";
-
-                if(mService!=null)
-                    try {
-                        mService.events().insert(calendarId, event).execute();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-            } catch (ParseException e) {
-                e.printStackTrace();
+            for (Event event : items) {
+                DateTime start = event.getStart().getDateTime();
+                if (start == null) {
+                    // All-day events don't have start times, so just use
+                    // the start date.
+                    start = event.getStart().getDate();
+                }
+                eventStrings.add(
+                        String.format("%s (%s)", event.getSummary(), start));
             }
-
             return eventStrings;
-
         }
+
 
         @Override
         protected void onPreExecute() {
@@ -454,12 +386,11 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
         @Override
         protected void onPostExecute(List<String> output) {
             mProgress.hide();
-
             if (output == null || output.size() == 0) {
                 mOutputText.setText("No results returned.");
             } else {
-                mOutputText.setText(String.valueOf(output));
-                startActivity(new Intent(GoogleCalendarTest.this, MyCalendar.class));
+                output.add(0, "Data retrieved using the Google Calendar API:");
+                mOutputText.setText(TextUtils.join("\n", output));
             }
         }
 
@@ -474,7 +405,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
                     startActivityForResult(
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
-                            GoogleCalendarTest.REQUEST_AUTHORIZATION);
+                            Test.REQUEST_AUTHORIZATION);
                 } else {
                     mOutputText.setText("The following error occurred:\n"
                             + mLastError.getMessage());

@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity{
 
     // go to MyCalendar
     public void onCalendarClick(View v) {
-        startActivity(new Intent(this, MyCalendar.class));
+        startActivity(new Intent(this, GoogleCalendarTest.class));
     }
     // go to Todo
     public void onTodoClick(View view) {
