@@ -43,17 +43,7 @@ public class MyCalendar extends AppCompatActivity {
     MyCalendarAdapter myCalendarAdapter;
     ListView listView;
 
-    int start_hour;
-    int start_mins;
-    int time_start;
-    int time_gap_hour;
-    int time_gap;
-    int end_hour;
-    int end_mins;
-    int time_end;
-
-    int time_end_old;
-
+    int start_hour, start_mins, time_start, time_gap_hour, time_gap, end_hour, end_mins, time_end, time_end_old;
     int bedtime_start = (23 * 60);
     int bedtime_end = (7 * 60);
 
@@ -118,24 +108,19 @@ public class MyCalendar extends AppCompatActivity {
                                 EditText startTime = (EditText) dialogView.findViewById(R.id.event_time_start);
                                 EditText endTime = (EditText) dialogView.findViewById(R.id.event_time_end);
 
-                                String startTim = startTime.getText().toString();
-                                String endTim = endTime.getText().toString();
-
                                 String start = year + "/" + month + "/" + day + " " +
-                                        startTim;
+                                        startTime.getText().toString();
                                 String end = year + "/" + month + "/" + day + " " +
-                                        endTim;
+                                        endTime.getText().toString();
 
                                 // startActivity to show activities on a specific day
-                                Intent newActivity = new Intent(getApplicationContext(), GoogleCalendarTest.class);
                                 Bundle extras = new Bundle();
-
                                 extras.putString("zero", "add");
                                 extras.putString("one", title);
                                 extras.putString("two", start);
                                 extras.putString("three", end);
-                                newActivity.putExtras(extras);
-                                startActivity(newActivity);
+                                startActivity(new Intent(getApplicationContext(), GoogleCalendarTest.class)
+                                        .putExtras(extras));
                             }
                         })
                         .create()
@@ -157,7 +142,6 @@ public class MyCalendar extends AppCompatActivity {
 
                                 String date = "2017-06-20";
                                 updateUI(date);
-
                             }
                         })
                         .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -199,49 +183,30 @@ public class MyCalendar extends AppCompatActivity {
 
         if (specific_date.equals("no specific date")) {
             while (cursor.moveToNext()) {
-                int id = cursor.getColumnIndex(MyCalendarTable.CalendarEntry._ID);
-                int title = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_TITLE);
-                int date = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_DATE);
-                int start = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START);
-                int end = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END);
 
-                String title_string = cursor.getString(title);
-                String date_string = cursor.getString(date);
-                String start_string = cursor.getString(start);
-                String end_string = cursor.getString(end);
+                String title_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_TITLE));
+                String date_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_DATE));
+                String start_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START));
+                String end_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END));
 
                 MyCalendarObject to = new MyCalendarObject(title_string,
                         date_string, start_string, end_string);
 
                 String[] start_split = start_string.split(":");
-                start_hour = Integer.valueOf(start_split[0]);
-                start_mins = Integer.valueOf(start_split[1]);
-                time_start = (start_hour * 60) + start_mins;
+                time_start = (Integer.valueOf(start_split[0]) * 60) + Integer.valueOf(start_split[1]);
 
                 String[] time_split_end = end_string.split(":");
-                end_hour = Integer.valueOf(time_split_end[0]);
-                end_mins = Integer.valueOf(time_split_end[1]);
-                time_end = (end_hour * 60) + end_mins;
+                time_end = (Integer.valueOf(time_split_end[0]) * 60) + Integer.valueOf(time_split_end[1]);
 
                 time_gap = time_start - time_end_old;
-                Log.d("TIME END OLD", String.valueOf(time_end_old));
-                Log.d("TIME START", String.valueOf(time_start));
-                Log.d("TIME END", String.valueOf(time_end));
-                Log.d("TIME GAP", String.valueOf(time_gap));
                 time_gap_hour = time_gap / 60;
-                Log.d("TIME GAP HOUR", String.valueOf(time_gap_hour));
 
                 date_new = date_string;
-
-                Log.d("DATE NEW", date_new);
-                Log.d("DATE OLD", date_old);
 
                 if (date_new.equals(date_old)) {
                     if (time_gap > 120) {
                         MyCalendarObject to2 = new MyCalendarObject("Big time gap", date_string,
                                 String.valueOf(time_gap), String.valueOf(time_gap_hour));
-
-                        Log.d("NEW IS OLD", "TIME GAP > 15");
 
                         time_end_old = time_end;
                         date_old = date_new;
@@ -249,32 +214,25 @@ public class MyCalendar extends AppCompatActivity {
                         calendarObjects.add(to2);
                         calendarObjects.add(to);
                     } else {
-                        Log.d("NEW IS OLD", "TIME GAP < 15");
-
                         MyCalendarObject to3 = new MyCalendarObject("Small time gap", date_string,
                                 String.valueOf(time_gap), String.valueOf(time_gap_hour));
 
                         time_end_old = time_end;
                         date_old = date_new;
+
                         calendarObjects.add(to3);
                         calendarObjects.add(to);
                     }
                 } else {
-                    Log.d("NEW ISN'T OLD", "TIME GAP > 15");
                     // calculate based on different date
 
                     int time_gap_evening = bedtime_start - time_end_old;
-                    int time_gap_evening_hour = time_gap_evening / 60;
                     int time_gap_morning = time_start - bedtime_end;
-                    int time_gap_morning_hour = time_gap_morning / 60;
 
                     MyCalendarObject to_gap_evening = new MyCalendarObject("Gap evening", date_string,
-                            String.valueOf(time_gap_evening), String.valueOf(time_gap_evening_hour));
+                            String.valueOf(time_gap_evening), String.valueOf(time_gap_evening / 60));
                     MyCalendarObject to_gap_morning = new MyCalendarObject("Gap morning", date_string,
-                            String.valueOf(time_gap_morning), String.valueOf(time_gap_morning_hour));
-
-                    Log.d("EVENING", String.valueOf(time_gap_evening));
-                    Log.d("MORNING", String.valueOf(time_gap_morning));
+                            String.valueOf(time_gap_morning), String.valueOf(time_gap_morning / 60));
 
                     time_end_old = time_end;
                     date_old = date_new;
@@ -293,42 +251,25 @@ public class MyCalendar extends AppCompatActivity {
                 Log.d("Date string", date_string);
 
                 if (date_of_choice.equals(date_string)) {
-                    int id = cursor.getColumnIndex(MyCalendarTable.CalendarEntry._ID);
-                    int title = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_TITLE);
-                    int start = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START);
-                    int end = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END);
-
-                    String title_string = cursor.getString(title);
-                    String start_string = cursor.getString(start);
-                    String end_string = cursor.getString(end);
+                    String title_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_TITLE));
+                    String start_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START));
+                    String end_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END));
 
                     MyCalendarObject to = new MyCalendarObject(title_string,
                             date_string, start_string, end_string);
 
                     String[] start_split = start_string.split(":");
-                    start_hour = Integer.valueOf(start_split[0]);
-                    start_mins = Integer.valueOf(start_split[1]);
-                    time_start = (start_hour * 60) + start_mins;
+                    time_start = (Integer.valueOf(start_split[0]) * 60) + Integer.valueOf(start_split[1]);
 
                     String[] time_split_end = end_string.split(":");
-                    end_hour = Integer.valueOf(time_split_end[0]);
-                    end_mins = Integer.valueOf(time_split_end[1]);
-                    time_end = (end_hour * 60) + end_mins;
+                    time_end = (Integer.valueOf(time_split_end[0]) * 60) + Integer.valueOf(time_split_end[1]);
 
                     time_gap = time_start - time_end_old;
-                    Log.d("TIME END OLD", String.valueOf(time_end_old));
-                    Log.d("TIME START", String.valueOf(time_start));
-                    Log.d("TIME END", String.valueOf(time_end));
-                    Log.d("TIME GAP", String.valueOf(time_gap));
                     time_gap_hour = time_gap / 60;
-                    Log.d("TIME GAP HOUR", String.valueOf(time_gap_hour));
-
 
                         if (time_gap > 120) {
                             MyCalendarObject to2 = new MyCalendarObject("Big time gap", date_string,
                                     String.valueOf(time_gap), String.valueOf(time_gap_hour));
-
-                            Log.d("NEW IS OLD", "TIME GAP > 15");
 
                             time_end_old = time_end;
                             date_old = date_new;
@@ -336,28 +277,19 @@ public class MyCalendar extends AppCompatActivity {
                             calendarObjects.add(to2);
                             calendarObjects.add(to);
                         } else {
-                            Log.d("NEW IS OLD", "TIME GAP < 15");
-
                             MyCalendarObject to3 = new MyCalendarObject("Small time gap", date_string,
                                     String.valueOf(time_gap), String.valueOf(time_gap_hour));
 
                             time_end_old = time_end;
                             date_old = date_new;
+
                             calendarObjects.add(to3);
                             calendarObjects.add(to);
                         }
                     // TODO: how can you calculate that last time gap
-
                 }
-
-
-
-                Log.d("COUNT", Integer.toString(calendarObjects.size()));
             }
-            Log.d("COUNT2", Integer.toString(calendarObjects.size()));
         }
-
-
             if (myCalendarAdapter == null) {
                 myCalendarAdapter = new MyCalendarAdapter(this, 0, calendarObjects);
                 listView.setAdapter(myCalendarAdapter);
@@ -368,11 +300,7 @@ public class MyCalendar extends AppCompatActivity {
             }
             cursor.close();
             db.close();
-
         }
-
-
-
 }
 
 
