@@ -22,6 +22,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -30,6 +31,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.sql.Array;
 import java.sql.Date;
 import java.util.ArrayList;
 
@@ -52,8 +54,8 @@ public class MyCalendar extends AppCompatActivity {
 
     int time_end_old;
 
-    int bedtime_start = (23*60);
-    int bedtime_end = (7*60);
+    int bedtime_start = (23 * 60);
+    int bedtime_end = (7 * 60);
 
     String date_old = "nog niks";
     String date_new;
@@ -65,24 +67,12 @@ public class MyCalendar extends AppCompatActivity {
         setContentView(R.layout.calendar_list);
 
         listView = (ListView) findViewById(R.id.list_calendar);
-        // initialize the list
-        listView.setLongClickable(true);
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view,
-                                           int position, long id) {
-//                deleteActivity(view);
-                return true;
-            }
-        });
-
         myCalendarDbHelper = new MyCalendarDbHelper(this);
 
         time_end = 0;
         time_end_old = 0;
 
         updateUI("no specific date");
-
     }
 
     @Override
@@ -92,6 +82,7 @@ public class MyCalendar extends AppCompatActivity {
         inflater.inflate(R.menu.menu_calendar, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -121,7 +112,7 @@ public class MyCalendar extends AppCompatActivity {
 
                                 DatePicker datePicker = (DatePicker) dialogView.findViewById(R.id.event_date_start);
                                 String day = String.valueOf(datePicker.getDayOfMonth());
-                                String month = String.valueOf(datePicker.getMonth()+1);
+                                String month = String.valueOf(datePicker.getMonth() + 1);
                                 String year = String.valueOf(datePicker.getYear());
 
                                 EditText startTime = (EditText) dialogView.findViewById(R.id.event_time_start);
@@ -153,6 +144,8 @@ public class MyCalendar extends AppCompatActivity {
             case R.id.menu_day:
                 LayoutInflater layoutInflaterDay = LayoutInflater.from(this);
                 final View dialogViewDay = layoutInflaterDay.inflate(R.layout.calendar_main, null);
+
+                // TODO add a "show all" button
 
                 AlertDialog.Builder builderDay = new AlertDialog.Builder(this);
                 builderDay
@@ -187,11 +180,14 @@ public class MyCalendar extends AppCompatActivity {
         }
     }
 
-    private void updateUI(String specific_date){
+    private void updateUI(String specific_date) {
         listView = (ListView) findViewById(R.id.list_calendar);
         myCalendarDbHelper = new MyCalendarDbHelper(this);
         SQLiteDatabase db = myCalendarDbHelper.getReadableDatabase();
-        Cursor cursor = db.query(MyCalendarTable.CalendarEntry.TABLE,
+
+        Cursor cursor = null;
+        cursor.close();
+        cursor = db.query(MyCalendarTable.CalendarEntry.TABLE,
                 new String[]{TaskTable.TaskEntry._ID,
                         MyCalendarTable.CalendarEntry.COL_CAL_TITLE,
                         MyCalendarTable.CalendarEntry.COL_CAL_DATE,
@@ -202,6 +198,11 @@ public class MyCalendar extends AppCompatActivity {
 
         ArrayList<MyCalendarObject> calendarObjects = new ArrayList<>();
 
+        String title_string;
+        String date_string;
+        String start_string = null;
+        String end_string = null;
+
         if (specific_date.equals("no specific date")) {
             while (cursor.moveToNext()) {
                 int id = cursor.getColumnIndex(MyCalendarTable.CalendarEntry._ID);
@@ -210,105 +211,23 @@ public class MyCalendar extends AppCompatActivity {
                 int start = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START);
                 int end = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END);
 
-                String title_string = cursor.getString(title);
-                String date_string = cursor.getString(date);
-                String start_string = cursor.getString(start);
-                String end_string = cursor.getString(end);
-//            Log.d("ID", cursor.getString(id));
-//            Log.d("ACTIVITY", cursor.getString(title));
-//            Log.d("DATE", cursor.getString(date));
-//            Log.d("START", cursor.getString(start));
-//            Log.d("END", cursor.getString(end));
+                title_string = cursor.getString(title);
+                date_string = cursor.getString(date);
+                start_string = cursor.getString(start);
+                end_string = cursor.getString(end);
 
-                MyCalendarObject to = new MyCalendarObject(title_string,
-                        date_string, start_string, end_string);
+                checkFor(calendarObjects, title_string, date_string, start_string, end_string);
 
-                String[] start_split = start_string.split(":");
-                start_hour = Integer.valueOf(start_split[0]);
-                start_mins = Integer.valueOf(start_split[1]);
-                time_start = (start_hour * 60) + start_mins;
-
-                String[] time_split_end = end_string.split(":");
-                end_hour = Integer.valueOf(time_split_end[0]);
-                end_mins = Integer.valueOf(time_split_end[1]);
-                time_end = (end_hour * 60) + end_mins;
-
-                time_gap = time_start - time_end_old;
-                Log.d("TIME END OLD", String.valueOf(time_end_old));
-                Log.d("TIME START", String.valueOf(time_start));
-                Log.d("TIME END", String.valueOf(time_end));
-                Log.d("TIME GAP", String.valueOf(time_gap));
-                time_gap_hour = time_gap / 60;
-                Log.d("TIME GAP HOUR", String.valueOf(time_gap_hour));
-
-                date_new = date_string;
-
-                Log.d("DATE NEW", date_new);
-                Log.d("DATE OLD", date_old);
-
-                if (date_new.equals(date_old)) {
-                    if(time_gap > 120) {
-                        MyCalendarObject to2 = new MyCalendarObject("Big time gap", date_string,
-                                String.valueOf(time_gap), String.valueOf(time_gap_hour));
-
-                        Log.d("NEW IS OLD", "TIME GAP > 15");
-
-                        time_end_old = time_end;
-                        date_old = date_new;
-
-                        calendarObjects.add(to2);
-                        calendarObjects.add(to);
-                    }
-                    else {
-                        Log.d("NEW IS OLD", "TIME GAP < 15");
-
-                        MyCalendarObject to3 = new MyCalendarObject("Small time gap", date_string,
-                                String.valueOf(time_gap), String.valueOf(time_gap_hour));
-
-                        time_end_old = time_end;
-                        date_old = date_new;
-                        calendarObjects.add(to3);
-                        calendarObjects.add(to);
-                    }
-                }
-                else {
-                    Log.d("NEW ISN'T OLD", "TIME GAP > 15");
-                    // calculate based on different date
-
-                    int time_gap_evening = bedtime_start - time_end_old;
-                    int time_gap_evening_hour = time_gap_evening / 60;
-                    int time_gap_morning = time_start - bedtime_end;
-                    int time_gap_morning_hour = time_gap_morning / 60;
-
-                    MyCalendarObject to_gap_evening = new MyCalendarObject("Gap evening", date_string,
-                            String.valueOf(time_gap_evening), String.valueOf(time_gap_evening_hour));
-                    MyCalendarObject to_gap_morning = new MyCalendarObject("Gap morning", date_string,
-                            String.valueOf(time_gap_morning), String.valueOf(time_gap_morning_hour));
-
-                    Log.d("EVENING", String.valueOf(time_gap_evening));
-                    Log.d("MORNING", String.valueOf(time_gap_morning));
-
-                    time_end_old = time_end;
-                    date_old = date_new;
-                    calendarObjects.add(to_gap_evening);
-                    calendarObjects.add(to_gap_morning);
-                    calendarObjects.add(to);
-                }
-
-                Log.d("COUNT", Integer.toString(calendarObjects.size()));
+//                MyCalendarObject to = new MyCalendarObject(title_string,
+//                        date_string, start_string, end_string);
             }
-            Log.d("COUNT2", Integer.toString(calendarObjects.size()));
-
-        }
-        else {
+        } else {
             String date_of_choice = "2017-06-20";
-
 
             while (cursor.moveToNext()) {
                 int date = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_DATE);
-                String date_string = cursor.getString(date);
+                date_string = cursor.getString(date);
                 Log.d("Date string", date_string);
-
 
                 if (date_of_choice.equals(date_string)) {
                     int id = cursor.getColumnIndex(MyCalendarTable.CalendarEntry._ID);
@@ -316,45 +235,221 @@ public class MyCalendar extends AppCompatActivity {
                     int start = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START);
                     int end = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END);
 
-                    String title_string = cursor.getString(title);
-                    String start_string = cursor.getString(start);
-                    String end_string = cursor.getString(end);
+                    title_string = cursor.getString(title);
+                    start_string = cursor.getString(start);
+                    end_string = cursor.getString(end);
 
-                    MyCalendarObject to = new MyCalendarObject(title_string,
-                            date_string, start_string, end_string);
-                    calendarObjects.add(to);
+                    checkFor(calendarObjects, title_string, date_string, start_string, end_string);
+
+//                    MyCalendarObject to = new MyCalendarObject(title_string,
+//                            date_string, start_string, end_string);
+//                    calendarObjects.add(to);
                 }
+
+                cursor.close();
+                db.close();
+
             }
+
+
+//        if (specific_date.equals("no specific date")) {
+//            while (cursor.moveToNext()) {
+//                int id = cursor.getColumnIndex(MyCalendarTable.CalendarEntry._ID);
+//                int title = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_TITLE);
+//                int date = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_DATE);
+//                int start = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START);
+//                int end = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END);
+//
+//                String title_string = cursor.getString(title);
+//                String date_string = cursor.getString(date);
+//                String start_string = cursor.getString(start);
+//                String end_string = cursor.getString(end);
+//
+//                MyCalendarObject to = new MyCalendarObject(title_string,
+//                        date_string, start_string, end_string);
+//
+//                String[] start_split = start_string.split(":");
+//                start_hour = Integer.valueOf(start_split[0]);
+//                start_mins = Integer.valueOf(start_split[1]);
+//                time_start = (start_hour * 60) + start_mins;
+//
+//                String[] time_split_end = end_string.split(":");
+//                end_hour = Integer.valueOf(time_split_end[0]);
+//                end_mins = Integer.valueOf(time_split_end[1]);
+//                time_end = (end_hour * 60) + end_mins;
+//
+//                time_gap = time_start - time_end_old;
+//                Log.d("TIME END OLD", String.valueOf(time_end_old));
+//                Log.d("TIME START", String.valueOf(time_start));
+//                Log.d("TIME END", String.valueOf(time_end));
+//                Log.d("TIME GAP", String.valueOf(time_gap));
+//                time_gap_hour = time_gap / 60;
+//                Log.d("TIME GAP HOUR", String.valueOf(time_gap_hour));
+//
+//                date_new = date_string;
+//
+//                Log.d("DATE NEW", date_new);
+//                Log.d("DATE OLD", date_old);
+//
+//                if (date_new.equals(date_old)) {
+//                    if (time_gap > 120) {
+//                        MyCalendarObject to2 = new MyCalendarObject("Big time gap", date_string,
+//                                String.valueOf(time_gap), String.valueOf(time_gap_hour));
+//
+//                        Log.d("NEW IS OLD", "TIME GAP > 15");
+//
+//                        time_end_old = time_end;
+//                        date_old = date_new;
+//
+//                        calendarObjects.add(to2);
+//                        calendarObjects.add(to);
+//                    } else {
+//                        Log.d("NEW IS OLD", "TIME GAP < 15");
+//
+//                        MyCalendarObject to3 = new MyCalendarObject("Small time gap", date_string,
+//                                String.valueOf(time_gap), String.valueOf(time_gap_hour));
+//
+//                        time_end_old = time_end;
+//                        date_old = date_new;
+//                        calendarObjects.add(to3);
+//                        calendarObjects.add(to);
+//                    }
+//                } else {
+//                    Log.d("NEW ISN'T OLD", "TIME GAP > 15");
+//                    // calculate based on different date
+//
+//                    int time_gap_evening = bedtime_start - time_end_old;
+//                    int time_gap_evening_hour = time_gap_evening / 60;
+//                    int time_gap_morning = time_start - bedtime_end;
+//                    int time_gap_morning_hour = time_gap_morning / 60;
+//
+//                    MyCalendarObject to_gap_evening = new MyCalendarObject("Gap evening", date_string,
+//                            String.valueOf(time_gap_evening), String.valueOf(time_gap_evening_hour));
+//                    MyCalendarObject to_gap_morning = new MyCalendarObject("Gap morning", date_string,
+//                            String.valueOf(time_gap_morning), String.valueOf(time_gap_morning_hour));
+//
+//                    Log.d("EVENING", String.valueOf(time_gap_evening));
+//                    Log.d("MORNING", String.valueOf(time_gap_morning));
+//
+//                    time_end_old = time_end;
+//                    date_old = date_new;
+//                    calendarObjects.add(to_gap_evening);
+//                    calendarObjects.add(to_gap_morning);
+//                    calendarObjects.add(to);
+//                }
+//
+//                Log.d("COUNT", Integer.toString(calendarObjects.size()));
+//            }
+//            Log.d("COUNT2", Integer.toString(calendarObjects.size()));
+//
+//
+//            if (myCalendarAdapter == null) {
+//                myCalendarAdapter = new MyCalendarAdapter(this, 0, calendarObjects);
+//                listView.setAdapter(myCalendarAdapter);
+//            } else {
+//                myCalendarAdapter.clear();
+//                myCalendarAdapter.addAll(calendarObjects);
+//                myCalendarAdapter.notifyDataSetChanged();
+//            }
+//            cursor.close();
+//            db.close();
+
         }
 
+    }
+
+
+    private void checkFor(ArrayList<MyCalendarObject> calendarObjects, String title_string, String date_string, String start_string, String end_string) {
+
+        MyCalendarObject to = new MyCalendarObject(title_string,
+                date_string, start_string, end_string);
+
+        String[] start_split = start_string.split(":");
+        start_hour = Integer.valueOf(start_split[0]);
+        start_mins = Integer.valueOf(start_split[1]);
+        time_start = (start_hour * 60) + start_mins;
+
+        String[] time_split_end = end_string.split(":");
+        end_hour = Integer.valueOf(time_split_end[0]);
+        end_mins = Integer.valueOf(time_split_end[1]);
+        time_end = (end_hour * 60) + end_mins;
+
+        time_gap = time_start - time_end_old;
+        Log.d("TIME END OLD", String.valueOf(time_end_old));
+        Log.d("TIME START", String.valueOf(time_start));
+        Log.d("TIME END", String.valueOf(time_end));
+        Log.d("TIME GAP", String.valueOf(time_gap));
+        time_gap_hour = time_gap / 60;
+        Log.d("TIME GAP HOUR", String.valueOf(time_gap_hour));
+
+        date_new = date_string;
+
+        Log.d("DATE NEW", date_new);
+        Log.d("DATE OLD", date_old);
+
+        if (date_new.equals(date_old)) {
+            if (time_gap > 120) {
+                MyCalendarObject to2 = new MyCalendarObject("Big time gap", date_string,
+                        String.valueOf(time_gap), String.valueOf(time_gap_hour));
+
+                Log.d("NEW IS OLD", "TIME GAP > 15");
+
+                time_end_old = time_end;
+                date_old = date_new;
+
+                calendarObjects.add(to2);
+                calendarObjects.add(to);
+            } else {
+                Log.d("NEW IS OLD", "TIME GAP < 15");
+
+                MyCalendarObject to3 = new MyCalendarObject("Small time gap", date_string,
+                        String.valueOf(time_gap), String.valueOf(time_gap_hour));
+
+                time_end_old = time_end;
+                date_old = date_new;
+                calendarObjects.add(to3);
+                calendarObjects.add(to);
+            }
+        } else {
+            Log.d("NEW ISN'T OLD", "TIME GAP > 15");
+            // calculate based on different date
+
+            int time_gap_evening = bedtime_start - time_end_old;
+            int time_gap_evening_hour = time_gap_evening / 60;
+            int time_gap_morning = time_start - bedtime_end;
+            int time_gap_morning_hour = time_gap_morning / 60;
+
+            MyCalendarObject to_gap_evening = new MyCalendarObject("Gap evening", date_string,
+                    String.valueOf(time_gap_evening), String.valueOf(time_gap_evening_hour));
+            MyCalendarObject to_gap_morning = new MyCalendarObject("Gap morning", date_string,
+                    String.valueOf(time_gap_morning), String.valueOf(time_gap_morning_hour));
+
+            Log.d("EVENING", String.valueOf(time_gap_evening));
+            Log.d("MORNING", String.valueOf(time_gap_morning));
+
+            time_end_old = time_end;
+            date_old = date_new;
+            calendarObjects.add(to_gap_evening);
+            calendarObjects.add(to_gap_morning);
+            calendarObjects.add(to);
+        }
+
+        Log.d("COUNT", Integer.toString(calendarObjects.size()));
         if (myCalendarAdapter == null) {
             myCalendarAdapter = new MyCalendarAdapter(this, 0, calendarObjects);
+            Log.d("JUP", "YAS");
             listView.setAdapter(myCalendarAdapter);
         } else {
             myCalendarAdapter.clear();
             myCalendarAdapter.addAll(calendarObjects);
+            Log.d("Did he thoughh", "Did he??");
             myCalendarAdapter.notifyDataSetChanged();
         }
-        cursor.close();
-        db.close();
+        return;
     }
 
-//    public void deleteActivity(View view) {
-//        View parent = (View) view.getParent();
-//        TextView activityTextView = (TextView) parent.findViewById(R.id.calendar_activity);
-//        Log.d("GET TEXT", String.valueOf(activityTextView.getText()));
-//        String task = String.valueOf(activityTextView.getText());
-//        SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
-//        db.delete(MyCalendarTable.CalendarEntry.TABLE,
-//                MyCalendarTable.CalendarEntry.COL_CAL_TITLE + " = ?",
-//                new String[]{task});
-//        db.close();
-//        updateUI();
-//    }
 
-    private void insertEvent() {
-
-
-    }
 
 }
+
+
