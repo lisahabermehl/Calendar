@@ -84,8 +84,6 @@ public class MyCalendar extends AppCompatActivity {
                 final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_insert_event, null);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-
                 builder
                         .setView(dialogView)
                         .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -101,17 +99,15 @@ public class MyCalendar extends AppCompatActivity {
                                 String title = editText.getText().toString();
 
                                 DatePicker datePicker = (DatePicker) dialogView.findViewById(R.id.event_date_start);
-                                String day = String.valueOf(datePicker.getDayOfMonth());
-                                String month = String.valueOf(datePicker.getMonth() + 1);
-                                String year = String.valueOf(datePicker.getYear());
+                                String date = String.valueOf(datePicker.getDayOfMonth()) + "/" +
+                                        String.valueOf(datePicker.getMonth() + 1) + "/" +
+                                        String.valueOf(datePicker.getYear());
 
                                 EditText startTime = (EditText) dialogView.findViewById(R.id.event_time_start);
                                 EditText endTime = (EditText) dialogView.findViewById(R.id.event_time_end);
 
-                                String start = year + "/" + month + "/" + day + " " +
-                                        startTime.getText().toString();
-                                String end = year + "/" + month + "/" + day + " " +
-                                        endTime.getText().toString();
+                                String start = date + " " + startTime.getText().toString();
+                                String end = date + " " + endTime.getText().toString();
 
                                 // startActivity to show activities on a specific day
                                 Bundle extras = new Bundle();
@@ -139,7 +135,6 @@ public class MyCalendar extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 calendarView = (CalendarView) findViewById(R.id.calendarView);
-
                                 String date = "2017-06-20";
                                 updateUI(date);
                             }
