@@ -223,8 +223,6 @@ public class MyCalendar extends AppCompatActivity {
 
                 MyCalendarObject to = new MyCalendarObject(title_string, date_string, start_string, end_string);
 
-
-
                 time_end = convertToMins(end_string);
                 time_start = convertToMins(start_string);
                 time_gap = time_start - time_end_old;
@@ -259,22 +257,32 @@ public class MyCalendar extends AppCompatActivity {
                     Log.d("OTHER DAY", String.valueOf(date_new)+" "+String.valueOf(date_old));
                 }
 
-
+                date_old = date_new;
 
                 calendarObjects.add(to);
 
                     if(todo_cursor.moveToNext()) {
 
-                        String id_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry._ID));
-                        String todo_title_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_TITLE));
-                        String todo_duration_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DURATION));
-                        String todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DEADLINE));
+                        String[] details;
+                        details = getDetails(myCalendarDbHelper, todo_cursor, todo_cursor.getColumnIndex(TaskTable.TaskEntry._ID));
+
+                        String todo_title_string = details[0];
+                        String todo_duration_string = details[1];
+                        String todo_deadline_string = details[2];
+
+//                        String id_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry._ID));
+//                        String todo_title_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_TITLE));
+//                        String todo_duration_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DURATION));
+//                        String todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DEADLINE));
 
                         MyCalendarObject todo = new MyCalendarObject(todo_title_string,
                                 date_string, todo_duration_string, todo_deadline_string);
 
                         if(time_gap_morning > Integer.valueOf(todo_duration_string)){
+
                             calendarObjects.add(todo);
+                            time_gap_morning = time_gap_morning - Integer.valueOf(todo_duration_string);
+
                         }
                         else if(time_gap > Integer.valueOf(todo_duration_string)){
                             calendarObjects.add(todo);
@@ -305,8 +313,6 @@ public class MyCalendar extends AppCompatActivity {
         db.close();
         todo_cursor.close();
         todo_db.close();
-
-
     }
 
     private int convertToMins (String startTime) {
@@ -325,6 +331,17 @@ public class MyCalendar extends AppCompatActivity {
         return time_in_hours;
     }
 
+    private String[] getDetails (MyCalendarDbHelper helper, Cursor cursor, int ID) {
+        String[] details = new String[3];
+
+        cursor.move(ID);
+
+        details[0] = cursor.getString(cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_TITLE));
+        details[1] = cursor.getString(cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DURATION));
+        details[2] = cursor.getString(cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DEADLINE));
+
+        return details;
+    }
 }
 
 
