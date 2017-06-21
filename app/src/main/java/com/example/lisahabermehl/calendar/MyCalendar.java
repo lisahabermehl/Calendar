@@ -283,6 +283,28 @@ public class MyCalendar extends AppCompatActivity {
                             calendarObjects.add(todo);
                             time_gap_morning = time_gap_morning - Integer.valueOf(todo_duration_string);
 
+
+                            details = getDetails(myCalendarDbHelper, todo_cursor, todo_cursor.getColumnIndex(TaskTable.TaskEntry._ID));
+                            todo_duration_string = details[1];
+
+                            while(time_gap_morning > Integer.valueOf(todo_duration_string)){
+                                todo_title_string = details[0];
+                                todo_duration_string = details[1];
+                                todo_deadline_string = details[2];
+
+                                todo = new MyCalendarObject(todo_title_string,
+                                        date_string, todo_duration_string, todo_deadline_string);
+
+                                calendarObjects.add(todo);
+
+                                time_gap_morning = time_gap_morning - Integer.valueOf(todo_duration_string);
+
+                                int ID = todo_cursor.getColumnIndex(TaskTable.TaskEntry._ID);
+
+                                details = getDetails(myCalendarDbHelper, todo_cursor, ID+1);
+                                todo_duration_string = details[1];
+                            }
+
                         }
                         else if(time_gap > Integer.valueOf(todo_duration_string)){
                             calendarObjects.add(todo);
