@@ -455,13 +455,11 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                     Log.d("Added?", "big chance");
                     mService.events().insert(calendarId, event).execute();
                     Log.d("Added?", "bigger chance");
-//                    Log.d("HTML", event.getHtmlLink());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             return eventStrings;
         }
-
 
         @Override
         protected void onPreExecute() {

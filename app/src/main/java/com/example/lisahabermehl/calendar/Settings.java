@@ -28,12 +28,7 @@ public class Settings extends AppCompatActivity {
     Button edit_bedtime_end;
     Button sync_calendar;
 
-    DialogInterface dialogInterface;
-
     MyCalendarDbHelper myCalendarDbHelper;
-    GoogleCalendarTest googleCalendarTest;
-
-    Context context;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
