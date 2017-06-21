@@ -229,7 +229,6 @@ public class MyCalendar extends AppCompatActivity {
                 time_gap = time_start - time_end_old;
 
 
-
                 date_new = date_string;
 
                 // check for today: time and date, adjust todos on this
@@ -245,14 +244,12 @@ public class MyCalendar extends AppCompatActivity {
 
                 if (date_new.equals(date_old)) {
                     day = "same day";
-                }
-                else if (date_new.equals(currentDate)){
+                } else if (date_new.equals(currentDate)) {
                     day = "today";
                     time_gap = time_start - currentTime;
                     time_gap_hour = convertToHour(time_gap);
 
-                }
-                else {
+                } else {
                     day = "other day";
                     // 23:00 - 19:00 = 04:00
                     time_gap_evening = bedtime_start - time_end_old;
@@ -266,7 +263,7 @@ public class MyCalendar extends AppCompatActivity {
                     String todo_duration_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DURATION));
                     String todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DEADLINE));
 
-                    if(time_gap_morning > Integer.valueOf(todo_duration_string)) {
+                    if (time_gap_morning > Integer.valueOf(todo_duration_string)) {
 
                         MyCalendarObject to2 = new MyCalendarObject("Time gap morning", date_string,
                                 String.valueOf(time_gap_morning), time_gap_hour);
@@ -278,8 +275,7 @@ public class MyCalendar extends AppCompatActivity {
 
                         calendarObjects.add(to2);
                         calendarObjects.add(todo);
-                    }
-                    else if (time_gap > Integer.valueOf(todo_duration_string)){
+                    } else if (time_gap > Integer.valueOf(todo_duration_string)) {
                         MyCalendarObject to2 = new MyCalendarObject("Time gap random", date_string,
                                 String.valueOf(time_gap), time_gap_hour);
 
@@ -290,8 +286,7 @@ public class MyCalendar extends AppCompatActivity {
 
                         calendarObjects.add(to2);
                         calendarObjects.add(todo);
-                    }
-                    else if (time_gap_evening > Integer.valueOf(todo_duration_string)) {
+                    } else if (time_gap_evening > Integer.valueOf(todo_duration_string)) {
                         MyCalendarObject to2 = new MyCalendarObject("Time gap evening", date_string,
                                 String.valueOf(time_gap), time_gap_hour);
 
@@ -307,141 +302,9 @@ public class MyCalendar extends AppCompatActivity {
                 }
 
                 calendarObjects.add(to);
-
-//                // check if you're still on the same day or going to the next day
-//                if (date_new.equals(date_old)) {
-//
-//                    // check if you have a lot of time between two activities
-//                    // more than two hours is considered as a big time gap
-//                    if (time_gap < 120) {
-//
-//                        MyCalendarObject to2 = new MyCalendarObject("Big time gap", date_string,
-//                                String.valueOf(time_gap), time_gap_hour);
-//
-////                        todo_cursor.moveToNext();
-//
-////                        while (todo_cursor.moveToNext()) {
-//                            String id_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry._ID));
-//                            String todo_title_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_TITLE));
-//                            String todo_duration_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DURATION));
-//                            String todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DEADLINE));
-//
-//                            Log.d("ID", id_string);
-//                            Log.d("TODO TITLE", todo_title_string);
-//                            Log.d("TODO DURATION", todo_duration_string);
-//                            Log.d("TIME GAP", String.valueOf(time_gap));
-//
-//                            // does this to do fit in this gap?
-//                            if (time_gap > Integer.valueOf(todo_duration_string)) {
-//                                MyCalendarObject todo = new MyCalendarObject(todo_title_string,
-//                                        date_string, String.valueOf(time_gap), String.valueOf(time_gap - Integer.valueOf(todo_duration_string)));
-//
-//                                time_gap = time_gap - Integer.valueOf(todo_duration_string);
-//
-//                                Log.d("CHECK", "add todo to calendar");
-//                                calendarObjects.add(todo);
-//                                todo_cursor.moveToNext();
-//                            }
-//                            // if it doesn't, don't do anything and go to the next to do
-//                            else {
-//                                // check if there is anything left
-//                                if (todo_cursor.moveToNext()) {
-//                                    Toast.makeText(this, "There is something left.", Toast.LENGTH_SHORT).show();
-//                                    Toast.makeText(this, id_string, Toast.LENGTH_SHORT).show();
-//                                }
-//                                // else you should go back to the first and check if it fits in the time gap in the evening
-//                                else {
-//                                    Toast.makeText(this, "There is nothing left.", Toast.LENGTH_SHORT).show();
-//                                    Toast.makeText(this, id_string, Toast.LENGTH_SHORT).show();
-//                                }
-//                            }
-////                        }
-//
-//                        // swap
-//                        time_end_old = time_end;
-//                        date_old = date_new;
-//
-//                        calendarObjects.add(to2);
-//                        calendarObjects.add(to);
-//
-//                    // less than two hours
-//                    } else {
-//                        MyCalendarObject to3 = new MyCalendarObject("Small time gap", date_string,
-//                                String.valueOf(time_gap), String.valueOf(time_gap_hour));
-//
-//                        // look for todos that don't take a lot of time
-//                        time_end_old = time_end;
-//                        date_old = date_new;
-//
-//                        calendarObjects.add(to3);
-//                        calendarObjects.add(to);
-//                    }
-//                } else {
-//                    // calculate based on different date
-//                    int time_gap_evening = bedtime_start - time_end_old;
-//                    int time_gap_morning = time_start - bedtime_end;
-//
-//                    MyCalendarObject to_gap_evening = new MyCalendarObject("Gap evening", date_string,
-//                            String.valueOf(time_gap_evening), String.valueOf(time_gap_evening / 60));
-//                    MyCalendarObject to_gap_morning = new MyCalendarObject("Gap morning", date_string,
-//                            String.valueOf(time_gap_morning), String.valueOf(time_gap_morning / 60));
-//
-//                    time_end_old = time_end;
-//                    date_old = date_new;
-//                    calendarObjects.add(to_gap_evening);
-//                    calendarObjects.add(to_gap_morning);
-//                    calendarObjects.add(to);
-//                }
             }
-//        } else {
-//            String date_of_choice = "2017-06-20";
-//            int time_end_old = (7 * 60);
-//
-//            while (cursor.moveToNext()) {
-//                int date = cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_DATE);
-//                String date_string = cursor.getString(date);
-//                Log.d("Date string", date_string);
-//
-//                if (date_of_choice.equals(date_string)) {
-//                    String title_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_TITLE));
-//                    String start_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START));
-//                    String end_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END));
-//
-//                    MyCalendarObject to = new MyCalendarObject(title_string,
-//                            date_string, start_string, end_string);
-//
-//                    String[] start_split = start_string.split(":");
-//                    time_start = (Integer.valueOf(start_split[0]) * 60) + Integer.valueOf(start_split[1]);
-//
-//                    String[] time_split_end = end_string.split(":");
-//                    time_end = (Integer.valueOf(time_split_end[0]) * 60) + Integer.valueOf(time_split_end[1]);
-//
-//                    time_gap = time_start - time_end_old;
-//                    time_gap_hour = convertToHour(time_gap);
-//
-//                        if (time_gap > 120) {
-//                            MyCalendarObject to2 = new MyCalendarObject("Big time gap", date_string,
-//                                    String.valueOf(time_gap), String.valueOf(time_gap_hour));
-//
-//                            time_end_old = time_end;
-//                            date_old = date_new;
-//
-//                            calendarObjects.add(to2);
-//                            calendarObjects.add(to);
-//                        } else {
-//                            MyCalendarObject to3 = new MyCalendarObject("Small time gap", date_string,
-//                                    String.valueOf(time_gap), String.valueOf(time_gap_hour));
-//
-//                            time_end_old = time_end;
-//                            date_old = date_new;
-//
-//                            calendarObjects.add(to3);
-//                            calendarObjects.add(to);
-//                        }
-//                    // TODO: how can you calculate that last time gap
-//                }
-//            }
-//        }
+
+
             if (myCalendarAdapter == null) {
                 myCalendarAdapter = new MyCalendarAdapter(this, 0, calendarObjects);
                 calendarListView.setAdapter(myCalendarAdapter);
