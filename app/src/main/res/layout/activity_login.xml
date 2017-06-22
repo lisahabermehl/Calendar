@@ -1,28 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/intro"
+    android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:layout_alignParentBottom="true">
 
-    <Button
-        android:id="@+id/enterApp"
-        android:layout_width="match_parent"
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:src="@drawable/calendar"/>
+
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onLoginClick"
-        android:text="LOG IN" />
+        android:layout_gravity="center_horizontal"
+        android:text="MY CALENDAR"
+        android:textStyle="bold"
+        android:textSize="35dp"/>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:design="http://schemas.android.com/apk/res-auto"
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
-
-        <android.support.design.widget.BottomNavigationView
-            android:id="@+id/navigation"
-            android:layout_width="fill_parent"
-            android:layout_height="match_parent"
-            design:menu="@menu/menu" />
-
-    </LinearLayout>
-
-</RelativeLayout>
+</LinearLayout>
