@@ -45,6 +45,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -61,6 +62,8 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
     TextView mOutputText;
     ProgressDialog mProgress;
     MyCalendarDbHelper myCalendarDbHelper;
+
+    Context context;
 
     MyCalendar myCalendar;
 
@@ -368,11 +371,20 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
         private List<String> getDataFromApi() throws IOException {
             // List the next 10 events from the primary calendar.
             DateTime now = new DateTime(System.currentTimeMillis());
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+            int noOfDays = 3; //i.e two weeks
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+            calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
+            Date date = calendar.getTime();
+
+            DateTime dateTime = new DateTime(date);
 
             List<String> eventStrings = new ArrayList<>();
 
             Events events = mService.events().list("primary")
-                    .setMaxResults(30)
+                    .setTimeMax(dateTime)
                     .setTimeMin(now)
                     .setOrderBy("startTime")
                     .setSingleEvents(true)
@@ -385,7 +397,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
             for (Event event : items) {
 
                 // get the date
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date original = new Date(event.getStart().getDateTime().getValue());
                 String dateStart = dateFormat.format(original);
 
@@ -412,6 +424,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 values.put(MyCalendarTable.CalendarEntry.COL_CAL_START, timeStart);
                 values.put(MyCalendarTable.CalendarEntry.COL_CAL_END, timeEnd);
                 Log.d("ACTIVITY", activity);
+                Log.d("DATE", dateStart);
 
                 // add new values to table
                 db.insertWithOnConflict(MyCalendarTable.CalendarEntry.TABLE,
@@ -422,6 +435,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
 
             }
             return eventStrings;
+
         }
 
         private List<String> insertEvent(String des, Date startDate, Date endDate) {

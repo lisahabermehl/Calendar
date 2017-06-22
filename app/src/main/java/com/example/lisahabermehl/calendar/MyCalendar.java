@@ -49,6 +49,7 @@ public class MyCalendar extends AppCompatActivity {
     int ID = 0;
     int time_gap_morning;
     int time_gap_evening;
+    int time_gap_first;
 
     String time_gap_hour;
     String day;
@@ -234,12 +235,6 @@ public class MyCalendar extends AppCompatActivity {
 
     private void updateUI(String[] search_for) {
 
-        String date_old_ym = new SimpleDateFormat("yyyy-MM-").format(Calendar.getInstance().getTime());
-        String date_old_d = new SimpleDateFormat("dd").format(Calendar.getInstance().getTime());
-        int date_old_dd = Integer.valueOf(date_old_d);
-        int date_old_ddd = date_old_dd - 1;
-        String date_old = date_old_ym + String.valueOf(date_old_ddd);
-
         SQLiteDatabase db = myCalendarDbHelper.getReadableDatabase();
         Cursor cursor = db.query(MyCalendarTable.CalendarEntry.TABLE,
                 new String[]{MyCalendarTable.CalendarEntry._ID,
@@ -262,115 +257,118 @@ public class MyCalendar extends AppCompatActivity {
 
         ArrayList<MyCalendarObject> calendarObjects = new ArrayList<>();
 
+        String title_string, date_string, start_string, end_string, bedtime;
+
+        cursor.moveToFirst();
+
+//        String id = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry._ID));
+//        Log.d("ID", String.valueOf(id));
+
+        MyCalendarObject nextEvent;
 
         if(search_for[0].equals("no")){
 
-            while(cursor.moveToNext()) {
+            String[] everythingToKnow = nextEvent(cursor, ID, date_old, time_end_old);
 
-                String id = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry._ID));
-                Log.d("ID", id);
+            time_gap = Integer.valueOf(everythingToKnow[0]);
+            title_string = everythingToKnow[1];
+            date_string = everythingToKnow[2];
+            start_string = everythingToKnow[3];
+            end_string = everythingToKnow[4];
+            bedtime = everythingToKnow[5];
 
-                String title_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_TITLE));
-                String date_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_DATE));
-                String start_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START));
-                String end_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END));
+            nextEvent = new MyCalendarObject(title_string, date_string, start_string, end_string);
 
-                MyCalendarObject to = new MyCalendarObject(title_string, date_string, start_string, end_string);
+            // new is the new old
+            ID = ID + 1;
+            date_old = date_string;
+            time_end_old = convertToMins(end_string);
 
-                time_end = convertToMins(end_string);
-                time_start = convertToMins(start_string);
-                time_gap = time_start - time_end_old;
-                date_new = date_string;
+            // get todos one at a time, they are already organized on importance
+            while(todo_cursor.moveToNext()) {
 
-                String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
-                Log.d("CURRENT DATE", currentDate);
-                String currentTimeMin = new SimpleDateFormat("mm").format(Calendar.getInstance().getTime());
-                Log.d("CURRENT TIME MIN", currentTimeMin);
-                String currentTimeHour = new SimpleDateFormat("HH").format(Calendar.getInstance().getTime());
-                Log.d("CURRENT TIME HOUR", currentTimeHour);
-                int currentTime = (Integer.valueOf(currentTimeHour) * 60) + Integer.valueOf(currentTimeMin);
+                String id_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry._ID));
+                String todo_title_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_TITLE));
+                String todo_duration_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DURATION));
+                String todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DEADLINE));
 
-                if (date_new.equals(date_old)) {
-                    day = "same day";
-                    Log.d("SAME DAY", String.valueOf(date_new)+" "+String.valueOf(date_old));
+                MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string, todo_duration_string, todo_deadline_string);
+
+                int duration = Integer.valueOf(todo_duration_string);
+
+                Log.d("GAP > DURATION", String.valueOf(time_gap));
+
+                if(time_gap > duration){
+                    calendarObjects.add(todo);
+                    time_gap = time_gap - duration;
                 }
-                else if (date_new.equals(currentDate)){
-                    day = "today";
+                else{
 
-                    // check what the start time of next activity is
-                    cursor.moveToNext();
-                    start_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START));
-                    time_start = convertToMins(start_string);
-                    Log.d("TIME START", String.valueOf(time_start));
-                    cursor.moveToPrevious();
-
-                    time_gap = time_start - currentTime;
-                    time_gap_hour = convertToHour(time_gap);
-                    Log.d("CURRENT DAY", String.valueOf(date_new)+" "+currentDate);
-                }
-                else {
-                    day = "other day";
-                    // 23:00 - 19:00 = 04:00
-                    time_gap_evening = bedtime_start - time_end_old;
-                    // 10:00 - 07:00 = 03:00
-                    time_gap_morning = time_start - bedtime_end;
-                    MyCalendarObject bedtime = new MyCalendarObject("Bedtime", date_old+" + 1", "23:00", "07:00");
-                    calendarObjects.add(bedtime);
-                    Log.d("OTHER DAY", String.valueOf(date_new)+" "+String.valueOf(date_old));
-                }
-
-                date_old = date_new;
-
-                calendarObjects.add(to);
-
-                if(todo_cursor.moveToNext()) {
-
-                    String id_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry._ID));
-                    String todo_title_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_TITLE));
-                    String todo_duration_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DURATION));
-                    String todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DEADLINE));
-
-                    MyCalendarObject todo = new MyCalendarObject(todo_title_string,
-                            date_string, todo_duration_string, todo_deadline_string);
-
-                    Log.d("GAP > DURATION", String.valueOf(time_gap));
-
-                    if(time_gap_morning > Integer.valueOf(todo_duration_string)){
-
-                        calendarObjects.add(todo);
-                        time_gap_morning = time_gap_morning - Integer.valueOf(todo_duration_string);
-
-                        Log.d("GAP MORNING", String.valueOf(time_gap_morning));
-
-                        // check again if you can fill more todos into this time gap
+                    if(bedtime.equals("bedtime_yes")){
+                        MyCalendarObject to2 = new MyCalendarObject("Bedtime", date_string + " +1", "23:00", "07:00");
+                        calendarObjects.add(to2);
                     }
-                    else if(time_gap > Integer.valueOf(todo_duration_string)){
-                        calendarObjects.add(todo);
+//
+                    calendarObjects.add(nextEvent);
 
-                        Log.d("TIME GAP", String.valueOf(time_gap));
-                    }
-                    else if(time_gap_evening > Integer.valueOf(todo_duration_string)){
-                        calendarObjects.add(todo);
+                    everythingToKnow = nextEvent(cursor, ID, date_old, time_end_old);
 
-                        Log.d("GAP EVENING", String.valueOf(time_gap_evening));
-                    }
-                    else{
-                        todo_cursor.move(ID-1);
-                        Log.d("ID new", String.valueOf(ID) + " " + String.valueOf(ID - 1));
-                    }
+                    time_gap = Integer.valueOf(everythingToKnow[0]);
+                    title_string = everythingToKnow[1];
+                    date_string = everythingToKnow[2];
+                    start_string = everythingToKnow[3];
+                    end_string = everythingToKnow[4];
+                    bedtime = everythingToKnow[5];
 
+                    nextEvent = new MyCalendarObject(title_string, date_string, start_string, end_string);
+
+                    // new is the new old
+                    date_old = date_string;
+                    time_end_old = convertToMins(end_string);
                 }
             }
+
+            if(bedtime.equals("bedtime_yes")){
+                MyCalendarObject to2 = new MyCalendarObject("Bedtime", date_string + " +1", "23:00", "07:00");
+                calendarObjects.add(to2);
+            }
+
+            calendarObjects.add(nextEvent);
+
+            while(cursor.moveToNext()){
+                everythingToKnow = nextEvent(cursor, ID, date_old, time_end_old);
+
+                time_gap = Integer.valueOf(everythingToKnow[0]);
+                title_string = everythingToKnow[1];
+                date_string = everythingToKnow[2];
+                start_string = everythingToKnow[3];
+                end_string = everythingToKnow[4];
+                bedtime = everythingToKnow[5];
+
+                nextEvent = new MyCalendarObject(title_string, date_string, start_string, end_string);
+
+                if(bedtime.equals("bedtime_yes")){
+                    MyCalendarObject to2 = new MyCalendarObject("Bedtime", date_string + " +1", "23:00", "07:00");
+                    calendarObjects.add(to2);
+                }
+
+                calendarObjects.add(nextEvent);
+
+                // new is the new old
+                date_old = date_string;
+                time_end_old = convertToMins(end_string);
+            }
+
         }
         else if (search_for[0].equals("date")){
             // look for specific date in table and print details while looking for gaps and filling these gaps with todos
 
             while(cursor.moveToNext()) {
 
-                String title_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_TITLE));
-                String date_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_DATE));
-                String start_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START));
-                String end_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END));
+                title_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_TITLE));
+                date_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_DATE));
+                start_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START));
+                end_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END));
 
                 if(date_string.equals(search_for[1])){
                     MyCalendarObject yes = new MyCalendarObject(title_string, date_string, start_string, end_string);
@@ -407,8 +405,8 @@ public class MyCalendar extends AppCompatActivity {
                     // 10:00 - 07:00 = 03:00
                     time_gap_morning = time_start - bedtime_end;
                     if (date_string.equals(search_for[1])){
-                        MyCalendarObject bedtime = new MyCalendarObject("Bedtime", date_string+" + 1", "23:00", "07:00");
-                        calendarObjects.add(bedtime);
+//                        MyCalendarObject bedtime = new MyCalendarObject("Bedtime", date_string+" + 1", "23:00", "07:00");
+//                        calendarObjects.add(bedtime);
                     }
 
                     Log.d("OTHER DAY", String.valueOf(date_new)+" "+String.valueOf(date_old));
@@ -449,10 +447,10 @@ public class MyCalendar extends AppCompatActivity {
         else if(search_for[0].equals("title")){
             while(cursor.moveToNext()) {
 
-                String title_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_TITLE));
-                String date_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_DATE));
-                String start_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START));
-                String end_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END));
+                title_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_TITLE));
+                date_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_DATE));
+                start_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START));
+                end_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END));
 
                 if(title_string.equals(search_for[1])){
                     MyCalendarObject yes = new MyCalendarObject(title_string, date_string, start_string, end_string);
@@ -542,9 +540,6 @@ public class MyCalendar extends AppCompatActivity {
         todo_cursor.close();
         todo_db.close();
 
-
-
-
     }
 
     private int convertToMins (String startTime) {
@@ -562,6 +557,100 @@ public class MyCalendar extends AppCompatActivity {
 
         return time_in_hours;
     }
+
+    private String[] nextEvent(Cursor cursor, int ID, String date_old, int time_end_old){
+
+        String title_string, date_string, start_string, end_string;
+
+        if(!cursor.isAfterLast()){
+
+            String[] sendBack = new String[10];
+
+            title_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_TITLE));
+            date_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_DATE));
+            start_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START));
+            end_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END));
+
+            String bedtime = "bedtime_no";
+
+            time_end = convertToMins(end_string);
+            time_start = convertToMins(start_string);
+            date_new = date_string;
+
+            cursor.moveToNext();
+
+            String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+            Log.d("CURRENT DATE", currentDate);
+            String currentTimeMin = new SimpleDateFormat("mm").format(Calendar.getInstance().getTime());
+            Log.d("CURRENT TIME MIN", currentTimeMin);
+            String currentTimeHour = new SimpleDateFormat("HH").format(Calendar.getInstance().getTime());
+            Log.d("CURRENT TIME HOUR", currentTimeHour);
+            int currentTime = (Integer.valueOf(currentTimeHour) * 60) + Integer.valueOf(currentTimeMin);
+
+            // check if the next event is on the same day as the last event
+            if (date_new.equals(date_old)) {
+
+                day = "same day";
+                time_gap = time_start - time_end_old;
+
+                Log.d("SAME DAY", String.valueOf(date_new)+" "+String.valueOf(date_old));
+
+            }
+            // it's also possible that date_old is empty, therefore it's impossible to be on the same date as date_new
+            // so, check if the first event is today
+            // what if the first event is tomorrow
+            else if (date_new.equals(currentDate) && date_old.equals("nog niks")){
+
+                day = "today";
+
+                // check how much time there is between current time and start of next activity
+                time_gap = time_start - currentTime;
+
+                Log.d("CURRENT DAY", String.valueOf(date_new)+" "+currentDate);
+            }
+            // else it has to be on another day
+            // which means we can fill the gap between the last activity (time_end_old) and bedtime
+            // but after filling this gap between the last and bedtime
+            // we can also fill the gap between waking up and the next event
+            else {
+
+                day = "other day";
+
+                if(date_old.equals("nog niks")){
+                    time_gap = bedtime_start - currentTime;
+                }
+                else{
+                    // 23:00 - 19:00 = 04:00
+                    time_gap = bedtime_start - time_end_old;
+                    // 10:00 - 07:00 = 03:00
+                    // time_gap_morning = time_start - bedtime_end;
+                }
+
+                bedtime = "bedtime_yes";
+
+
+                Log.d("OTHER DAY", String.valueOf(date_new)+" "+String.valueOf(date_old));
+            }
+
+            sendBack[0] = String.valueOf(time_gap);
+            sendBack[1] = title_string;
+            sendBack[2] = date_string;
+            sendBack[3] = start_string;
+            sendBack[4] = end_string;
+            sendBack[5] = bedtime;
+
+            return sendBack;
+        }
+        else{
+            Log.d("PROBLEMOOO", "JUP");
+        }
+
+
+
+
+        return null;
+    }
+
 }
 
 
