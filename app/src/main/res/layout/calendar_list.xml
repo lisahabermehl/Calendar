@@ -18,14 +18,14 @@
         android:textStyle="bold"
         android:textAlignment="center"/>
 
-    <TextView
-        android:id="@+id/mOutputText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:text=" " />
+    <!--<TextView-->
+        <!--android:id="@+id/mOutputText"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:paddingTop="@dimen/activity_vertical_margin"-->
+        <!--android:paddingLeft="@dimen/activity_horizontal_margin"-->
+        <!--android:paddingRight="@dimen/activity_horizontal_margin"-->
+        <!--android:text=" " />-->
 
     <ListView
         android:id="@+id/list_calendar"

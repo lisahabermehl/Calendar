@@ -1,5 +1,6 @@
 package com.example.lisahabermehl.calendar;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,6 +29,8 @@ public class Settings extends AppCompatActivity {
     Button edit_bedtime_end;
     Button sync_calendar;
 
+    ProgressDialog mProgress;
+
     MyCalendarDbHelper myCalendarDbHelper;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +47,11 @@ public class Settings extends AppCompatActivity {
         SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
         db.delete(MyCalendarTable.CalendarEntry.TABLE, null, null);
 
+
+
         Intent intent = new Intent(this, GoogleCalendarTest.class);
         Bundle extras = new Bundle();
-
         extras.putString("zero", "get");
-
         intent.putExtras(extras);
         startActivity(intent);
     }

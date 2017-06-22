@@ -79,7 +79,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.calendar_list);
+        setContentView(R.layout.blank);
 
         mOutputText = (TextView) findViewById(R.id.mOutputText);
 
@@ -337,7 +337,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
 
                 try {
                     String title = params[1];
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
                     Date startDate = simpleDateFormat.parse(params[2]);
                     Date endDate = simpleDateFormat.parse(params[3]);
                     Log.d("Startdate", String.valueOf(startDate));
@@ -474,8 +474,9 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
             if (output == null || output.size() == 0) {
                 mOutputText.setText("No results returned.");
             } else {
-                mOutputText.setText(String.valueOf(output));
-//                startActivity(new Intent(GoogleCalendarTest.this, MyCalendar.class));
+//                mOutputText.setText(String.valueOf(output));
+                startActivity(new Intent(GoogleCalendarTest.this, MyCalendar.class));
+                finish();
             }
         }
 

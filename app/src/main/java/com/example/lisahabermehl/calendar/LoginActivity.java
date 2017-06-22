@@ -5,6 +5,7 @@ package com.example.lisahabermehl.calendar;
  */
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,8 @@ import android.view.animation.AlphaAnimation;
 import android.widget.LinearLayout;
 
 public class LoginActivity extends AppCompatActivity {
+
+    MyCalendarDbHelper myCalendarDbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +33,17 @@ public class LoginActivity extends AppCompatActivity {
         int secondsDelayed = 5;
         new Handler().postDelayed(new Runnable() {
             public void run() {
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                myCalendarDbHelper = new MyCalendarDbHelper(LoginActivity.this);
+                SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
+                db.delete(MyCalendarTable.CalendarEntry.TABLE, null, null);
+
+                Intent intent = new Intent(LoginActivity.this, GoogleCalendarTest.class);
+                Bundle extras = new Bundle();
+                extras.putString("zero", "get");
+                intent.putExtras(extras);
+                startActivity(intent);
                 finish();
             }
         }, secondsDelayed * 1000);
-
-//        startActivity(new Intent(this, MainActivity.class));
     }
 }
