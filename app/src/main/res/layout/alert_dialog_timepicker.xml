@@ -4,6 +4,14 @@
     android:layout_height="match_parent">
 
     <TimePicker
+        android:id="@+id/bedtime_start"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+    </TimePicker>
+
+    <TimePicker
+        android:id="@+id/bedtime_end"
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
 

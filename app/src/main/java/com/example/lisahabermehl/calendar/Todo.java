@@ -74,6 +74,9 @@ public class Todo extends AppCompatActivity {
             case R.id.menu_todo:
                 startActivity(new Intent(this, Todo.class));
                 return true;
+            case R.id.menu_settings:
+                startActivity(new Intent(this, Settings.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

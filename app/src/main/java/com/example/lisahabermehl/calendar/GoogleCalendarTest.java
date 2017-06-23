@@ -373,7 +373,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
             DateTime now = new DateTime(System.currentTimeMillis());
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-            int noOfDays = 3; //i.e two weeks
+            int noOfDays = 7;
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(new Date());
             calendar.add(Calendar.DAY_OF_YEAR, noOfDays);

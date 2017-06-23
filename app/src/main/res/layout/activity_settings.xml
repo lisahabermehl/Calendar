@@ -19,37 +19,29 @@
 
     <TextView
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/edit_bedtime"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:text="Bedtime start"/>
+        android:text="SET BEDTIME"
+        android:onClick="editBedtime "/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <Button
-        android:id="@+id/edit_bedtime_start"
+        android:id="@+id/time_span"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="SET TIME"
-        android:onClick="editBedtimeStart"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:text="Bedtime end"/>
+        android:text="SET TIME SPAN"
+        android:onClick="setTimeSpan"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/edit_bedtime_end"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="SET TIME"
-        android:onClick="editBedtimeEnd"/>
 
     <Button
         android:id="@+id/sync_calendar"
@@ -57,12 +49,5 @@
         android:layout_height="wrap_content"
         android:text="SYNC CALENDAR"
         android:onClick="syncCalendar"/>
-
-    <Button
-        android:id="@+id/add_activity"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="ADD ACTIVITY"
-        android:onClick="addActivity"/>
 
 </LinearLayout>
