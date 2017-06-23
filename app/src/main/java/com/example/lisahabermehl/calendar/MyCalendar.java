@@ -257,9 +257,11 @@ public class MyCalendar extends AppCompatActivity {
 
         ArrayList<MyCalendarObject> calendarObjects = new ArrayList<>();
 
-        String title_string, date_string, start_string, end_string, bedtime;
+        String title_string, date_string, start_string, end_string, bedtime, old_end_string;
 
         cursor.moveToFirst();
+        todo_cursor.moveToFirst();
+        todo_cursor.moveToPrevious();
 
 //        String id = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry._ID));
 //        Log.d("ID", String.valueOf(id));
@@ -276,13 +278,16 @@ public class MyCalendar extends AppCompatActivity {
             start_string = everythingToKnow[3];
             end_string = everythingToKnow[4];
             bedtime = everythingToKnow[5];
+            old_end_string = everythingToKnow[6];
 
             nextEvent = new MyCalendarObject(title_string, date_string, start_string, end_string);
 
             // new is the new old
             ID = ID + 1;
             date_old = date_string;
-            time_end_old = convertToMins(end_string);
+            int last = Integer.valueOf(old_end_string);
+
+            Log.d("End last event", String.valueOf(time_end_old));
 
             // get todos one at a time, they are already organized on importance
             while(todo_cursor.moveToNext()) {
@@ -292,23 +297,43 @@ public class MyCalendar extends AppCompatActivity {
                 String todo_duration_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DURATION));
                 String todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DEADLINE));
 
-                MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string, todo_duration_string, todo_deadline_string);
+                String begin = convertToHour(last);
+                Log.d("BEGIN", String.valueOf(last));
+                Log.d("BEGIN", begin);
+                int lastlast = last + Integer.valueOf(todo_duration_string);
+
+                String eind = convertToHour(lastlast);
+                Log.d("EIND", eind);
+                Log.d("EIND", String.valueOf(lastlast));
+
+                last = lastlast;
+
+                MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string, begin, eind);
+
+                Log.d("TITLE", todo_title_string);
 
                 int duration = Integer.valueOf(todo_duration_string);
 
-                Log.d("GAP > DURATION", String.valueOf(time_gap));
+                Log.d("Time gap", String.valueOf(time_gap));
 
                 if(time_gap > duration){
                     calendarObjects.add(todo);
+
                     time_gap = time_gap - duration;
+                    Log.d("Time gap new", String.valueOf(time_gap));
                 }
                 else{
+
+                    Log.d("Check for next time gap", " ");
 
                     if(bedtime.equals("bedtime_yes")){
                         MyCalendarObject to2 = new MyCalendarObject("Bedtime", date_string + " +1", "23:00", "07:00");
                         calendarObjects.add(to2);
+                        // how do you check for time gap between rising and first activity on a day?
                     }
-//
+
+                    todo_cursor.moveToPrevious();
+
                     calendarObjects.add(nextEvent);
 
                     everythingToKnow = nextEvent(cursor, ID, date_old, time_end_old);
@@ -328,6 +353,7 @@ public class MyCalendar extends AppCompatActivity {
                 }
             }
 
+            // there a no more todos left
             if(bedtime.equals("bedtime_yes")){
                 MyCalendarObject to2 = new MyCalendarObject("Bedtime", date_string + " +1", "23:00", "07:00");
                 calendarObjects.add(to2);
@@ -552,15 +578,26 @@ public class MyCalendar extends AppCompatActivity {
 
     private String convertToHour (int timeInMins) {
 
-        int hours = timeInMins / 60;
-        String time_in_hours = String.valueOf(hours);
+        int hours = 0;
+
+        while(timeInMins > 59) {
+            timeInMins = timeInMins - 60;
+            hours = hours + 1;
+        }
+
+        String time_in_hours = String.valueOf(hours) + ":" + String.valueOf(timeInMins);
+
+        if(timeInMins == 0){
+            time_in_hours = String.valueOf(hours) + ":00";
+        }
 
         return time_in_hours;
     }
 
     private String[] nextEvent(Cursor cursor, int ID, String date_old, int time_end_old){
 
-        String title_string, date_string, start_string, end_string;
+        String title_string, date_string, start_string, end_string, bedtime;
+        String old_end_string = " ";
 
         if(!cursor.isAfterLast()){
 
@@ -571,7 +608,7 @@ public class MyCalendar extends AppCompatActivity {
             start_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START));
             end_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END));
 
-            String bedtime = "bedtime_no";
+            bedtime = "bedtime_no";
 
             time_end = convertToMins(end_string);
             time_start = convertToMins(start_string);
@@ -605,8 +642,12 @@ public class MyCalendar extends AppCompatActivity {
 
                 // check how much time there is between current time and start of next activity
                 time_gap = time_start - currentTime;
+                old_end_string = String.valueOf(currentTime);
 
                 Log.d("CURRENT DAY", String.valueOf(date_new)+" "+currentDate);
+                Log.d("START TIME", String.valueOf(time_start));
+                Log.d("CURRENT", String.valueOf(currentTime));
+                Log.d("TIME GAP", String.valueOf(time_gap));
             }
             // else it has to be on another day
             // which means we can fill the gap between the last activity (time_end_old) and bedtime
@@ -628,7 +669,6 @@ public class MyCalendar extends AppCompatActivity {
 
                 bedtime = "bedtime_yes";
 
-
                 Log.d("OTHER DAY", String.valueOf(date_new)+" "+String.valueOf(date_old));
             }
 
@@ -638,6 +678,7 @@ public class MyCalendar extends AppCompatActivity {
             sendBack[3] = start_string;
             sendBack[4] = end_string;
             sendBack[5] = bedtime;
+            sendBack[6] = old_end_string;
 
             return sendBack;
         }
