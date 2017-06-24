@@ -28,7 +28,7 @@ import java.util.ArrayList;
 
 public class Todo extends AppCompatActivity {
 
-    private TaskDbHelper mHelper;
+    private DatabaseHelper databaseHelper;
     private TaskAdapter taskAdapter;
 
     private ListView mTaskListView;
@@ -38,7 +38,7 @@ public class Todo extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.todo_list);
 
-        mHelper = new TaskDbHelper(this);
+        databaseHelper = new DatabaseHelper(this);
 
         // initialize the list
         mTaskListView = (ListView) findViewById(R.id.list_todo);
@@ -85,20 +85,20 @@ public class Todo extends AppCompatActivity {
     // to see the updated data you need to call the updateUI method every time the underlying data of the app changes
     // so we add it in two places: onCreate() and after adding a new task using the AlertDialog
     private void updateUI() {
-        SQLiteDatabase db = mHelper.getReadableDatabase();
-        Cursor cursor = db.query(TaskTable.TaskEntry.TABLE,
-                new String[]{TaskTable.TaskEntry._ID,
-                        TaskTable.TaskEntry.COL_TASK_TITLE,
-                        TaskTable.TaskEntry.COL_TASK_DURATION,
-                        TaskTable.TaskEntry.COL_TASK_DEADLINE},
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        Cursor cursor = db.query(TableNames.TodoEntry.TABLE_TODO,
+                new String[]{TableNames.TodoEntry._ID,
+                        TableNames.TodoEntry.COL_TODO_TITLE,
+                        TableNames.TodoEntry.COL_TODO_DURATION,
+                        TableNames.TodoEntry.COL_TODO_DEADLINE},
                 null, null, null, null, null);
 
         ArrayList<TaskObject> taskObject = new ArrayList<>();
 
         while (cursor.moveToNext()) {
-            int idx = cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_TITLE);
-            int idxx = cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DURATION);
-            int idxxx = cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DEADLINE);
+            int idx = cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE);
+            int idxx = cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DURATION);
+            int idxxx = cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DEADLINE);
             TaskObject to = new TaskObject(cursor.getString(idx), cursor.getString(idxx), cursor.getString(idxxx));
             taskObject.add(to);
         }
@@ -139,13 +139,13 @@ public class Todo extends AppCompatActivity {
                                 int year = deadline.getYear();
                                 String deadline = String.valueOf(year + "-" + month + "-" + day);
 
-                                SQLiteDatabase db = mHelper.getWritableDatabase();
+                                SQLiteDatabase db = databaseHelper.getWritableDatabase();
 
                                 ContentValues values = new ContentValues();
-                                values.put(TaskTable.TaskEntry.COL_TASK_TITLE, task);
-                                values.put(TaskTable.TaskEntry.COL_TASK_DURATION, time);
-                                values.put(TaskTable.TaskEntry.COL_TASK_DEADLINE, deadline);
-                                db.insertWithOnConflict(TaskTable.TaskEntry.TABLE,
+                                values.put(TableNames.TodoEntry.COL_TODO_TITLE, task);
+                                values.put(TableNames.TodoEntry.COL_TODO_DURATION, time);
+                                values.put(TableNames.TodoEntry.COL_TODO_DEADLINE, deadline);
+                                db.insertWithOnConflict(TableNames.TodoEntry.TABLE_TODO,
                                         null,
                                         values,
                                         SQLiteDatabase.CONFLICT_REPLACE);
@@ -167,9 +167,9 @@ public class Todo extends AppCompatActivity {
         View parent = (View) view.getParent();
         TextView taskTextView = (TextView) parent.findViewById(R.id.task_title);
         String task = String.valueOf(taskTextView.getText());
-        SQLiteDatabase db = mHelper.getWritableDatabase();
-        db.delete(TaskTable.TaskEntry.TABLE,
-                TaskTable.TaskEntry.COL_TASK_TITLE + " = ?",
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        db.delete(TableNames.TodoEntry.TABLE_TODO,
+                TableNames.TodoEntry.COL_TODO_TITLE + " = ?",
                 new String[]{task});
         db.close();
         updateUI();

@@ -32,11 +32,11 @@ public class MyCalendar extends AppCompatActivity {
 
     DatePicker datePicker;
 
-    MyCalendarDbHelper myCalendarDbHelper;
+    DatabaseHelper databaseHelper;
+
     MyCalendarAdapter myCalendarAdapter;
     ListView calendarListView;
 
-    TaskDbHelper taskDbHelper;
     TaskAdapter taskAdapter;
     ListView todoListView;
 
@@ -62,10 +62,10 @@ public class MyCalendar extends AppCompatActivity {
         setContentView(R.layout.calendar_list);
 
         calendarListView = (ListView) findViewById(R.id.list_calendar);
-        myCalendarDbHelper = new MyCalendarDbHelper(this);
+//        myCalendarDbHelper = new DatabaseHelper(this);
 
         todoListView = (ListView) findViewById(R.id.list_todo);
-        taskDbHelper = new TaskDbHelper(this);
+        databaseHelper = new DatabaseHelper(this);
 
         time_end = 0;
         time_end_old = 0;
@@ -89,9 +89,9 @@ public class MyCalendar extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.refresh:
-                myCalendarDbHelper = new MyCalendarDbHelper(this);
-                SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
-                db.delete(MyCalendarTable.CalendarEntry.TABLE, null, null);
+                databaseHelper = new DatabaseHelper(this);
+                SQLiteDatabase db = databaseHelper.getWritableDatabase();
+                db.delete(TableNames.CalendarEntry.TABLE_CALENDAR, null, null);
 
                 Intent intent = new Intent(this, GoogleCalendarTest.class);
                 Bundle extras = new Bundle();
@@ -242,26 +242,25 @@ public class MyCalendar extends AppCompatActivity {
     private void updateUI(String[] search_for) {
 
         // open the myCalendar database
-        SQLiteDatabase db = myCalendarDbHelper.getReadableDatabase();
-        Cursor cursor = db.query(MyCalendarTable.CalendarEntry.TABLE,
-                new String[]{MyCalendarTable.CalendarEntry._ID,
-                        MyCalendarTable.CalendarEntry.COL_CAL_TITLE,
-                        MyCalendarTable.CalendarEntry.COL_CAL_DATE,
-                        MyCalendarTable.CalendarEntry.COL_CAL_START,
-                        MyCalendarTable.CalendarEntry.COL_CAL_END},
-                null, null, null, null, MyCalendarTable.CalendarEntry.COL_CAL_DATE + ", " +
-                        MyCalendarTable.CalendarEntry.COL_CAL_START + " ASC");
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        Cursor cursor = db.query(TableNames.CalendarEntry.TABLE_CALENDAR,
+                new String[]{TableNames.CalendarEntry._ID,
+                        TableNames.CalendarEntry.COL_CAL_TITLE,
+                        TableNames.CalendarEntry.COL_CAL_DATE,
+                        TableNames.CalendarEntry.COL_CAL_START,
+                        TableNames.CalendarEntry.COL_CAL_END},
+                null, null, null, null, TableNames.CalendarEntry.COL_CAL_DATE + ", " +
+                        TableNames.CalendarEntry.COL_CAL_START + " ASC");
 
         // open the myTodo database
         // show data from to do list: first deadline first, and tasks with the "biggest time needed" first
-        SQLiteDatabase todo_db = taskDbHelper.getReadableDatabase();
-        Cursor todo_cursor = todo_db.query(TaskTable.TaskEntry.TABLE,
-                new String[]{TaskTable.TaskEntry._ID,
-                        TaskTable.TaskEntry.COL_TASK_TITLE,
-                        TaskTable.TaskEntry.COL_TASK_DURATION,
-                        TaskTable.TaskEntry.COL_TASK_DEADLINE},
-                null, null, null, null, TaskTable.TaskEntry.COL_TASK_DEADLINE + " ASC "+ ", " +
-                        TaskTable.TaskEntry.COL_TASK_DURATION + " DESC");
+        Cursor todo_cursor = db.query(TableNames.TodoEntry.TABLE_TODO,
+                new String[]{TableNames.TodoEntry._ID,
+                        TableNames.TodoEntry.COL_TODO_TITLE,
+                        TableNames.TodoEntry.COL_TODO_DURATION,
+                        TableNames.TodoEntry.COL_TODO_DEADLINE},
+                null, null, null, null, TableNames.TodoEntry.COL_TODO_DEADLINE + " ASC "+ ", " +
+                        TableNames.TodoEntry.COL_TODO_DURATION + " DESC");
 
         // make a new arraylist where calendarObjects will be stored in
         ArrayList<MyCalendarObject> calendarObjects = new ArrayList<>();
@@ -308,10 +307,10 @@ public class MyCalendar extends AppCompatActivity {
             // get todos one at a time, they are already organized on importance
             while(todo_cursor.moveToNext()) {
 
-                String id_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry._ID));
-                String todo_title_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_TITLE));
-                String todo_duration_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DURATION));
-                String todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DEADLINE));
+                String id_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry._ID));
+                String todo_title_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE));
+                String todo_duration_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DURATION));
+                String todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DEADLINE));
 
                 duration = Integer.valueOf(todo_duration_string);
 
@@ -464,10 +463,10 @@ public class MyCalendar extends AppCompatActivity {
             // get todos one at a time, they are already organized on importance
             while(todo_cursor.moveToNext()) {
 
-                String id_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry._ID));
-                String todo_title_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_TITLE));
-                String todo_duration_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DURATION));
-                String todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DEADLINE));
+                String id_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry._ID));
+                String todo_title_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE));
+                String todo_duration_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DURATION));
+                String todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DEADLINE));
 
                 duration = Integer.valueOf(todo_duration_string);
 
@@ -541,10 +540,10 @@ public class MyCalendar extends AppCompatActivity {
         else if(search_for[0].equals("title")){
             while(cursor.moveToNext()) {
 
-                title_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_TITLE));
-                date_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_DATE));
-                start_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START));
-                end_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END));
+                title_string = cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_TITLE));
+                date_string = cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_DATE));
+                start_string = cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_START));
+                end_string = cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_END));
 
                 if(title_string.equals(search_for[1])){
                     MyCalendarObject yes = new MyCalendarObject(title_string, date_string, start_string, end_string);
@@ -589,10 +588,10 @@ public class MyCalendar extends AppCompatActivity {
 
                 if(todo_cursor.moveToNext()) {
 
-                    String id_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry._ID));
-                    String todo_title_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_TITLE));
-                    String todo_duration_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DURATION));
-                    String todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TaskTable.TaskEntry.COL_TASK_DEADLINE));
+                    String id_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry._ID));
+                    String todo_title_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE));
+                    String todo_duration_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DURATION));
+                    String todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DEADLINE));
 
                     if(todo_title_string.equals(search_for[1])){
                         MyCalendarObject yes = new MyCalendarObject(todo_title_string,
@@ -627,9 +626,8 @@ public class MyCalendar extends AppCompatActivity {
             myCalendarAdapter.notifyDataSetChanged();
         }
         cursor.close();
-        db.close();
         todo_cursor.close();
-        todo_db.close();
+        db.close();
     }
 
     private int convertToMins (String startTime) {
@@ -667,10 +665,10 @@ public class MyCalendar extends AppCompatActivity {
 
             String[] sendBack = new String[10];
 
-            title_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_TITLE));
-            date_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_DATE));
-            start_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_START));
-            end_string = cursor.getString(cursor.getColumnIndex(MyCalendarTable.CalendarEntry.COL_CAL_END));
+            title_string = cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_TITLE));
+            date_string = cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_DATE));
+            start_string = cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_START));
+            end_string = cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_END));
 
             bedtime = "bedtime_no";
 

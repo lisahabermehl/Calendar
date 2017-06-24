@@ -10,7 +10,6 @@ public class MyCalendarObject {
     private String start;
     private String end;
 
-    // setters
     public MyCalendarObject(String activity, String date, String start, String end) {
         this.activity = activity;
         this.date = date;

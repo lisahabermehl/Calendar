@@ -10,7 +10,6 @@ public class TaskObject {
     private String duration;
     private String deadline;
 
-    // setters
     public TaskObject(String task, String duration, String deadline) {
         this.task = task;
         this.duration = duration;

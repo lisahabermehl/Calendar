@@ -61,7 +61,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
     GoogleAccountCredential mCredential;
     TextView mOutputText;
     ProgressDialog mProgress;
-    MyCalendarDbHelper myCalendarDbHelper;
+    DatabaseHelper myCalendarDbHelper;
 
     Context context;
 
@@ -86,7 +86,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
 
         mOutputText = (TextView) findViewById(R.id.mOutputText);
 
-        myCalendarDbHelper = new MyCalendarDbHelper(this);
+        myCalendarDbHelper = new DatabaseHelper(this);
         myCalendar = new MyCalendar();
 
         // let user know that app is fetching data/adding data
@@ -419,15 +419,15 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
 
                 ContentValues values = new ContentValues();
-                values.put(MyCalendarTable.CalendarEntry.COL_CAL_TITLE, activity);
-                values.put(MyCalendarTable.CalendarEntry.COL_CAL_DATE, dateStart);
-                values.put(MyCalendarTable.CalendarEntry.COL_CAL_START, timeStart);
-                values.put(MyCalendarTable.CalendarEntry.COL_CAL_END, timeEnd);
+                values.put(TableNames.CalendarEntry.COL_CAL_TITLE, activity);
+                values.put(TableNames.CalendarEntry.COL_CAL_DATE, dateStart);
+                values.put(TableNames.CalendarEntry.COL_CAL_START, timeStart);
+                values.put(TableNames.CalendarEntry.COL_CAL_END, timeEnd);
                 Log.d("ACTIVITY", activity);
                 Log.d("DATE", dateStart);
 
                 // add new values to table
-                db.insertWithOnConflict(MyCalendarTable.CalendarEntry.TABLE,
+                db.insertWithOnConflict(TableNames.CalendarEntry.TABLE_CALENDAR,
                         null,
                         values,
                         SQLiteDatabase.CONFLICT_REPLACE);

@@ -35,7 +35,7 @@ public class Settings extends AppCompatActivity {
     Button edit_bedtime;
     Button sync_calendar;
 
-    MyCalendarDbHelper myCalendarDbHelper;
+    DatabaseHelper databaseHelper;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,9 +46,9 @@ public class Settings extends AppCompatActivity {
     }
 
     public void syncCalendar(View view) {
-        myCalendarDbHelper = new MyCalendarDbHelper(this);
-        SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
-        db.delete(MyCalendarTable.CalendarEntry.TABLE, null, null);
+        databaseHelper = new DatabaseHelper(this);
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        db.delete(TableNames.CalendarEntry.TABLE_CALENDAR, null, null);
 
         Intent intent = new Intent(this, GoogleCalendarTest.class);
         Bundle extras = new Bundle();

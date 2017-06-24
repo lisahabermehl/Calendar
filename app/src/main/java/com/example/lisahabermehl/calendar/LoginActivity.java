@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
 
 public class LoginActivity extends AppCompatActivity {
 
-    MyCalendarDbHelper myCalendarDbHelper;
+    DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +34,9 @@ public class LoginActivity extends AppCompatActivity {
         int secondsDelayed = 5;
         new Handler().postDelayed(new Runnable() {
             public void run() {
-                myCalendarDbHelper = new MyCalendarDbHelper(LoginActivity.this);
-                SQLiteDatabase db = myCalendarDbHelper.getWritableDatabase();
-                db.delete(MyCalendarTable.CalendarEntry.TABLE, null, null);
+                databaseHelper = new DatabaseHelper(LoginActivity.this);
+                SQLiteDatabase db = databaseHelper.getWritableDatabase();
+                db.delete(TableNames.CalendarEntry.TABLE_CALENDAR, null, null);
 
                 Intent intent = new Intent(LoginActivity.this, GoogleCalendarTest.class);
                 Bundle extras = new Bundle();
