@@ -9,7 +9,7 @@ import android.provider.BaseColumns;
 public class TableNames {
 
     public static final String DB_NAME = "myCalendar";
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 3;
 
     public class CalendarEntry implements BaseColumns {
         public static final String TABLE_CALENDAR = "calendar";
@@ -29,7 +29,9 @@ public class TableNames {
     public class SettingsEntry implements BaseColumns {
         public static final String TABLE_SETTINGS = "settings";
         public static final String COL_SET_TIME_OFF_TITLE = "time_off_title";
-        public static final String COL_SET_TIME_OFF = "time_off";
+        public static final String COL_SET_TIME_OFF_START = "time_off_start";
+        public static final String COL_SET_TIME_OFF_END = "time_off_end";
+        public static final String COL_SET_TIME_GAP = "time_gap";
         public static final String COL_SET_TIME_SPAN = "time_span";
     }
 

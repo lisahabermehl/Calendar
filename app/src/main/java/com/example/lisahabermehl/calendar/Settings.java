@@ -1,15 +1,19 @@
 package com.example.lisahabermehl.calendar;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,7 +37,6 @@ import java.sql.Time;
 public class Settings extends AppCompatActivity {
 
     Button edit_bedtime;
-    Button sync_calendar;
 
     DatabaseHelper databaseHelper;
 
@@ -41,20 +44,9 @@ public class Settings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        edit_bedtime = (Button) findViewById(R.id.edit_bedtime);
-        sync_calendar = (Button) findViewById(R.id.sync_calendar);
-    }
-
-    public void syncCalendar(View view) {
         databaseHelper = new DatabaseHelper(this);
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-        db.delete(TableNames.CalendarEntry.TABLE_CALENDAR, null, null);
 
-        Intent intent = new Intent(this, GoogleCalendarTest.class);
-        Bundle extras = new Bundle();
-        extras.putString("zero", "get");
-        intent.putExtras(extras);
-        startActivity(intent);
+        edit_bedtime = (Button) findViewById(R.id.edit_bedtime);
     }
 
     public void setTimeSpan(View view){
@@ -68,8 +60,42 @@ public class Settings extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        String timeSpanString = timeSpan.getText().toString();
-                        Toast.makeText(Settings.this, timeSpanString, Toast.LENGTH_SHORT).show();
+                        int timeSpanInt = Integer.valueOf(timeSpan.getText().toString());
+
+                        SharedPreferences sp = getSharedPreferences("shared_preferences", Activity.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sp.edit();
+                        editor.putInt("time_span", timeSpanInt);
+                        editor.apply();
+                    }
+                })
+                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create()
+                .show();
+    }
+
+    public void setTimeGap(View view){
+        final EditText timeGap = new EditText(this);
+        timeGap.setRawInputType(InputType.TYPE_CLASS_NUMBER);
+
+        AlertDialog.Builder timeGapBuilder = new AlertDialog.Builder(this);
+        timeGapBuilder
+                .setView(timeGap)
+                .setTitle("Enter the gap you'd like to have between todos")
+                .setPositiveButton("SUBMIT", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        int timeGapInt = Integer.valueOf(timeGap.getText().toString());
+
+                        SharedPreferences sp = getSharedPreferences("shared_preferences", Activity.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sp.edit();
+                        editor.putInt("time_gap", timeGapInt);
+                        editor.apply();
                     }
                 })
                 .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -84,8 +110,43 @@ public class Settings extends AppCompatActivity {
 
     public void editBedtime(View view) {
 
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+
+        Cursor settings_cursor = db.query(TableNames.SettingsEntry.TABLE_SETTINGS,
+                new String[]{TableNames.SettingsEntry._ID,
+                        TableNames.SettingsEntry.COL_SET_TIME_OFF_START,
+                        TableNames.SettingsEntry.COL_SET_TIME_OFF_END},
+                null, null, null, null, null);
+
+        settings_cursor.moveToLast();
+        int start = Integer.valueOf(settings_cursor.getString(settings_cursor.getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_START)));
+        int end = Integer.valueOf(settings_cursor.getString(settings_cursor.getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_END)));
+        settings_cursor.close();
+        db.close();
+
+        int start_hour = 0;
+        int end_hour = 0;
+
+        while(start > 59) {
+            start = start - 60;
+            start_hour = start_hour + 1;
+        }
+
+        while(end > 59) {
+            end = end - 60;
+            end_hour = end_hour + 1;
+        }
+
         LayoutInflater layoutInflaterDay = LayoutInflater.from(this);
         final View dialogViewDay = layoutInflaterDay.inflate(R.layout.alert_dialog_timepicker, null);
+        final TimePicker bedtimeStart = (TimePicker) dialogViewDay.findViewById(R.id.bedtime_start);
+        final TimePicker bedtimeEnd = (TimePicker) dialogViewDay.findViewById(R.id.bedtime_end);
+        bedtimeStart.setIs24HourView(true);
+        bedtimeStart.setCurrentHour(start_hour);
+        bedtimeStart.setCurrentMinute(start);
+        bedtimeEnd.setIs24HourView(true);
+        bedtimeEnd.setCurrentHour(end_hour);
+        bedtimeEnd.setCurrentMinute(end);
 
         AlertDialog.Builder builderDay = new AlertDialog.Builder(this);
         builderDay
@@ -94,8 +155,29 @@ public class Settings extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        TimePicker bedtimeStart = (TimePicker) dialogViewDay.findViewById(R.id.bedtime_start);
-                        TimePicker bedtimeEnd = (TimePicker) dialogViewDay.findViewById(R.id.bedtime_end);
+                        int start_hour = bedtimeStart.getCurrentHour();
+                        int start_mins = bedtimeStart.getCurrentMinute();
+
+                        int end_hour = bedtimeEnd.getCurrentHour();
+                        int end_mins = bedtimeEnd.getCurrentMinute();
+
+                        String start = String.valueOf((start_hour * 60) + start_mins);
+                        String end = String.valueOf((end_hour * 60) + end_mins);
+
+                        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+                        ContentValues cv = new ContentValues();
+                        cv.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_START, start);
+                        cv.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_END, end);
+
+//                        db.update(TableNames.SettingsEntry.TABLE_SETTINGS, cv,
+//                                TableNames.SettingsEntry._ID + "=0", null);
+
+                        db.insertWithOnConflict(TableNames.SettingsEntry.TABLE_SETTINGS,
+                                null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+
+                        db.close();
+
+                        Toast.makeText(Settings.this, start + " " + end, Toast.LENGTH_SHORT).show();
 
                     }
                 })

@@ -34,6 +34,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.telecom.ConnectionRequest;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -373,7 +374,19 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
             DateTime now = new DateTime(System.currentTimeMillis());
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-            int noOfDays = 7;
+            SharedPreferences sp = getSharedPreferences("shared_preferences", Activity.MODE_PRIVATE);
+            int time_span = sp.getInt("time_span", 0);
+            int noOfDays = 0;
+
+            if(time_span > 0){
+                noOfDays = Integer.valueOf(time_span);
+                Log.d("NR DAYS", String.valueOf(noOfDays));
+            }
+            else{
+                noOfDays = 14;
+                Log.d("NR DAYS SET", String.valueOf(noOfDays));
+            }
+
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(new Date());
             calendar.add(Calendar.DAY_OF_YEAR, noOfDays);

@@ -14,13 +14,13 @@ import java.util.ArrayList;
  * https://www.sitepoint.com/custom-data-layouts-with-your-own-android-arrayadapter/
  */
 
-public class TaskAdapter extends ArrayAdapter<TaskObject> {
+public class TodoAdapter extends ArrayAdapter<TodoObject> {
 
     Context context;
     int layoutResourceId;
-    ArrayList<TaskObject> data = null;
+    ArrayList<TodoObject> data = null;
 
-    public TaskAdapter(Context context, int layoutResourceId, ArrayList<TaskObject> data) {
+    public TodoAdapter(Context context, int layoutResourceId, ArrayList<TodoObject> data) {
         super(context, layoutResourceId, data);
         this.layoutResourceId = layoutResourceId;
         this.context = context;
@@ -29,7 +29,7 @@ public class TaskAdapter extends ArrayAdapter<TaskObject> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        TaskObject taskObject = data.get(position);
+        TodoObject todoObject = data.get(position);
 
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.todo_item, null);
@@ -38,9 +38,9 @@ public class TaskAdapter extends ArrayAdapter<TaskObject> {
         TextView duration = (TextView) view.findViewById(R.id.task_duration);
         TextView deadline = (TextView) view.findViewById(R.id.task_deadline);
 
-        description.setText(taskObject.getTask());
-        duration.setText(taskObject.getDuration() + " minutes");
-        deadline.setText(taskObject.getDeadline());
+        description.setText(todoObject.getTask());
+        duration.setText(todoObject.getDuration() + " minutes");
+        deadline.setText(todoObject.getDeadline());
 
         return view;
     }

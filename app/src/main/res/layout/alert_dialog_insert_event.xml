@@ -18,7 +18,7 @@
             android:id="@+id/event_time_start"
             android:layout_width="match_parent"
             android:layout_height="112dp"
-            android:inputType="time">
+            android:inputType="number">
 
         </EditText>
 

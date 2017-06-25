@@ -30,10 +30,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_SETTINGS = "CREATE TABLE IF NOT EXISTS "
             + TableNames.SettingsEntry.TABLE_SETTINGS + "("
-            + TableNames.SettingsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE + " TEXT NOT NULL, "
-            + TableNames.SettingsEntry.COL_SET_TIME_OFF + " TEXT NOT NULL, "
-            + TableNames.SettingsEntry.COL_SET_TIME_SPAN + " TEXT NOT NULL" + ")";
+            + TableNames.SettingsEntry._ID + " INTEGER PRIMARY KEY, "
+            + TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE + " TEXT, "
+            + TableNames.SettingsEntry.COL_SET_TIME_OFF_START + " TEXT, "
+            + TableNames.SettingsEntry.COL_SET_TIME_OFF_END + " TEXT, "
+            + TableNames.SettingsEntry.COL_SET_TIME_GAP + " TEXT, "
+            + TableNames.SettingsEntry.COL_SET_TIME_SPAN + " TEXT" + ")";
 
     public DatabaseHelper(Context context) {
         super(context, TableNames.DB_NAME, null, TableNames.DB_VERSION);

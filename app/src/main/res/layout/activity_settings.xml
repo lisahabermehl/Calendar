@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="SET BEDTIME"
-        android:onClick="editBedtime "/>
+        android:onClick="editBedtime"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -44,10 +44,10 @@
         android:layout_height="wrap_content" />
 
     <Button
-        android:id="@+id/sync_calendar"
+        android:id="@+id/time_gap"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="SYNC CALENDAR"
-        android:onClick="syncCalendar"/>
+        android:text="SET TIME GAP"
+        android:onClick="setTimeGap"/>
 
 </LinearLayout>

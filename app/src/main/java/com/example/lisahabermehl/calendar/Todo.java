@@ -18,7 +18,6 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import java.util.ArrayList;
 
@@ -29,7 +28,7 @@ import java.util.ArrayList;
 public class Todo extends AppCompatActivity {
 
     private DatabaseHelper databaseHelper;
-    private TaskAdapter taskAdapter;
+    private TodoAdapter todoAdapter;
 
     private ListView mTaskListView;
 
@@ -93,23 +92,23 @@ public class Todo extends AppCompatActivity {
                         TableNames.TodoEntry.COL_TODO_DEADLINE},
                 null, null, null, null, null);
 
-        ArrayList<TaskObject> taskObject = new ArrayList<>();
+        ArrayList<TodoObject> todoObject = new ArrayList<>();
 
         while (cursor.moveToNext()) {
             int idx = cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE);
             int idxx = cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DURATION);
             int idxxx = cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DEADLINE);
-            TaskObject to = new TaskObject(cursor.getString(idx), cursor.getString(idxx), cursor.getString(idxxx));
-            taskObject.add(to);
+            TodoObject to = new TodoObject(cursor.getString(idx), cursor.getString(idxx), cursor.getString(idxxx));
+            todoObject.add(to);
         }
 
-        if (taskAdapter == null) {
-            taskAdapter = new TaskAdapter(this, 3, taskObject);
-            mTaskListView.setAdapter(taskAdapter);
+        if (todoAdapter == null) {
+            todoAdapter = new TodoAdapter(this, 3, todoObject);
+            mTaskListView.setAdapter(todoAdapter);
         } else {
-            taskAdapter.clear();
-            taskAdapter.addAll(taskObject);
-            taskAdapter.notifyDataSetChanged();
+            todoAdapter.clear();
+            todoAdapter.addAll(todoObject);
+            todoAdapter.notifyDataSetChanged();
         }
         cursor.close();
         db.close();

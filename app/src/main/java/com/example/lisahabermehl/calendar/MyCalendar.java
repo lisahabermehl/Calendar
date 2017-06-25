@@ -6,8 +6,10 @@ package com.example.lisahabermehl.calendar;
  * Source code: http://www.viralandroid.com/2015/11/android-calendarview-example.html
  */
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -37,13 +39,13 @@ public class MyCalendar extends AppCompatActivity {
     MyCalendarAdapter myCalendarAdapter;
     ListView calendarListView;
 
-    TaskAdapter taskAdapter;
+    TodoAdapter todoAdapter;
     ListView todoListView;
 
     int time_start, time_gap, time_end;
     int time_end_old = 40;
-    int bedtime_start = (23 * 60);
-    int bedtime_end = (7 * 60);
+    int bedtime_start;
+    int bedtime_end;
     int ID = 0;
     int time_gap_morning;
     int time_gap_evening;
@@ -262,6 +264,23 @@ public class MyCalendar extends AppCompatActivity {
                 null, null, null, null, TableNames.TodoEntry.COL_TODO_DEADLINE + " ASC "+ ", " +
                         TableNames.TodoEntry.COL_TODO_DURATION + " DESC");
 
+        Cursor settings_cursor = db.query(TableNames.SettingsEntry.TABLE_SETTINGS,
+                new String[]{TableNames.SettingsEntry._ID,
+                        TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE,
+                        TableNames.SettingsEntry.COL_SET_TIME_OFF_START,
+                        TableNames.SettingsEntry.COL_SET_TIME_OFF_END,
+                        TableNames.SettingsEntry.COL_SET_TIME_GAP,
+                        TableNames.SettingsEntry.COL_SET_TIME_SPAN,},
+                null, null, null, null, null);
+
+        settings_cursor.moveToLast();
+        bedtime_start = Integer.valueOf(settings_cursor.getString(settings_cursor.getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_START)));
+        bedtime_end = Integer.valueOf(settings_cursor.getString(settings_cursor.getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_END)));
+        settings_cursor.close();
+
+        String bed_start = convertToHour(bedtime_start);
+        String bed_end = convertToHour(bedtime_end);
+
         // make a new arraylist where calendarObjects will be stored in
         ArrayList<MyCalendarObject> calendarObjects = new ArrayList<>();
 
@@ -278,6 +297,10 @@ public class MyCalendar extends AppCompatActivity {
 
         // initialize a new calendarObject
         MyCalendarObject nextEvent;
+
+        SharedPreferences sp = getSharedPreferences("shared_preferences", Activity.MODE_PRIVATE);
+        int time_gap_sp = sp.getInt("time_gap", 0);
+        Log.d("TIME GAP SP", String.valueOf(time_gap_sp));
 
         // if not looking for specific date or title
         if(search_for[0].equals("no")){
@@ -339,7 +362,8 @@ public class MyCalendar extends AppCompatActivity {
                     }
                     else if(time_gap_morning > duration){
                         if (i == 0){
-                            MyCalendarObject to2 = new MyCalendarObject("Bedtime", date_string + " +1", "23:00", "07:00");
+
+                            MyCalendarObject to2 = new MyCalendarObject("Bedtime", date_string + " +1", bed_start, bed_end);
                             calendarObjects.add(to2);
                         }
 
