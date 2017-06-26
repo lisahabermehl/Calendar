@@ -209,8 +209,15 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 * make sure the user can set things in settings
 ### Process
 * user is able to set a time gap between activities a time span to plan for and a bedtime
+* afronden naar boven van tijden, want als todo wordt ingepland tussen current time en start next activity dan krijg je gekke tijden
 
 # day 21
 ### Todo
 * make sure the user can't only set a bedtime, but also set different times that he/she doesn't want to be bothered with having to do Todos
 * try to make the UpdateUI in MyCalendar.java less long (maybe put some of the database stuff in the Database helper and call these functions from UpdateUI?)
+* Bij toevoegen van een nieuw event automatisch refreshen
+* Voorkomen dat user dubbel kan plannen in Calendar o.b.v. events die uit de Google Calendar worden gehaald
+### Think, think
+* Bij passeren deadline wordt het nog steeds ingedeeld
+* Als er een kleine time gap is dan wordt deze ook niet ingedeeld met todos die weinig tijd innemen, en wordt er gewacht op een grote time gap om die ene “belangrijkere” todo in te delen
+
