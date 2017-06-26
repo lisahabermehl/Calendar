@@ -158,7 +158,59 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 
 # day 15
 ### TODO
-* 
+* add events to GoogleCalendar with my app
+### Process
+*
+### Important decisions
+
+# day 16
+### TODO
 ### Process
 ### Think, think
+* Wat zijn de uitgangspunten voor het plannen van Todos in de Calendar? (1) Eerst in de time gaps van <120 minuten in de ochtend, (2) dan in tim gaps van <120 minuten whenever (want alle kleine dingen die gedaan moeten worden passen hier dan mooi in) (3) time gaps van <120 minuten in de avond liever niet? (4) Time gaps van >120 in de ochtend, (5) time gaps van > 120 whenever, (6) time gaps van >120 in de avond.
+* Deadlines zo vroeg mogelijk? Of beter
+* Ga je eerst alles wat in de korte lijst past hier in zetten, of ga je per korte Todo item waar deze het beste past: in <120 of >120. Denk dat per Todo item op dit moment het makkelijkst is, want die looped als laatste en dan zou je al die verschillende tijdsvakken af kunnen gaan
+* En dan alle verschillende condities op de volgorde dat je dingen als eerste zou doen. Dus eerst in een kort vakje proberen te laten passen: eerst in de ochtend want dan heb je nog een fris hoofd, dan random op de dag en anders als het echt niet kan 's avonds. Dan in een lang vakje: in de ochtend, random en avond.
+* Of heb je die big/small time gaps wel nodig? Eigenlijk kan je ook een onderscheid maken tussen ochtend, random en avond. En dan de eerste gap die je tegenkomt vullen met Todo items, als dit niet past ga je naar de volgende gap.
 ### Important decisions
+* gonna give users the option to plan for a specific time span
+* maybe it's also good to give users the option to set minimum time gap between the Todos in the Calendar
+
+# day 17
+### Todo
+### Process
+* Geen Calendarview meer, want dan krijg je een long, met een Datepicker kan je gewoon day, month en year ophalen. Maar month wordt wel als 6 gegeven in plaats van 06, dus daar nog even wat aan doen
+* select by date works
+* added an intro screen
+* it's possible to search by specific date and title
+* updated the algorithm for planning Todos in the Calendar
+### Important decisions
+* gonna 
+
+# day 18
+### Todo
+*
+### Process
+* Als je nu een nieuwe todo toevoegt, dan wordt die nog niet op de goede volgorde gedaan lijkt het
+* not possible to search by title and date anymore
+### Important decisions
+* Het ophalen van gegevens duurt soms wel een beetje lang, daarom misschien beter om een limiet aan te zetten. Zoals standaard alleen gegeven van 3 maanden ophalen en daarvooor kunnen plannen. 
+* implement the option for users to set different times where they don't want to do anything, not just bedtime gaps (zoals het nu is), but also time for lunch etc.
+
+# day 19
+### Todos
+* make sure that the user can set different time gaps, a time span
+### Process
+* so at first I had differen Databasehelpers (one for the Todos and one for the Calendar). But I have a lot of files now, so I thought it might be better to just merge these Databasehelpers
+* also deleted unnecessary files 
+
+# day 20
+### Todo
+* make sure the user can set things in settings
+### Process
+* user is able to set a time gap between activities a time span to plan for and a bedtime
+
+# day 21
+### Todo
+* make sure the user can't only set a bedtime, but also set different times that he/she doesn't want to be bothered with having to do Todos
+* try to make the UpdateUI in MyCalendar.java less long (maybe put some of the database stuff in the Database helper and call these functions from UpdateUI?)
