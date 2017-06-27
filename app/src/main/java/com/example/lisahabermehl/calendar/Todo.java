@@ -173,4 +173,78 @@ public class Todo extends AppCompatActivity {
         db.close();
         updateUI();
     }
+
+    public void editTask(View view){
+        View parent = (View) view.getParent();
+        TextView taskTextView = (TextView) parent.findViewById(R.id.task_title);
+        final String task_title_old = String.valueOf(taskTextView.getText());
+
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        Cursor cursor = db.query(TableNames.TodoEntry.TABLE_TODO,
+                new String[]{TableNames.TodoEntry._ID,
+                        TableNames.TodoEntry.COL_TODO_TITLE,
+                        TableNames.TodoEntry.COL_TODO_DURATION,
+                        TableNames.TodoEntry.COL_TODO_DEADLINE},
+                null, null, null, null, null);
+
+        String title = null;
+        String duration = null;
+        String deadline = null;
+
+        while (cursor.moveToNext()) {
+            if(cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE)).equals(task_title_old)){
+                title = cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE));
+                duration = cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DURATION));
+                deadline = cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DEADLINE));
+            }
+
+        }
+
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+
+        final View dialogView = layoutInflater.inflate(R.layout.alert_dialog, null);
+        final EditText title_edit_text = (EditText) dialogView
+                .findViewById(R.id.new_todo);
+        title_edit_text.setText(title);
+        final EditText duration_edit_text = (EditText) dialogView
+                .findViewById(R.id.time_needed);
+        duration_edit_text.setText(duration);
+        final DatePicker deadline_edit_text = (DatePicker) dialogView
+                .findViewById(R.id.task_deadline);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder
+                .setView(dialogView)
+                .setPositiveButton("ADD",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                String task = String.valueOf(title_edit_text.getText());
+                                String time = String.valueOf(duration_edit_text.getText());
+                                int day = deadline_edit_text.getDayOfMonth();
+                                int month = deadline_edit_text.getMonth();
+                                int year = deadline_edit_text.getYear();
+                                String deadline = String.valueOf(year + "-" + month + "-" + day);
+
+                                SQLiteDatabase db = databaseHelper.getWritableDatabase();
+
+                                ContentValues values = new ContentValues();
+                                values.put(TableNames.TodoEntry.COL_TODO_TITLE, task);
+                                values.put(TableNames.TodoEntry.COL_TODO_DURATION, time);
+                                values.put(TableNames.TodoEntry.COL_TODO_DEADLINE, deadline);
+                                db.update(TableNames.TodoEntry.TABLE_TODO,
+                                        values, TableNames.TodoEntry.COL_TODO_TITLE + "=?",
+                                        new String[]{task_title_old});
+                                db.close();
+                                updateUI();
+                            }
+                        })
+                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                })
+                .create()
+                .show();
+    }
 }

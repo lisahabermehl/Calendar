@@ -258,9 +258,9 @@ public class TimeGap extends AppCompatActivity {
     public void editTimeGap(View view){
         View parent = (View) view.getParent();
         TextView title_textview = (TextView) parent.findViewById(R.id.time_gap_title);
-        String time_gap = String.valueOf(title_textview.getText());
+        final String time_gap_title_old = String.valueOf(title_textview.getText());
 
-        Toast.makeText(this, time_gap, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, time_gap_title_old, Toast.LENGTH_LONG).show();
 
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         Cursor cursor = db.query(TableNames.SettingsEntry.TABLE_SETTINGS,
@@ -271,20 +271,17 @@ public class TimeGap extends AppCompatActivity {
                         TableNames.SettingsEntry.COL_SET_TIME_OFF_DAYS},
                 null, null, null, null, null);
 
-        String id = null;
         String title_string = null;
         String start_string = null;
         String end_string = null;
         String days_string = null;
 
         while(cursor.moveToNext()){
-            if(cursor.getString(cursor.getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE)).equals(time_gap)){
-                id = cursor.getString(cursor.getColumnIndex(TableNames.SettingsEntry._ID));
+            if(cursor.getString(cursor.getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE)).equals(time_gap_title_old)){
                 title_string = cursor.getString(cursor.getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE));
                 start_string = cursor.getString(cursor.getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_START));
                 end_string = cursor.getString(cursor.getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_END));
                 days_string = cursor.getString(cursor.getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_DAYS));
-                Toast.makeText(this, id, Toast.LENGTH_LONG).show();
             }
         }
 
@@ -301,7 +298,6 @@ public class TimeGap extends AppCompatActivity {
         original_start = start_string.split(":");
         int start_hour = Integer.valueOf(original_start[0]);
         int start_mins = Integer.valueOf(original_start[1]);
-//        Toast.makeText(this, String.valueOf(start_hour), Toast.LENGTH_SHORT).show();
         start.setCurrentHour(start_hour);
         start.setCurrentMinute(start_mins);
 
@@ -312,7 +308,6 @@ public class TimeGap extends AppCompatActivity {
         original_end = end_string.split(":");
         int end_hour = Integer.valueOf(original_end[0]);
         int end_mins = Integer.valueOf(original_end[1]);
-//        Toast.makeText(this, String.valueOf(end_hour), Toast.LENGTH_SHORT).show();
         end.setCurrentHour(end_hour);
         end.setCurrentMinute(end_mins);
 
@@ -361,12 +356,27 @@ public class TimeGap extends AppCompatActivity {
 
                                 int start_hour = start.getCurrentHour();
                                 int start_minute = start.getCurrentMinute();
-                                String start_time = String.valueOf(start_hour + ":" + start_minute);
+                                String start_hour_string = String.valueOf(start_hour);
+                                String start_minute_string = String.valueOf(start_minute);
+                                if(start_hour > -1 && start_hour < 10){
+                                    start_hour_string = "0" + String.valueOf(start_hour);
+                                }
+                                if(start_minute > -1 && start_minute < 10){
+                                    start_minute_string = "0" + String.valueOf(start_minute);
+                                }
+                                String start_time = start_hour_string + ":" + start_minute_string;
+
                                 int hour = end.getCurrentHour();
                                 int minute = end.getCurrentMinute();
-                                String end_time = String.valueOf(hour + ":" + minute);
-                                Toast.makeText(TimeGap.this, start_time, Toast.LENGTH_SHORT).show();
-                                Toast.makeText(TimeGap.this, end_time, Toast.LENGTH_SHORT).show();
+                                String end_hour_string = String.valueOf(hour);
+                                String end_minute_string = String.valueOf(minute);
+                                if(hour > -1 && hour < 10){
+                                    end_hour_string = "0" + String.valueOf(hour);
+                                }
+                                if(minute > -1 && minute < 10){
+                                    end_minute_string = "0" + String.valueOf(minute);
+                                }
+                                String end_time = end_hour_string + ":" + end_minute_string;
 
                                 String[] days = new String[7];
                                 String days_final = "-";
@@ -398,9 +408,6 @@ public class TimeGap extends AppCompatActivity {
                                         days_final = days_final + days[i] + "-";
                                     }
                                 }
-                                Toast.makeText(TimeGap.this, days_final, Toast.LENGTH_SHORT).show();
-
-//                                Toast.makeText(TimeGap.this, days_final, Toast.LENGTH_SHORT).show();
 
                                 SQLiteDatabase db = databaseHelper.getWritableDatabase();
 
@@ -411,7 +418,7 @@ public class TimeGap extends AppCompatActivity {
                                 values.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_DAYS, days_final);
                                 db.update(TableNames.SettingsEntry.TABLE_SETTINGS,
                                         values, TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE + "=?",
-                                        new String[]{task});
+                                        new String[]{time_gap_title_old});
                                 db.close();
                                 updateUI();
                             }
