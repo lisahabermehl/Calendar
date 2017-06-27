@@ -15,7 +15,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".LoginActivity"
             android:label="Intro"
-            android:theme="@style/Theme.AppCompat.NoActionBar">
+            android:theme="@style/Theme.Design.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,23 +25,27 @@
 
         <activity android:name=".MyCalendar"
             android:label=" "
-            android:theme="@style/AppTheme" />
+            android:theme="@style/Theme.Design" />
 
         <activity android:name=".GoogleCalendarTest"
             android:label=" "
-            android:theme="@style/AppTheme" />
+            android:theme="@style/Theme.Design" />
 
         <activity android:name=".MainActivity"
             android:label=" "
-            android:theme="@style/AppTheme" />
+            android:theme="@style/Theme.Design" />
 
         <activity android:name=".Todo"
             android:label=" "
-            android:theme="@style/AppTheme" />
+            android:theme="@style/Theme.Design" />
 
         <activity android:name=".Settings"
             android:label=" "
-            android:theme="@style/AppTheme" />
+            android:theme="@style/Theme.Design" />
+
+        <activity android:name=".TimeGap"
+            android:label=" "
+            android:theme="@style/Theme.Design" />
 
     </application>
 

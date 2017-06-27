@@ -1,11 +1,8 @@
 package com.example.lisahabermehl.calendar;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 /**
  * http://www.androidhive.info/2013/09/android-sqlite-database-with-multiple-tables/
@@ -25,7 +22,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + TableNames.TodoEntry.TABLE_TODO + "("
             + TableNames.TodoEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + TableNames.TodoEntry.COL_TODO_TITLE + " TEXT NOT NULL, "
-            + TableNames.TodoEntry.COL_TODO_DURATION + " INTEGER NOT NULL, "
+            + TableNames.TodoEntry.COL_TODO_DURATION + " TEXT NOT NULL, "
             + TableNames.TodoEntry.COL_TODO_DEADLINE + " TEXT NOT NULL" + ")";
 
     private static final String CREATE_TABLE_SETTINGS = "CREATE TABLE IF NOT EXISTS "
@@ -33,7 +30,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + TableNames.SettingsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE + " TEXT NOT NULL, "
             + TableNames.SettingsEntry.COL_SET_TIME_OFF_START + " TEXT NOT NULL, "
-            + TableNames.SettingsEntry.COL_SET_TIME_OFF_END + " TEXT NOT NULL)";
+            + TableNames.SettingsEntry.COL_SET_TIME_OFF_END + " TEXT NOT NULL, "
+            + TableNames.SettingsEntry.COL_SET_TIME_OFF_DAYS + " TEXT NOT NULL)";
 
     public DatabaseHelper(Context context) {
         super(context, TableNames.DB_NAME, null, TableNames.DB_VERSION);

@@ -41,18 +41,16 @@ public class MyCalendar extends AppCompatActivity {
     ListView calendarListView;
     ListView todoListView;
 
-    TodoAdapter todoAdapter;
-
     int time_start, time_gap, time_end;
     int time_end_old = 40;
     int bedtime_start;
     int bedtime_end;
-    int ID = 0;
     int time_gap_morning;
     int time_gap_evening;
 
-    String time_gap_hour;
     String day;
+
+    String[] searchFor = new String[2];
 
     String date_old = "nog niks";
     String date_new;
@@ -71,7 +69,6 @@ public class MyCalendar extends AppCompatActivity {
         time_end = 0;
         time_end_old = 0;
 
-        String[] searchFor = new String[2];
         searchFor[0] = "no";
         searchFor[1] = "no";
 
@@ -90,6 +87,7 @@ public class MyCalendar extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.refresh:
+
                 databaseHelper = new DatabaseHelper(this);
                 SQLiteDatabase db = databaseHelper.getWritableDatabase();
                 db.delete(TableNames.CalendarEntry.TABLE_CALENDAR, null, null);
@@ -99,7 +97,9 @@ public class MyCalendar extends AppCompatActivity {
                 extras.putString("zero", "get");
                 intent.putExtras(extras);
                 startActivity(intent);
+
             case R.id.menu_search:
+
                 final EditText textView = new EditText(this);
 
                 final AlertDialog.Builder search_builder = new AlertDialog.Builder(this);
@@ -113,7 +113,6 @@ public class MyCalendar extends AppCompatActivity {
                                 String title = textView.getText().toString();
                                 Toast.makeText(MyCalendar.this, title, Toast.LENGTH_SHORT).show();
 
-                                String[] searchFor = new String[2];
                                 searchFor[0] = "title";
                                 searchFor[1] = title;
 
@@ -126,7 +125,7 @@ public class MyCalendar extends AppCompatActivity {
                         .setNegativeButton("SHOW EVERYTHING", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                String[] searchFor = new String[2];
+
                                 searchFor[0] = "no";
                                 searchFor[1] = "no";
 
@@ -205,7 +204,6 @@ public class MyCalendar extends AppCompatActivity {
                                 String date = year + "-" + "0" + month + "-" + day;
                                 Toast.makeText(MyCalendar.this, date, Toast.LENGTH_LONG).show();
 
-                                String[] searchFor = new String[2];
                                 searchFor[0] = "date";
                                 searchFor[1] = date;
 
@@ -216,7 +214,6 @@ public class MyCalendar extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
 
-                                String[] searchFor = new String[2];
                                 searchFor[0] = "no";
                                 searchFor[1] = "no";
 
@@ -538,7 +535,7 @@ public class MyCalendar extends AppCompatActivity {
 
             int currentTimeMinInt = Integer.valueOf(currentTimeMin);
             int currentMin = currentTimeMinInt % 10;
-            if(currentMin > 4 && currentMin < 10){
+            if(currentMin > 0 && currentMin < 10){
                 currentTimeMinInt = (currentTimeMinInt - currentMin) + 10;
             }
             currentTimeMin = String.valueOf(currentTimeMinInt);

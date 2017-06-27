@@ -1,20 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        android:scrollbarAlwaysDrawVerticalTrack="true">
 
-    <TimePicker
-        android:id="@+id/bedtime_start"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+        <EditText
+            android:id="@+id/title_time_gap"
+            android:hint="Set a title for this time gap"
+            android:textColorHint="@color/teal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-    </TimePicker>
+        <TimePicker
+            android:id="@+id/start_time_gap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:timePickerMode="spinner"></TimePicker>
 
-    <TimePicker
-        android:id="@+id/bedtime_end"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+        <TimePicker
+            android:id="@+id/end_time_gap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:timePickerMode="spinner"></TimePicker>
 
-    </TimePicker>
+        <CheckedTextView
+            android:id="@+id/monday"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:gravity="center"
+            android:checkMark="@drawable/todo"
+            android:text="MON"/>
 
-</LinearLayout>
+        <CheckedTextView
+            android:id="@+id/tuesday"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:gravity="center"
+            android:checkMark="@drawable/todo"
+            android:text="TUE"/>
+
+        <CheckedTextView
+            android:id="@+id/wednesday"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:gravity="center"
+            android:checkMark="@drawable/todo"
+            android:text="WED"/>
+
+    </LinearLayout>
+</ScrollView>
