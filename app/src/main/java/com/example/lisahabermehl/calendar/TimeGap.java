@@ -16,6 +16,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CheckedTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -52,7 +54,7 @@ public class TimeGap extends AppCompatActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View view,
                                            int position, long id) {
 
-                Toast.makeText(TimeGap.this, "Supposed to delete this time gap now", Toast.LENGTH_SHORT).show();
+                deleteTimeGap(view);
                 return true;
             }
         });
@@ -97,12 +99,16 @@ public class TimeGap extends AppCompatActivity {
                 .findViewById(R.id.start_time_gap);
         final TimePicker end = (TimePicker) dialogView
                 .findViewById(R.id.end_time_gap);
-        final CheckedTextView monday = (CheckedTextView) dialogView
-                .findViewById(R.id.monday);
-        final CheckedTextView tuesday = (CheckedTextView) dialogView
-                .findViewById(R.id.tuesday);
-        final CheckedTextView wednesday = (CheckedTextView) dialogView
-                .findViewById(R.id.wednesday);
+        start.setIs24HourView(true);
+        end.setIs24HourView(true);
+
+        final CheckBox monday = (CheckBox) dialogView.findViewById(R.id.monday);
+        final CheckBox tuesday = (CheckBox) dialogView.findViewById(R.id.tuesday);
+        final CheckBox wednesday = (CheckBox) dialogView.findViewById(R.id.wednesday);
+        final CheckBox thursday = (CheckBox) dialogView.findViewById(R.id.thursday);
+        final CheckBox friday = (CheckBox) dialogView.findViewById(R.id.friday);
+        final CheckBox saturday = (CheckBox) dialogView.findViewById(R.id.saturday);
+        final CheckBox sunday = (CheckBox) dialogView.findViewById(R.id.sunday);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder
@@ -115,56 +121,69 @@ public class TimeGap extends AppCompatActivity {
 
                                 int start_hour = start.getCurrentHour();
                                 int start_minute = start.getCurrentMinute();
-                                String start_time = String.valueOf(start_hour + ":" + start_minute);
+                                String start_hour_string = String.valueOf(start_hour);
+                                String start_minute_string = String.valueOf(start_minute);
+                                if(start_hour > -1 && start_hour < 10){
+                                    start_hour_string = "0" + String.valueOf(start_hour);
+                                }
+                                if(start_minute > -1 && start_minute < 10){
+                                    start_minute_string = "0" + String.valueOf(start_minute);
+                                }
+                                String start_time = start_hour_string + ":" + start_minute_string;
+
                                 int hour = end.getCurrentHour();
                                 int minute = end.getCurrentMinute();
-                                String end_time = String.valueOf(hour + ":" + minute);
+                                String end_hour_string = String.valueOf(hour);
+                                String end_minute_string = String.valueOf(minute);
+                                if(hour > -1 && hour < 10){
+                                    end_hour_string = "0" + String.valueOf(hour);
+                                }
+                                if(minute > -1 && minute < 10){
+                                    end_minute_string = "0" + String.valueOf(minute);
+                                }
+                                String end_time = end_hour_string + ":" + end_minute_string;
 
                                 String[] days = new String[7];
+                                String days_final = "-";
 
-                                Boolean mondayChecked = monday.isChecked();
-                                if(mondayChecked.equals(true)){
+                                if(monday.isChecked()){
                                     days[0] = "MON";
                                 }
-                                else{
-                                    days[0] = null;
-                                }
-                                Boolean tuesdayChecked = tuesday.isChecked();
-                                if(tuesdayChecked.equals(true)){
+                                if(tuesday.isChecked()){
                                     days[1] = "TUE";
                                 }
-                                else{
-                                    days[1] = null;
-                                }
-                                Boolean wednesdayChecked = wednesday.isChecked();
-                                if(wednesdayChecked.equals(true)){
+                                if(wednesday.isChecked()){
                                     days[2] = "WED";
                                 }
-                                else{
-                                    days[2] = null;
+                                if(thursday.isChecked()){
+                                    days[3] = "THU";
+                                }
+                                if(friday.isChecked()){
+                                    days[4] = "FRI";
+                                }
+                                if(saturday.isChecked()){
+                                    days[5] = "SAT";
+                                }
+                                if(sunday.isChecked()){
+                                    days[6] = "SUN";
                                 }
 
-
-                                String all_together = "MON-";
-
-                                for(int i = 0; i<3; i++){
-                                    if(i == 0 && !days[i].equals(null)){
-                                        all_together = days[i] + "-";
+                                for(int i = 0; i < 7; i++){
+                                    if(days[i] != null){
+                                        days_final = days_final + days[i] + "-";
                                     }
-                                    else if(!days[i].equals(null)){
-                                        all_together = all_together + days[i] + "-";
-                                    }
-
                                 }
 
+                                Toast.makeText(TimeGap.this, days_final, Toast.LENGTH_SHORT).show();
 
                                 SQLiteDatabase db = databaseHelper.getWritableDatabase();
 
                                 ContentValues values = new ContentValues();
-                                values.put(TableNames.TodoEntry.COL_TODO_TITLE, task);
+                                values.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE, task);
                                 values.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_START, start_time);
                                 values.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_END, end_time);
-                                db.insertWithOnConflict(TableNames.TodoEntry.TABLE_TODO,
+                                values.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_DAYS, days_final);
+                                db.insertWithOnConflict(TableNames.SettingsEntry.TABLE_SETTINGS,
                                         null,
                                         values,
                                         SQLiteDatabase.CONFLICT_REPLACE);
@@ -222,31 +241,187 @@ public class TimeGap extends AppCompatActivity {
         }
         cursor.close();
         db.close();
+    }
 
-//        if(cursor != null) {
-//            if (!cursor.moveToFirst()) {
-//
-//                String one = "can't move to first";
-//                Log.d("This", one);
-//
-//                db = databaseHelper.getWritableDatabase();
-//                ContentValues cv = new ContentValues();
-//                cv.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE, "Default");
-//                cv.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_START, start);
-//                cv.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_END, end);
-//                cv.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_DAYS, days);
-//
-//                db.insertWithOnConflict(TableNames.SettingsEntry.TABLE_SETTINGS,
-//                        null, cv, SQLiteDatabase.CONFLICT_REPLACE);
-//
-//                db.close();
-//            } else if (cursor.moveToFirst()) {
-//                String two = "can move to first";
-//                Log.d("This", two);
-//
-//
-//
-//            }
-//        }
+    private void deleteTimeGap(View view){
+        View parent = (View) view.getParent();
+        TextView taskTextView = (TextView) parent.findViewById(R.id.time_gap_days);
+        String task = String.valueOf(taskTextView.getText());
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        db.delete(TableNames.SettingsEntry.TABLE_SETTINGS,
+                TableNames.SettingsEntry.COL_SET_TIME_OFF_DAYS + " = ?",
+                new String[]{task});
+        db.close();
+        updateUI();
+    }
+
+    public void editTimeGap(View view){
+        View parent = (View) view.getParent();
+        TextView title_textview = (TextView) parent.findViewById(R.id.time_gap_title);
+        String time_gap = String.valueOf(title_textview.getText());
+
+        Toast.makeText(this, time_gap, Toast.LENGTH_LONG).show();
+
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        Cursor cursor = db.query(TableNames.SettingsEntry.TABLE_SETTINGS,
+                new String[]{TableNames.SettingsEntry._ID,
+                        TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE,
+                        TableNames.SettingsEntry.COL_SET_TIME_OFF_START,
+                        TableNames.SettingsEntry.COL_SET_TIME_OFF_END,
+                        TableNames.SettingsEntry.COL_SET_TIME_OFF_DAYS},
+                null, null, null, null, null);
+
+        String id = null;
+        String title_string = null;
+        String start_string = null;
+        String end_string = null;
+        String days_string = null;
+
+        while(cursor.moveToNext()){
+            if(cursor.getString(cursor.getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE)).equals(time_gap)){
+                id = cursor.getString(cursor.getColumnIndex(TableNames.SettingsEntry._ID));
+                title_string = cursor.getString(cursor.getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE));
+                start_string = cursor.getString(cursor.getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_START));
+                end_string = cursor.getString(cursor.getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_END));
+                days_string = cursor.getString(cursor.getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_DAYS));
+                Toast.makeText(this, id, Toast.LENGTH_LONG).show();
+            }
+        }
+
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_edit_time_gap, null);
+        final EditText description = (EditText) dialogView
+                .findViewById(R.id.title_time_gap);
+        description.setText(title_string);
+
+        final TimePicker start = (TimePicker) dialogView
+                .findViewById(R.id.start_time_gap);
+        start.setIs24HourView(true);
+        String[] original_start;
+        original_start = start_string.split(":");
+        int start_hour = Integer.valueOf(original_start[0]);
+        int start_mins = Integer.valueOf(original_start[1]);
+//        Toast.makeText(this, String.valueOf(start_hour), Toast.LENGTH_SHORT).show();
+        start.setCurrentHour(start_hour);
+        start.setCurrentMinute(start_mins);
+
+        final TimePicker end = (TimePicker) dialogView
+                .findViewById(R.id.end_time_gap);
+        end.setIs24HourView(true);
+        String[] original_end;
+        original_end = end_string.split(":");
+        int end_hour = Integer.valueOf(original_end[0]);
+        int end_mins = Integer.valueOf(original_end[1]);
+//        Toast.makeText(this, String.valueOf(end_hour), Toast.LENGTH_SHORT).show();
+        end.setCurrentHour(end_hour);
+        end.setCurrentMinute(end_mins);
+
+        final CheckBox monday = (CheckBox) dialogView.findViewById(R.id.monday);
+        final CheckBox tuesday = (CheckBox) dialogView.findViewById(R.id.tuesday);
+        final CheckBox wednesday = (CheckBox) dialogView.findViewById(R.id.wednesday);
+        final CheckBox thursday = (CheckBox) dialogView.findViewById(R.id.thursday);
+        final CheckBox friday = (CheckBox) dialogView.findViewById(R.id.friday);
+        final CheckBox saturday = (CheckBox) dialogView.findViewById(R.id.saturday);
+        final CheckBox sunday = (CheckBox) dialogView.findViewById(R.id.sunday);
+
+        String[] checkboxes = days_string.split("-");
+        for(int j = 0; j < checkboxes.length; j++){
+            if(checkboxes[j].equals("MON")){
+                monday.setChecked(true);
+            }
+            if(checkboxes[j].equals("TUE")){
+                tuesday.setChecked(true);
+            }
+            if(checkboxes[j].equals("WED")){
+                wednesday.setChecked(true);
+            }
+            if(checkboxes[j].equals("THU")){
+                thursday.setChecked(true);
+            }
+            if(checkboxes[j].equals("FRI")){
+                friday.setChecked(true);
+            }
+            if(checkboxes[j].equals("SAT")){
+                saturday.setChecked(true);
+            }
+            if(checkboxes[j].equals("SUN")){
+                sunday.setChecked(true);
+            }
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder
+                .setView(dialogView)
+                .setPositiveButton("UPDATE",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                                String task = String.valueOf(description.getText());
+
+                                int start_hour = start.getCurrentHour();
+                                int start_minute = start.getCurrentMinute();
+                                String start_time = String.valueOf(start_hour + ":" + start_minute);
+                                int hour = end.getCurrentHour();
+                                int minute = end.getCurrentMinute();
+                                String end_time = String.valueOf(hour + ":" + minute);
+                                Toast.makeText(TimeGap.this, start_time, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(TimeGap.this, end_time, Toast.LENGTH_SHORT).show();
+
+                                String[] days = new String[7];
+                                String days_final = "-";
+
+                                if(monday.isChecked()){
+                                    days[0] = "MON";
+                                }
+                                if(tuesday.isChecked()){
+                                    days[1] = "TUE";
+                                }
+                                if(wednesday.isChecked()){
+                                    days[2] = "WED";
+                                }
+                                if(thursday.isChecked()){
+                                    days[3] = "THU";
+                                }
+                                if(friday.isChecked()){
+                                    days[4] = "FRI";
+                                }
+                                if(saturday.isChecked()){
+                                    days[5] = "SAT";
+                                }
+                                if(sunday.isChecked()){
+                                    days[6] = "SUN";
+                                }
+
+                                for(int i = 0; i < 7; i++){
+                                    if(days[i] != null){
+                                        days_final = days_final + days[i] + "-";
+                                        Toast.makeText(TimeGap.this, days_final, Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+//                                Toast.makeText(TimeGap.this, days_final, Toast.LENGTH_SHORT).show();
+
+                                SQLiteDatabase db = databaseHelper.getWritableDatabase();
+
+                                ContentValues values = new ContentValues();
+                                values.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE, task);
+                                values.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_START, start_time);
+                                values.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_END, end_time);
+                                values.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_DAYS, days_final);
+                                db.updateWithOnConflict(TableNames.SettingsEntry.TABLE_SETTINGS,
+                                        values, TableNames.SettingsEntry._ID + "=" + id,
+                                        null, SQLiteDatabase.CONFLICT_REPLACE);
+                                db.close();
+                                updateUI();
+                            }
+                        })
+                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                })
+                .create()
+                .show();
     }
 }

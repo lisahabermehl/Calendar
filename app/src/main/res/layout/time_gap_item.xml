@@ -64,11 +64,12 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/task_edit"
+        android:id="@+id/time_gap_edit"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:text="EDIT" />
+        android:text="EDIT"
+        android:onClick="editTimeGap"/>
 
 </RelativeLayout>
