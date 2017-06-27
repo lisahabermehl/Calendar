@@ -357,6 +357,7 @@ public class TimeGap extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int id) {
 
                                 String task = String.valueOf(description.getText());
+                                Toast.makeText(TimeGap.this, task, Toast.LENGTH_SHORT).show();
 
                                 int start_hour = start.getCurrentHour();
                                 int start_minute = start.getCurrentMinute();
@@ -395,9 +396,9 @@ public class TimeGap extends AppCompatActivity {
                                 for(int i = 0; i < 7; i++){
                                     if(days[i] != null){
                                         days_final = days_final + days[i] + "-";
-                                        Toast.makeText(TimeGap.this, days_final, Toast.LENGTH_SHORT).show();
                                     }
                                 }
+                                Toast.makeText(TimeGap.this, days_final, Toast.LENGTH_SHORT).show();
 
 //                                Toast.makeText(TimeGap.this, days_final, Toast.LENGTH_SHORT).show();
 
@@ -408,9 +409,9 @@ public class TimeGap extends AppCompatActivity {
                                 values.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_START, start_time);
                                 values.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_END, end_time);
                                 values.put(TableNames.SettingsEntry.COL_SET_TIME_OFF_DAYS, days_final);
-                                db.updateWithOnConflict(TableNames.SettingsEntry.TABLE_SETTINGS,
-                                        values, TableNames.SettingsEntry._ID + "=" + id,
-                                        null, SQLiteDatabase.CONFLICT_REPLACE);
+                                db.update(TableNames.SettingsEntry.TABLE_SETTINGS,
+                                        values, TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE + "=?",
+                                        new String[]{task});
                                 db.close();
                                 updateUI();
                             }
