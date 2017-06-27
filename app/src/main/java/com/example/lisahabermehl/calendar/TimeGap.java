@@ -286,7 +286,7 @@ public class TimeGap extends AppCompatActivity {
         }
 
         LayoutInflater layoutInflater = LayoutInflater.from(this);
-        final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_edit_time_gap, null);
+        final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_timepicker, null);
         final EditText description = (EditText) dialogView
                 .findViewById(R.id.title_time_gap);
         description.setText(title_string);

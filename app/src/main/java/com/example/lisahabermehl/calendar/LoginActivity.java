@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.ColorRes;
 import android.support.v7.app.AppCompatActivity;
 import android.view.animation.AlphaAnimation;
 import android.widget.LinearLayout;
@@ -38,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
                 SQLiteDatabase db = databaseHelper.getWritableDatabase();
                 db.delete(TableNames.CalendarEntry.TABLE_CALENDAR, null, null);
 
-                Intent intent = new Intent(LoginActivity.this, GoogleCalendarTest.class);
+                Intent intent = new Intent(LoginActivity.this, GoogleCalendar.class);
                 Bundle extras = new Bundle();
                 extras.putString("zero", "get");
                 intent.putExtras(extras);

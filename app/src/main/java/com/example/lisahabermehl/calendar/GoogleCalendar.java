@@ -1,6 +1,5 @@
 package com.example.lisahabermehl.calendar;
 
-import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -27,18 +26,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.telecom.ConnectionRequest;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -58,7 +52,7 @@ import pub.devrel.easypermissions.EasyPermissions;
  * https://developers.google.com/google-apps/calendar/quickstart/android
  */
 
-public class GoogleCalendarTest extends Activity implements EasyPermissions.PermissionCallbacks {
+public class GoogleCalendar extends Activity implements EasyPermissions.PermissionCallbacks {
     GoogleAccountCredential mCredential;
     TextView mOutputText;
     ProgressDialog mProgress;
@@ -258,7 +252,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
             final int connectionStatusCode) {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         Dialog dialog = apiAvailability.getErrorDialog(
-                GoogleCalendarTest.this,
+                GoogleCalendar.this,
                 connectionStatusCode,
                 REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
@@ -502,7 +496,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 mOutputText.setText("No results returned.");
             } else {
 //                mOutputText.setText(String.valueOf(output));
-                startActivity(new Intent(GoogleCalendarTest.this, MyCalendar.class));
+                startActivity(new Intent(GoogleCalendar.this, MyCalendar.class));
                 finish();
             }
         }
@@ -518,7 +512,7 @@ public class GoogleCalendarTest extends Activity implements EasyPermissions.Perm
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
                     startActivityForResult(
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
-                            GoogleCalendarTest.REQUEST_AUTHORIZATION);
+                            GoogleCalendar.REQUEST_AUTHORIZATION);
                 } else {
                     mOutputText.setText("The following error occurred:\n"
                             + mLastError.getMessage());

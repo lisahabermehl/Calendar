@@ -15,7 +15,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.NumberPicker;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 /**
  * Created by lisahabermehl on 09/06/2017.
@@ -69,19 +75,34 @@ public class Settings extends AppCompatActivity {
     }
 
     public void setTimeSpan(View view){
-        final EditText timeSpan = new EditText(this);
+        final SharedPreferences sp = getSharedPreferences("shared_preferences", Activity.MODE_PRIVATE);
+
+        final NumberPicker timeSpan = new NumberPicker(this);
+        int set_time_span = 14;
+        int time_span = sp.getInt("time_span", 0);
+        if(String.valueOf(time_span) == null){
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putInt("time_span", set_time_span);
+            editor.apply();
+        }
+        else{
+            set_time_span = time_span;
+        }
+        timeSpan.setMinValue(1);
+        timeSpan.setMaxValue(90);
+        timeSpan.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+        timeSpan.setValue(set_time_span);
 
         AlertDialog.Builder timeSpanBuilder = new AlertDialog.Builder(this);
         timeSpanBuilder
                 .setView(timeSpan)
-                .setTitle("Enter the amount of days you want to plan for")
+                .setTitle("Time span in days")
                 .setPositiveButton("SUBMIT", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        int timeSpanInt = Integer.valueOf(timeSpan.getText().toString());
+                        int timeSpanInt = timeSpan.getValue();
 
-                        SharedPreferences sp = getSharedPreferences("shared_preferences", Activity.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sp.edit();
                         editor.putInt("time_span", timeSpanInt);
                         editor.apply();
@@ -98,20 +119,42 @@ public class Settings extends AppCompatActivity {
     }
 
     public void setTimeGap(View view){
-        final EditText timeGap = new EditText(this);
-        timeGap.setRawInputType(InputType.TYPE_CLASS_NUMBER);
+        final SharedPreferences sp = getSharedPreferences("shared_preferences", Activity.MODE_PRIVATE);
+
+        final NumberPicker timeGap = new NumberPicker(this);
+
+        int set_time_gap = 5;
+        int time_gap = sp.getInt("time_gap", 0);
+        if(String.valueOf(time_gap) == null){
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putInt("time_gap", set_time_gap);
+            editor.apply();
+        }
+        else{
+            set_time_gap = time_gap;
+        }
+
+        String[] time_gaps = new String[7];
+        int i, gap;
+        for(gap = 0, i = 0; gap < 31; i++, gap=gap+5){
+            time_gaps[i] = String.valueOf(gap);
+        }
+        timeGap.setMinValue(0);
+        timeGap.setMaxValue(time_gaps.length-1);
+        timeGap.setDisplayedValues(time_gaps);
+        timeGap.setValue(set_time_gap);
+        timeGap.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 
         AlertDialog.Builder timeGapBuilder = new AlertDialog.Builder(this);
         timeGapBuilder
                 .setView(timeGap)
-                .setTitle("Enter the gap you'd like to have between todos")
+                .setTitle("Time in minutes between suggested Todos")
                 .setPositiveButton("SUBMIT", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        int timeGapInt = Integer.valueOf(timeGap.getText().toString());
+                        int timeGapInt = timeGap.getValue();
 
-                        SharedPreferences sp = getSharedPreferences("shared_preferences", Activity.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sp.edit();
                         editor.putInt("time_gap", timeGapInt);
                         editor.apply();

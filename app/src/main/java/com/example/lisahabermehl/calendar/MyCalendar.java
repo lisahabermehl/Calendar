@@ -92,7 +92,7 @@ public class MyCalendar extends AppCompatActivity {
                 SQLiteDatabase db = databaseHelper.getWritableDatabase();
                 db.delete(TableNames.CalendarEntry.TABLE_CALENDAR, null, null);
 
-                Intent intent = new Intent(this, GoogleCalendarTest.class);
+                Intent intent = new Intent(this, GoogleCalendar.class);
                 Bundle extras = new Bundle();
                 extras.putString("zero", "get");
                 intent.putExtras(extras);
@@ -171,7 +171,7 @@ public class MyCalendar extends AppCompatActivity {
                                 Log.d("START", start);
                                 Log.d("END", end);
 
-                                startActivity(new Intent(getApplicationContext(), GoogleCalendarTest.class)
+                                startActivity(new Intent(getApplicationContext(), GoogleCalendar.class)
                                         .putExtras(extras));
                             }
                         })
