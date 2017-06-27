@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
@@ -143,6 +144,7 @@ public class MyCalendar extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder
                         .setView(dialogView)
+                        .setTitle("Add event")
                         .setPositiveButton("INSERT EVENT", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -154,11 +156,42 @@ public class MyCalendar extends AppCompatActivity {
                                         String.valueOf(datePicker.getMonth() + 1) + "-" +
                                         String.valueOf(datePicker.getDayOfMonth());
 
-                                EditText startTime = (EditText) dialogView.findViewById(R.id.event_time_start);
-                                EditText endTime = (EditText) dialogView.findViewById(R.id.event_time_end);
+                                TimePicker startTime = (TimePicker) dialogView.findViewById(R.id.event_time_start);
+                                TimePicker endTime = (TimePicker) dialogView.findViewById(R.id.event_time_end);
 
-                                String start = date + " " + startTime.getText().toString();
-                                String end = date + " " + endTime.getText().toString();
+                                String startHour = null;
+                                String startMinute = null;
+                                String endHour = null;
+                                String endMinute = null;
+
+                                if(startTime.getCurrentHour() > -1 && startTime.getCurrentHour() < 10){
+                                    startHour = "0" + String.valueOf(startTime.getCurrentHour());
+                                }
+                                else{
+                                    startHour = String.valueOf(startTime.getCurrentHour());
+                                }
+                                if(startTime.getCurrentMinute() > -1 && startTime.getCurrentMinute() < 10){
+                                    startMinute = "0" + String.valueOf(startTime.getCurrentMinute());
+                                }
+                                else{
+                                    startMinute = String.valueOf(startTime.getCurrentMinute());
+
+                                }
+                                if(endTime.getCurrentHour() > -1 && endTime.getCurrentHour() < 10){
+                                    endHour = "0" + String.valueOf(endTime.getCurrentHour());
+                                }
+                                else{
+                                    endHour = String.valueOf(endTime.getCurrentHour());
+                                }
+                                if(endTime.getCurrentMinute() > -1 & endTime.getCurrentMinute() < 10){
+                                    endMinute = "0" + String.valueOf(endTime.getCurrentMinute());
+                                }
+                                else{
+                                    endMinute = String.valueOf(endTime.getCurrentMinute());
+                                }
+
+                                String start = date + " " + startHour + ":" + startMinute;
+                                String end = date + " " + endHour + ":" + endMinute;
 
                                 // startActivity to show activities on a specific day
                                 Bundle extras = new Bundle();

@@ -3,31 +3,29 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-        <TextView
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Title event"/>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Title event"/>
-
-        <EditText
-            android:id="@+id/event_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            />
-
-        <EditText
-            android:id="@+id/event_time_start"
-            android:layout_width="match_parent"
-            android:layout_height="112dp"
-            android:inputType="number">
-
-        </EditText>
-
-        <EditText
-            android:id="@+id/event_time_end"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-        </EditText>
+            android:orientation="horizontal"
+            android:weightSum="1.0">
+                <TimePicker
+                    android:id="@+id/event_time_start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:timePickerMode="spinner"
+                    android:layout_weight="0.5"></TimePicker>
+                <TimePicker
+                    android:id="@+id/event_time_end"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:timePickerMode="spinner"
+                    android:layout_weight="0.5"></TimePicker>
+        </LinearLayout>
 
         <DatePicker
             android:id="@+id/event_date_start"
@@ -37,6 +35,4 @@
             android:calendarViewShown="false">
 
         </DatePicker>
-
-
 </LinearLayout>
