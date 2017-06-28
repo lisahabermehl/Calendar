@@ -45,8 +45,6 @@ public class MyCalendar extends AppCompatActivity {
 
     int time_start, time_gap, time_end;
     int time_end_old = 40;
-    int bedtime_start;
-    int bedtime_end;
     int time_gap_morning;
     int time_gap_evening;
 
@@ -294,22 +292,14 @@ public class MyCalendar extends AppCompatActivity {
                 null, null, null, null, TableNames.TodoEntry.COL_TODO_DEADLINE + " ASC "+ ", " +
                         TableNames.TodoEntry.COL_TODO_DURATION + " DESC");
 
-        Cursor settings_cursor = db.query(TableNames.SettingsEntry.TABLE_SETTINGS,
-                new String[]{TableNames.SettingsEntry._ID,
-                        TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE,
-                        TableNames.SettingsEntry.COL_SET_TIME_OFF_START,
-                        TableNames.SettingsEntry.COL_SET_TIME_OFF_END,
-                        TableNames.SettingsEntry.COL_SET_TIME_OFF_DAYS},
-                null, null, null, null, null);
-
         // make a new arraylist where calendarObjects will be stored in
         ArrayList<MyCalendarObject> calendarObjects = new ArrayList<>();
 
         // all the strings and ints that we need
-        String time_gap_string, title_string, date_string, start_string, end_string, bedtime,
-                old_end_string, do_not_disturb_title, do_not_disturb_start,
-                do_not_disturb_end, do_not_disturb_days;
+        String time_gap_string, title_string, date_string, start_string, end_string,
+                old_end_string, bedtime;
         int end_last_event_rise_ct, end_todo, duration, start_event, time_gap_part1, time_gap_part2;
+        int time_gap_between_todos = 0;
 
         // move the cursor from myCalendar to the first entry
         cursor.moveToFirst();
@@ -317,34 +307,13 @@ public class MyCalendar extends AppCompatActivity {
         // move the cursor from myTodos to the one before the first entry
         todo_cursor.moveToFirst();
         todo_cursor.moveToPrevious();
-        // cursor of settings
-        settings_cursor.moveToFirst();
-        settings_cursor.moveToPrevious();
 
         // initialize a new calendarObject
         MyCalendarObject nextEvent;
 
-        // check how big the time gap between Todos should be
-        SharedPreferences sp = getSharedPreferences("shared_preferences", Activity.MODE_PRIVATE);
-        int time_gap_sp = sp.getInt("time_gap", 0);
-
-        ArrayList<MyCalendarObject> doNotDisturbObjects = new ArrayList<>();
-        MyCalendarObject doNotDisturb;
-//        while(!settings_cursor.isAfterLast()){
-//            settings_cursor.moveToNext();
-//            // check on at which times the user doesn't want to be disturbed
-//            do_not_disturb_title = settings_cursor.getString(settings_cursor
-//                    .getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE));
-//            do_not_disturb_start = settings_cursor.getString(settings_cursor
-//                    .getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_START));
-//            do_not_disturb_end = settings_cursor.getString(settings_cursor
-//                    .getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_END));
-//            do_not_disturb_days = settings_cursor.getString(settings_cursor
-//                    .getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_DAYS));
-//            doNotDisturb = new MyCalendarObject(do_not_disturb_title, do_not_disturb_start,
-//                    do_not_disturb_end, do_not_disturb_days);
-//            doNotDisturbObjects.add(doNotDisturb);
-//        }
+//        // check how big the time gap between Todos should be
+//        SharedPreferences sp = getSharedPreferences("shared_preferences", Activity.MODE_PRIVATE);
+//        int time_gap_sp = sp.getInt("time_gap", 0);
 
         // if not looking for specific date or title
         if(search_for[0].equals("no")){
@@ -362,53 +331,30 @@ public class MyCalendar extends AppCompatActivity {
             date_string = everythingToKnow[2];
             start_string = everythingToKnow[3];
             end_string = everythingToKnow[4];
-            // what is the end time of the last event?
+            bedtime = everythingToKnow[5];
+            // what is the end time of the last event/current time/time user woke up
+            // what is the time that is the start of the time gap?
             old_end_string = everythingToKnow[6];
 
+            Log.d("TITLE", title_string);
+            Log.d("TIME END OLD", String.valueOf(time_end_old));
+            Log.d("TIME GAP", time_gap_string);
+            Log.d("START", start_string);
+            Log.d("END", end_string);
+
             // new is the new old, initialize here so it will be passed on the next nextEvent-call
+            // date_old to determine if next event is on another day, hence to determine if the user will sleep in between
             date_old = date_string;
+            // how big is the time gap
             time_gap = Integer.valueOf(time_gap_string);
-            time_gap_part2 = 0;
             start_event = Integer.valueOf(convertToMins(start_string));
-
-            do_not_disturb_title = null;
-            do_not_disturb_start = null;
-            do_not_disturb_end = null;
-            do_not_disturb_days = null;
-
             // store the end time in minutes in an Integer
             end_last_event_rise_ct = Integer.valueOf(old_end_string);
 
-            // check if there are any "do-not-disturb" times set by the user in this time gap
-            while(settings_cursor.moveToNext()){
-                do_not_disturb_title = settings_cursor.getString(settings_cursor
-                        .getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE));
-                do_not_disturb_start = settings_cursor.getString(settings_cursor
-                        .getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_START));
-                do_not_disturb_end = settings_cursor.getString(settings_cursor
-                        .getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_END));
-                do_not_disturb_days = settings_cursor.getString(settings_cursor
-                        .getColumnIndex(TableNames.SettingsEntry.COL_SET_TIME_OFF_DAYS));
-
-                int dnd_start = convertToMins(do_not_disturb_start);
-                int dnd_end = convertToMins(do_not_disturb_end);
-
-                // if dnd time is somewhere in the timegap
-                // split the time gap
-                // it's not possible to set a do not disturb time that overlaps
-                if(dnd_start > end_last_event_rise_ct && dnd_start < start_event){
-                    time_gap = dnd_start - end_last_event_rise_ct;
-                    if(start_event > dnd_end){
-                        time_gap_part2 = start_event - dnd_end;
-                    }
-                    else{
-                        time_gap_part2 = 0;
-                    }
-                }
-            }
-
             // get todos one at a time, they are already organized on importance
             while(todo_cursor.moveToNext()) {
+
+                Log.d("OLD END STRING", old_end_string);
 
                 String id_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry._ID));
                 String todo_title_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE));
@@ -418,7 +364,9 @@ public class MyCalendar extends AppCompatActivity {
                 duration = Integer.valueOf(todo_duration_string);
 
                 String begin = convertToHour(end_last_event_rise_ct);
+                // calculate the new end
                 end_todo = end_last_event_rise_ct + Integer.valueOf(todo_duration_string);
+                // make sure it looks like HH:mm
                 String eind = convertToHour(end_todo);
 
                 // new is the new old
@@ -429,19 +377,6 @@ public class MyCalendar extends AppCompatActivity {
                     MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string, begin, eind);
                     calendarObjects.add(todo);
                     time_gap = time_gap - duration;
-                }
-                else {
-                    // make sure cursor doesn't skip a to do
-                    todo_cursor.moveToPrevious();
-                    doNotDisturb = new MyCalendarObject(do_not_disturb_title, do_not_disturb_start,
-                            do_not_disturb_end, do_not_disturb_days);
-                    // gap is filled, so dnd can be added
-                    calendarObjects.add(doNotDisturb);
-                }
-                if(time_gap_part2 > duration){
-                    MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string, begin, eind);
-                    calendarObjects.add(todo);
-                    time_gap_part2 = time_gap_part2 - duration;
                 }
                 else {
                     // make sure cursor doesn't skip a to do
@@ -476,24 +411,22 @@ public class MyCalendar extends AppCompatActivity {
             nextEvent = new MyCalendarObject(title_string, date_string, start_string, end_string);
             calendarObjects.add(nextEvent);
 
-            while(!cursor.isAfterLast()){
+            while(!cursor.moveToNext()){
+
                 everythingToKnow = nextEvent(cursor, date_old, time_end_old);
 
                 title_string = everythingToKnow[1];
                 date_string = everythingToKnow[2];
                 start_string = everythingToKnow[3];
                 end_string = everythingToKnow[4];
-                bedtime = everythingToKnow[5];
 
                 nextEvent = new MyCalendarObject(title_string, date_string, start_string, end_string);
-
                 calendarObjects.add(nextEvent);
 
                 // new is the new old
                 date_old = date_string;
                 time_end_old = convertToMins(end_string);
             }
-
         }
         else if (search_for[0].equals("date")){
             // look for specific date in table and print details while looking for gaps and filling these gaps with todos
@@ -547,6 +480,11 @@ public class MyCalendar extends AppCompatActivity {
         String title_string, date_string, start_string, end_string, bedtime;
         String old_end_string = String.valueOf(time_end_old);
 
+        int bedtime_start = (23*60);
+        int bedtime_end = (7*60);
+
+        bedtime = "no";
+
         if(!cursor.isAfterLast()){
 
             String[] sendBack = new String[10];
@@ -557,13 +495,11 @@ public class MyCalendar extends AppCompatActivity {
             end_string = cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_END));
             Log.d("TITLE", title_string);
 
-            bedtime = "bedtime_no";
-
             time_end = convertToMins(end_string);
             time_start = convertToMins(start_string);
             date_new = date_string;
 
-            cursor.moveToNext();
+//            cursor.moveToNext();
 
             String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
             String currentTimeMin = new SimpleDateFormat("mm").format(Calendar.getInstance().getTime());
@@ -597,6 +533,7 @@ public class MyCalendar extends AppCompatActivity {
 
                 // check how much time there is between current time and start of next activity
                 time_gap = time_start - currentTime;
+
                 old_end_string = String.valueOf(currentTime);
             }
             // else it has to be on another day
@@ -608,9 +545,15 @@ public class MyCalendar extends AppCompatActivity {
                 day = "other day";
 
                 if(date_old.equals("nog niks")){
-                    time_gap = convertToMins("23:00") - currentTime;
+                    time_gap = bedtime_start - currentTime;
                 }
-
+                // else it means that the user sleeps in between
+                else{
+                    bedtime = "yes";
+                    time_gap_evening = bedtime_start - time_end_old;
+                    time_gap = 0;
+                    time_gap_morning = time_start - bedtime_end;
+                }
             }
 
             sendBack[0] = String.valueOf(time_gap);

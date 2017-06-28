@@ -13,7 +13,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Settings"
+        <activity android:name=".LoginActivity"
             android:label="Intro"
             android:theme="@style/Theme.Design.NoActionBar">
             <intent-filter>
@@ -39,7 +39,7 @@
             android:label=" "
             android:theme="@style/Theme.Design" />
 
-        <activity android:name=".LoginActivity"
+        <activity android:name=".Settings"
             android:label=" "
             android:theme="@style/Theme.Design" />
 
