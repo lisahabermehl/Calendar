@@ -46,8 +46,10 @@ public class MyCalendar extends AppCompatActivity {
     ListView calendarListView;
     ListView todoListView;
 
-    int time_start, time_gap, time_end;
-    int time_end_old;
+    int time_start, time_gap;
+    int time_end = 0;
+    int time_end_old = 0;
+    int i = 0;
     int time_gap_morning;
     int time_gap_evening;
 
@@ -57,27 +59,22 @@ public class MyCalendar extends AppCompatActivity {
 
     String date_old = "nog niks";
 
-    int currentTimeMin, currentTimeHour, currentTime, currentModulo;
+    int currentTimeMin, currentTimeHour, currentTime, currentModulo, bedtime_start, bedtime_end;
 
-    String title_string, date_string, start_string, end_string, current_date;
+    String title_string, date_string, start_string, end_string, current_date, date_todo;
     int end_last_event_rise_ct, end_todo, duration, start_event;
-    int time_gap_between_todos = 0;
-    int bedtime_start = (23*60);
-    int bedtime_end = (7*60);
+    int time_gap_between_todos = 5;
+//    int bedtime_start = (23*60);
+//    int bedtime_end = (7*60);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.calendar_list);
 
         calendarListView = (ListView) findViewById(R.id.list_calendar);
-        todoListView = (ListView) findViewById(R.id.list_todo);
 
         databaseHelper = new DatabaseHelper(this);
-
-        time_end = 0;
-        time_end_old = 0;
 
         searchFor[0] = "no";
         searchFor[1] = "no";
@@ -145,6 +142,43 @@ public class MyCalendar extends AppCompatActivity {
                         .create()
                         .show();
 
+                return true;
+            case R.id.menu_day:
+                LayoutInflater layoutInflaterDay = LayoutInflater.from(this);
+                final View dialogViewDay = layoutInflaterDay.inflate(R.layout.calendar_main, null);
+
+                AlertDialog.Builder builderDay = new AlertDialog.Builder(this);
+                builderDay
+                        .setView(dialogViewDay)
+                        .setPositiveButton("SELECT DATE", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                datePicker = (DatePicker) dialogViewDay.findViewById(R.id.search_by_date);
+
+                                String day = String.valueOf(datePicker.getDayOfMonth());
+                                String month = String.valueOf(datePicker.getMonth() + 1);
+                                String year = String.valueOf(datePicker.getYear());
+                                String date = year + "-" + "0" + month + "-" + day;
+                                Toast.makeText(MyCalendar.this, date, Toast.LENGTH_LONG).show();
+
+                                searchFor[0] = "date";
+                                searchFor[1] = date;
+
+                                updateUI(searchFor);
+                            }
+                        })
+                        .setNegativeButton("SHOW ALL DATES", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                                searchFor[0] = "no";
+                                searchFor[1] = "no";
+
+                                updateUI(searchFor);
+                            }
+                        })
+                        .create()
+                        .show();
                 return true;
             case R.id.insert_event:
                 LayoutInflater layoutInflater = LayoutInflater.from(this);
@@ -226,48 +260,6 @@ public class MyCalendar extends AppCompatActivity {
                         .create()
                         .show();
                 return true;
-            case R.id.menu_day:
-                LayoutInflater layoutInflaterDay = LayoutInflater.from(this);
-                final View dialogViewDay = layoutInflaterDay.inflate(R.layout.calendar_main, null);
-
-                // TODO add a "show all" button
-
-                AlertDialog.Builder builderDay = new AlertDialog.Builder(this);
-                builderDay
-                        .setView(dialogViewDay)
-                        .setPositiveButton("SELECT DATE", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                datePicker = (DatePicker) dialogViewDay.findViewById(R.id.search_by_date);
-
-                                String day = String.valueOf(datePicker.getDayOfMonth());
-                                String month = String.valueOf(datePicker.getMonth() + 1);
-                                String year = String.valueOf(datePicker.getYear());
-                                String date = year + "-" + "0" + month + "-" + day;
-                                Toast.makeText(MyCalendar.this, date, Toast.LENGTH_LONG).show();
-
-                                searchFor[0] = "date";
-                                searchFor[1] = date;
-
-                                updateUI(searchFor);
-                            }
-                        })
-                        .setNegativeButton("SHOW ALL DATES", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                                searchFor[0] = "no";
-                                searchFor[1] = "no";
-
-                                updateUI(searchFor);
-                            }
-                        })
-                        .create()
-                        .show();
-                return true;
-            case R.id.menu_calendar:
-                startActivity(new Intent(this, MyCalendar.class));
-                return true;
             case R.id.menu_todo:
                 startActivity(new Intent(this, Todo.class));
                 return true;
@@ -280,7 +272,6 @@ public class MyCalendar extends AppCompatActivity {
     }
 
     private void updateUI(String[] search_for) {
-
         // open the myCalendar database
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         Cursor cursor = db.query(TableNames.CalendarEntry.TABLE_CALENDAR,
@@ -314,7 +305,6 @@ public class MyCalendar extends AppCompatActivity {
         // if not looking for specific date or title
         if(search_for[0].equals("no")){
 
-            int i = 0;
 
             Log.d("DATE OLD", date_old);
             Log.d("TIME END OLD", String.valueOf(time_end_old));
@@ -333,8 +323,8 @@ public class MyCalendar extends AppCompatActivity {
             time_gap = Integer.valueOf(everythingToKnow[6]);
             time_gap_evening = Integer.valueOf(everythingToKnow[7]);
             time_gap_morning = Integer.valueOf(everythingToKnow[8]);
+            date_todo = everythingToKnow[9];
             Log.d("0", title_string);
-            Log.d("1", date_string);
             Log.d("2", start_string);
             Log.d("3", end_string);
             Log.d("4", String.valueOf(end_last_event_rise_ct));
@@ -372,13 +362,13 @@ public class MyCalendar extends AppCompatActivity {
                 // time_gap = start_activity - end_activity_rise_ct
                 // is it a "normal" time gap
                 if (time_gap > duration) {
-                    MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string, begin, eind);
+                    MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_todo, begin, eind);
                     calendarObjects.add(todo);
                     time_gap = time_gap - duration;
                 // is it a time gap that has a part 1 before bedtime and a part 2 after bedtime?
                 } else if (time_gap_evening > duration) {
 
-                    MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string, begin, eind);
+                    MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_todo, begin, eind);
                     calendarObjects.add(todo);
 
                     i = 0;
@@ -392,8 +382,8 @@ public class MyCalendar extends AppCompatActivity {
                         String bed_start = convertToHour(bedtime_start);
                         String bed_end = convertToHour(bedtime_end);
 
-                        MyCalendarObject to2 = new MyCalendarObject("Bedtime", date_string + " +1", bed_start, bed_end);
-                        calendarObjects.add(to2);
+                        MyCalendarObject to2 = new MyCalendarObject("Bedtime", date_todo + " +1", bed_start, bed_end);
+//                        calendarObjects.add(to2);
                     }
 
                     // after that we can calculate the start time and end time of a todo
@@ -438,7 +428,7 @@ public class MyCalendar extends AppCompatActivity {
                     Log.d("2", start_string);
                     Log.d("3", end_string);
                     Log.d("4", String.valueOf(end_last_event_rise_ct));
-//            Log.d("5", bedtime);
+                    Log.d("5", current_date);
                     Log.d("6", String.valueOf(time_gap));
                     Log.d("7", String.valueOf(time_gap_evening));
                     Log.d("8", String.valueOf(time_gap_morning));
@@ -518,12 +508,11 @@ public class MyCalendar extends AppCompatActivity {
 
     private String[] nextEvent(Cursor cursor, String date_old, int time_end_old){
 
-        String title_string, date_string, start_string, end_string, bedtime;
+        String title_string, date_string, start_string, end_string;
 
-        int bedtime_start = (23*60);
-        int bedtime_end = (7*60);
+        bedtime_start = (23*60);
+        bedtime_end = (7*60);
 
-        bedtime = "no";
         time_gap_evening = 0;
         time_gap_morning = 0;
 
@@ -567,11 +556,13 @@ public class MyCalendar extends AppCompatActivity {
             if (date_string.equals(date_old)) {
 
                 day = "same day";
+                date_todo = date_string;
 
                 Log.d("SAME SAME DAY", day);
 
                 time_gap = time_start - time_end_old;
                 end_last_event_rise_ct = time_end_old;
+
             }
             // it's also possible that date_old is empty, therefore it's impossible to be on the same date as date_new
             // so, check if the first event is today
@@ -579,6 +570,7 @@ public class MyCalendar extends AppCompatActivity {
             else if (date_string.equals(current_date) && date_old.equals("nog niks")){
 
                 day = "today";
+                date_todo = date_string;
 
                 Log.d("TODAY TODAY TODAY", day);
 
@@ -592,11 +584,11 @@ public class MyCalendar extends AppCompatActivity {
             // we can also fill the gap between waking up and the next event
             else {
 
-                    Log.d("ELSE", bedtime);
-                    bedtime = "yes";
-                    time_gap_evening = bedtime_start - time_end_old;
-                    time_gap = 0;
-                    time_gap_morning = time_start - bedtime_end;
+                date_todo = date_old;
+
+                time_gap_evening = bedtime_start - time_end_old;
+                time_gap = 0;
+                time_gap_morning = time_start - bedtime_end;
             }
 
             sendBack[0] = title_string;
@@ -608,9 +600,7 @@ public class MyCalendar extends AppCompatActivity {
             sendBack[6] = String.valueOf(time_gap);
             sendBack[7] = String.valueOf(time_gap_evening);
             sendBack[8] = String.valueOf(time_gap_morning);
-//            sendBack[9] = String.valueOf(move);
-//            Log.d("MOVE MOVE MOVE", String.valueOf(move));
-
+            sendBack[9] = date_todo;
 
             return sendBack;
         }

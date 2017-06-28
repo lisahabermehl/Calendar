@@ -43,10 +43,6 @@
             android:label=" "
             android:theme="@style/Theme.Design" />
 
-        <activity android:name=".TimeGap"
-            android:label=" "
-            android:theme="@style/Theme.Design" />
-
     </application>
 
 </manifest>

@@ -21,12 +21,29 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/edit_bedtime"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="SET BEDTIME"
-        android:onClick="editBedtime"/>
+        android:orientation="horizontal"
+        android:weightSum="1.0">
+
+        <Button
+            android:id="@+id/edit_start_bedtime"
+            android:layout_weight="0.5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="START BEDTIME"
+            android:onClick="editStartBedtime"/>
+
+        <Button
+            android:id="@+id/edit_end_bedtime"
+            android:layout_weight="0.5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="END BEDTIME"
+            android:onClick="editEndBedtime"/>
+
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"

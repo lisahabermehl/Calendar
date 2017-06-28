@@ -7,8 +7,7 @@
         android:id="@+id/refresh"
         app:showAsAction="always"
         android:icon="@drawable/refresh"
-        android:title="Refresh"
-        />
+        android:title="Refresh"/>
 
     <item
         android:id="@+id/menu_search"
@@ -25,11 +24,6 @@
         android:icon="@drawable/ic_action_name"
         android:title="Add Task"
         app:showAsAction="always" />
-    <item
-        android:id="@+id/menu_calendar"
-        android:orderInCategory="1"
-        app:showAsAction="never"
-        android:title="My Calendar"/>
     <item
         android:id="@+id/menu_todo"
         android:orderInCategory="2"

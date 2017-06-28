@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -29,14 +30,7 @@ import java.util.ArrayList;
 
 public class Settings extends AppCompatActivity {
 
-    Button edit_bedtime;
-    Button do_magic;
-
     DatabaseHelper databaseHelper;
-
-    TimeGapAdapter timeGapAdapter;
-
-    ListView timeGapListView;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,9 +38,6 @@ public class Settings extends AppCompatActivity {
 
         databaseHelper = new DatabaseHelper(this);
 
-        timeGapListView = (ListView) findViewById(R.id.list_time_gap);
-
-        edit_bedtime = (Button) findViewById(R.id.edit_bedtime);
     }
 
     @Override
@@ -69,6 +60,85 @@ public class Settings extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void editStartBedtime(View view) {
+        final SharedPreferences sp = getSharedPreferences("shared_preferences", Activity.MODE_PRIVATE);
+
+        final TimePicker bedtimeStart = new TimePicker(this);
+        bedtimeStart.setIs24HourView(true);
+
+        int time_start_hour = sp.getInt("bedtime_start_hour", 23);
+        int time_start_minute = sp.getInt("bedtime_start_minute", 0);
+
+        bedtimeStart.setCurrentHour(time_start_hour);
+        bedtimeStart.setCurrentMinute(time_start_minute);
+
+        AlertDialog.Builder timeSpanBuilder = new AlertDialog.Builder(this);
+        timeSpanBuilder
+                .setView(bedtimeStart)
+                .setTitle("Set bedtime")
+                .setPositiveButton("SUBMIT", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        int start_hour = bedtimeStart.getCurrentHour();
+                        int start_minute = bedtimeStart.getCurrentMinute();
+
+                        SharedPreferences.Editor editor = sp.edit();
+                        editor.putInt("bedtime_start_hour", start_hour);
+                        editor.putInt("bedtime_start_minute", start_minute);
+                        editor.apply();
+                    }
+                })
+                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create()
+                .show();
+    }
+
+    public void editEndBedtime(View view) {
+        final SharedPreferences sp = getSharedPreferences("shared_preferences", Activity.MODE_PRIVATE);
+
+        final TimePicker bedtimeEnd = new TimePicker(this);
+        bedtimeEnd.setIs24HourView(true);
+
+        int time_end_hour = sp.getInt("bedtime_en_hour", 7);
+        int time_end_minute = sp.getInt("bedtime_end_minute", 0);
+
+        bedtimeEnd.setCurrentHour(time_end_hour);
+        bedtimeEnd.setCurrentMinute(time_end_minute);
+
+        AlertDialog.Builder timeSpanBuilder = new AlertDialog.Builder(this);
+        timeSpanBuilder
+                .setView(bedtimeEnd)
+                .setTitle("Set bedtime")
+                .setPositiveButton("SUBMIT", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        int end_hour = bedtimeEnd.getCurrentHour();
+                        int end_minute = bedtimeEnd.getCurrentMinute();
+
+
+                        SharedPreferences.Editor editor = sp.edit();
+                        editor.putInt("bedtime_end_hour", end_hour);
+                        editor.putInt("bedtime_end_minute", end_minute);
+                        editor.apply();
+                    }
+                })
+                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create()
+                .show();
     }
 
     public void setTimeSpan(View view){
@@ -167,8 +237,6 @@ public class Settings extends AppCompatActivity {
                 .show();
     }
 
-    public void editBedtime(View view) {
-        startActivity(new Intent(this, TimeGap.class));
-    }
+
 }
 

@@ -25,14 +25,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + TableNames.TodoEntry.COL_TODO_DURATION + " TEXT NOT NULL, "
             + TableNames.TodoEntry.COL_TODO_DEADLINE + " TEXT NOT NULL" + ")";
 
-    private static final String CREATE_TABLE_SETTINGS = "CREATE TABLE IF NOT EXISTS "
-            + TableNames.SettingsEntry.TABLE_SETTINGS + "("
-            + TableNames.SettingsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + TableNames.SettingsEntry.COL_SET_TIME_OFF_TITLE + " TEXT NOT NULL, "
-            + TableNames.SettingsEntry.COL_SET_TIME_OFF_START + " TEXT NOT NULL, "
-            + TableNames.SettingsEntry.COL_SET_TIME_OFF_END + " TEXT NOT NULL, "
-            + TableNames.SettingsEntry.COL_SET_TIME_OFF_DAYS + " TEXT NOT NULL)";
-
     public DatabaseHelper(Context context) {
         super(context, TableNames.DB_NAME, null, TableNames.DB_VERSION);
     }
@@ -43,7 +35,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // creating required tables
         db.execSQL(CREATE_TABLE_CALENDAR);
         db.execSQL(CREATE_TABLE_TODO);
-        db.execSQL(CREATE_TABLE_SETTINGS);
     }
 
     @Override
@@ -51,8 +42,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // on upgrade drop older tables
         db.execSQL("DROP TABLE IF EXISTS " + TableNames.CalendarEntry.TABLE_CALENDAR);
         db.execSQL("DROP TABLE IF EXISTS " + TableNames.TodoEntry.TABLE_TODO);
-        db.execSQL("DROP TABLE IF EXISTS " + TableNames.SettingsEntry.TABLE_SETTINGS);
-
+        
         // create new tables
         onCreate(db);
     }
