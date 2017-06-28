@@ -201,7 +201,7 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 ### Todos
 * make sure that the user can set different time gaps, a time span
 ### Process
-* so at first I had differen Databasehelpers (one for the Todos and one for the Calendar). But I have a lot of files now, so I thought it might be better to just merge these Databasehelpers
+* so at first I had different Databasehelpers (one for the Todos and one for the Calendar). But I have a lot of files now, so I thought it might be better to just merge these Databasehelpers
 * also deleted unnecessary files 
 
 # day 20
@@ -217,7 +217,26 @@ Vanmiddag kon ik mijn eigen laptop weer ophalen (yay), maar het linken van GitHu
 * try to make the UpdateUI in MyCalendar.java less long (maybe put some of the database stuff in the Database helper and call these functions from UpdateUI?)
 * Bij toevoegen van een nieuw event automatisch refreshen
 * Voorkomen dat user dubbel kan plannen in Calendar o.b.v. events die uit de Google Calendar worden gehaald
+### Process
+* Beetje aan layout gewerkt ook, wil eigenlijk dat de Timegap dingen van rechts komen scrollen, 
+* Verschillende timegaps in een tabel plaatsen en de andere dingen in shared preferences. 
 ### Think, think
 * Bij passeren deadline wordt het nog steeds ingedeeld
 * Als er een kleine time gap is dan wordt deze ook niet ingedeeld met todos die weinig tijd innemen, en wordt er gewacht op een grote time gap om die ene “belangrijkere” todo in te delen
 
+# day 22
+### Process
+* In plaats van checkedtextview, gewoon checkboxes gebruiken want ik krijg die checkboxes niet aan de praat
+* Het is nu mogelijk om checkboxes te checken en dan deze dagen in de database op te slaan (+ begin en eind van donotdisturb tijd instellen + titel op slaan)
+* Mogelijk om time span en time gaps tussen Todos in te stellen met een NumberPicker en deze opslaan in SharedPreferences
+* Bij time gaps van user: eerst checken hoe groot de time gap is, net zoals bij de vorige versie, maar dan ook een check of de time gap van de user in deze time gap zit. En dan opsplitsen in twee: time gap part 1 en time gap part 2. 
+### Think, think
+* Bij time gaps van user: eerst checken hoe groot de time gap is, net zoals bij de vorige versie, maar dan ook een check of de time gap van de user in deze time gap zit. En dan opsplitsen in twee: time gap part 1 en time gap part 2. 
+
+# day 23
+### Todo
+* Vandaag de do not disturb tijden die ingesteld zijn door de user implementeren in de calendar, zou het als een soort calendar event gemaakt worden? En het dan zo meenemen in de calendar
+* Never mind bovenstaande. Nu focussen op het implementeren van todo’s dichter naar de deadline toe. 
+Beetje opnieuw beginnen om zo ook meteen de code beter te maken. En eerst handmatig values doorgeven zoals de time gap tussen de verschillende todos en daarna gebruik maken van wat de user invoert.
+### Important decisions
+* Toch maar ervoor gekozen om de verschillende time gaps eruit te laten, want dat werkt nog niet. Past niet goed in het algoritme dat ik al heb
