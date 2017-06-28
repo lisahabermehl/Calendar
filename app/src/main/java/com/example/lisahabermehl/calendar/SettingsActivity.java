@@ -7,12 +7,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.NumberPicker;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 /**
  * Created by lisahabermehl on 09/06/2017.
@@ -174,8 +176,10 @@ public class SettingsActivity extends AppCompatActivity {
         timeGap.setMinValue(0);
         timeGap.setMaxValue(time_gaps.length-1);
         timeGap.setDisplayedValues(time_gaps);
-        timeGap.setValue(sp.getInt("time_gap", 5));
+        timeGap.setValue(sp.getInt("time_gap", 1));
         timeGap.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+
+        Log.d("TIME GAP", String.valueOf(sp.getInt("time_gap", 5)));
 
         AlertDialog.Builder timeGapBuilder = new AlertDialog.Builder(this);
         timeGapBuilder
@@ -186,7 +190,9 @@ public class SettingsActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {
 
                         SharedPreferences.Editor editor = sp.edit();
-                        editor.putInt("time_gap", timeGap.getValue());
+                        // have to multiply by 5 because I'm using intervals of five
+                        // apparently getValue gives me the position of selected number in list
+                        editor.putInt("time_gap", (timeGap.getValue() * 5));
                         editor.apply();
                     }
                 })

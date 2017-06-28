@@ -63,9 +63,6 @@ public class MyCalendarActivity extends AppCompatActivity {
 
     String title_string, date_string, start_string, end_string, current_date, date_todo, begin, eind;
     int end_last_event_rise_ct, end_todo, duration, start_event;
-    int time_gap_between_todos = 5;
-//    int bedtime_start = (23*60);
-//    int bedtime_end = (7*60);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -351,7 +348,7 @@ public class MyCalendarActivity extends AppCompatActivity {
                 // is it a "normal" time gap
                 if (time_gap > duration) {
                     // convert minutes to HH:mm
-                    begin = convertToHour(end_last_event_rise_ct);
+                    begin = convertToHour(end_last_event_rise_ct + time_between_todos);
                     // calculate end of todo
                     end_todo = end_last_event_rise_ct + duration;
                     eind = convertToHour(end_todo);
@@ -365,7 +362,7 @@ public class MyCalendarActivity extends AppCompatActivity {
                     calendarObjects.add(todo);
                     time_gap = time_gap - (duration + time_between_todos);
                     // new is the new old
-                    end_last_event_rise_ct = end_todo + time_between_todos;
+                    end_last_event_rise_ct = end_todo;
                     Log.d("LAST EVENT END", String.valueOf(end_last_event_rise_ct));
                     Log.d("END TODO", String.valueOf(end_todo));
                     Log.d("TIME GAP BETWEEN TODOS", String.valueOf(time_between_todos));
@@ -374,7 +371,7 @@ public class MyCalendarActivity extends AppCompatActivity {
                     // is it a time gap that has a part 1 before bedtime and a part 2 after bedtime?
                 } else if (time_gap_evening > duration) {
                     // convert minutes to HH:mm
-                    begin = convertToHour(end_last_event_rise_ct);
+                    begin = convertToHour(end_last_event_rise_ct + time_between_todos);
                     // calculate end of todo
                     end_todo = end_last_event_rise_ct + duration;
                     eind = convertToHour(end_todo);
@@ -388,21 +385,20 @@ public class MyCalendarActivity extends AppCompatActivity {
                     i = 0;
 
                     time_gap_evening = time_gap_evening - (duration + time_between_todos);
-                    end_last_event_rise_ct = end_todo + time_between_todos;
+                    end_last_event_rise_ct = end_todo;
                     // if time gap after bedtime isn't filled yet
                 } else if (time_gap_morning > duration) {
                     // after that we can calculate the start time and end time of a todo
                     if (i == 0) {
-                        begin = convertToHour(bedtime_end);
+                        begin = convertToHour(bedtime_end + time_between_todos);
                         end_todo = bedtime_end + duration;
                         eind = convertToHour(end_todo);
-
 
                         // make sure that we don't go in past
                         time_gap_evening = 0;
                     }
                     else{
-                        begin = convertToHour(end_last_event_rise_ct);
+                        begin = convertToHour(end_last_event_rise_ct + time_between_todos);
                         end_todo = end_last_event_rise_ct + duration;
                         eind = convertToHour(end_todo);
                     }
@@ -416,7 +412,7 @@ public class MyCalendarActivity extends AppCompatActivity {
                     i = i + 1;
 
                     time_gap_morning = time_gap_morning - (duration + time_between_todos);
-                    end_last_event_rise_ct = end_todo + time_between_todos;
+                    end_last_event_rise_ct = end_todo;
                     // else all the time gaps are filled and we should look for a next event
                 } else {
                     // make sure cursor doesn't skip a to do
@@ -531,6 +527,7 @@ public class MyCalendarActivity extends AppCompatActivity {
         SharedPreferences sp = getSharedPreferences("shared_preferences", Activity.MODE_PRIVATE);
         bedtime_start = (sp.getInt("bedtime_start_hour", 23)*60) + sp.getInt("bedtime_start_minute", 0);
         bedtime_end = (sp.getInt("bedtime_end_hour", 7)*60) + sp.getInt("bedtime_end_minute", 0);
+        time_between_todos = sp.getInt("time_gap", 1);
 
         time_gap_evening = 0;
         time_gap_morning = 0;

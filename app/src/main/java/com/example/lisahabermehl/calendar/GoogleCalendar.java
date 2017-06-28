@@ -110,6 +110,7 @@ public class GoogleCalendar extends Activity implements EasyPermissions.Permissi
         } else if (! isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
         } else {
+
             Intent intent = getIntent();
             Bundle extras = intent.getExtras();
             String[] passing = new String[4];
@@ -366,21 +367,10 @@ public class GoogleCalendar extends Activity implements EasyPermissions.Permissi
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
             SharedPreferences sp = getSharedPreferences("shared_preferences", Activity.MODE_PRIVATE);
-            int time_span = sp.getInt("time_span", 0);
-            int noOfDays = 0;
-
-            if(time_span > 0){
-                noOfDays = Integer.valueOf(time_span);
-                Log.d("NR DAYS", String.valueOf(noOfDays));
-            }
-            else{
-                noOfDays = 14;
-                Log.d("NR DAYS SET", String.valueOf(noOfDays));
-            }
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(new Date());
-            calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
+            calendar.add(Calendar.DAY_OF_YEAR, sp.getInt("time_span", 14));
             Date date = calendar.getTime();
 
             DateTime dateTime = new DateTime(date);
