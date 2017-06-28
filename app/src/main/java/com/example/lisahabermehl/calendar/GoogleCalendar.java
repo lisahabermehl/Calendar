@@ -58,9 +58,7 @@ public class GoogleCalendar extends Activity implements EasyPermissions.Permissi
     ProgressDialog mProgress;
     DatabaseHelper myCalendarDbHelper;
 
-    Context context;
-
-    MyCalendar myCalendar;
+    MyCalendarActivity myCalendarActivity;
 
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     static final int REQUEST_AUTHORIZATION = 1001;
@@ -82,7 +80,7 @@ public class GoogleCalendar extends Activity implements EasyPermissions.Permissi
         mOutputText = (TextView) findViewById(R.id.mOutputText);
 
         myCalendarDbHelper = new DatabaseHelper(this);
-        myCalendar = new MyCalendar();
+        myCalendarActivity = new MyCalendarActivity();
 
         // let user know that app is fetching data/adding data
         mProgress = new ProgressDialog(this);
@@ -112,7 +110,6 @@ public class GoogleCalendar extends Activity implements EasyPermissions.Permissi
         } else if (! isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
         } else {
-
             Intent intent = getIntent();
             Bundle extras = intent.getExtras();
             String[] passing = new String[4];
@@ -496,7 +493,7 @@ public class GoogleCalendar extends Activity implements EasyPermissions.Permissi
                 mOutputText.setText("No results returned.");
             } else {
 //                mOutputText.setText(String.valueOf(output));
-                startActivity(new Intent(GoogleCalendar.this, MyCalendar.class));
+                startActivity(new Intent(GoogleCalendar.this, MyCalendarActivity.class));
                 finish();
             }
         }

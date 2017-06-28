@@ -8,12 +8,6 @@
     android:gravity="center_vertical"
     android:layout_alignParentBottom="true">
 
-    <ImageView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_gravity="center_horizontal"
-        android:src="@drawable/calendar"/>
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

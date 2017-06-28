@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * https://www.sitepoint.com/starting-android-development-creating-todo-app/
  */
 
-public class Todo extends AppCompatActivity {
+public class TodoActivity extends AppCompatActivity {
 
     private DatabaseHelper databaseHelper;
     private TodoAdapter todoAdapter;
@@ -68,10 +68,10 @@ public class Todo extends AppCompatActivity {
                 addTodo();
                 return true;
             case R.id.menu_calendar:
-                startActivity(new Intent(this, MyCalendar.class));
+                startActivity(new Intent(this, MyCalendarActivity.class));
                 return true;
             case R.id.menu_settings:
-                startActivity(new Intent(this, Settings.class));
+                startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -7,28 +7,18 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.NumberPicker;
-import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
-
-import java.util.ArrayList;
 
 /**
  * Created by lisahabermehl on 09/06/2017.
  */
 
-public class Settings extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     DatabaseHelper databaseHelper;
 
@@ -52,10 +42,10 @@ public class Settings extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_calendar:
-                startActivity(new Intent(this, MyCalendar.class));
+                startActivity(new Intent(this, MyCalendarActivity.class));
                 return true;
             case R.id.menu_todo:
-                startActivity(new Intent(this, Todo.class));
+                startActivity(new Intent(this, TodoActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -68,11 +58,8 @@ public class Settings extends AppCompatActivity {
         final TimePicker bedtimeStart = new TimePicker(this);
         bedtimeStart.setIs24HourView(true);
 
-        int time_start_hour = sp.getInt("bedtime_start_hour", 23);
-        int time_start_minute = sp.getInt("bedtime_start_minute", 0);
-
-        bedtimeStart.setCurrentHour(time_start_hour);
-        bedtimeStart.setCurrentMinute(time_start_minute);
+        bedtimeStart.setCurrentHour(sp.getInt("bedtime_start_hour", 23));
+        bedtimeStart.setCurrentMinute(sp.getInt("bedtime_start_minute", 0));
 
         AlertDialog.Builder timeSpanBuilder = new AlertDialog.Builder(this);
         timeSpanBuilder
@@ -82,12 +69,9 @@ public class Settings extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        int start_hour = bedtimeStart.getCurrentHour();
-                        int start_minute = bedtimeStart.getCurrentMinute();
-
                         SharedPreferences.Editor editor = sp.edit();
-                        editor.putInt("bedtime_start_hour", start_hour);
-                        editor.putInt("bedtime_start_minute", start_minute);
+                        editor.putInt("bedtime_start_hour", bedtimeStart.getCurrentHour());
+                        editor.putInt("bedtime_start_minute", bedtimeStart.getCurrentMinute());
                         editor.apply();
                     }
                 })
@@ -107,11 +91,8 @@ public class Settings extends AppCompatActivity {
         final TimePicker bedtimeEnd = new TimePicker(this);
         bedtimeEnd.setIs24HourView(true);
 
-        int time_end_hour = sp.getInt("bedtime_en_hour", 7);
-        int time_end_minute = sp.getInt("bedtime_end_minute", 0);
-
-        bedtimeEnd.setCurrentHour(time_end_hour);
-        bedtimeEnd.setCurrentMinute(time_end_minute);
+        bedtimeEnd.setCurrentHour(sp.getInt("bedtime_end_hour", 7));
+        bedtimeEnd.setCurrentMinute(sp.getInt("bedtime_end_minute", 0));
 
         AlertDialog.Builder timeSpanBuilder = new AlertDialog.Builder(this);
         timeSpanBuilder
@@ -120,14 +101,9 @@ public class Settings extends AppCompatActivity {
                 .setPositiveButton("SUBMIT", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-
-                        int end_hour = bedtimeEnd.getCurrentHour();
-                        int end_minute = bedtimeEnd.getCurrentMinute();
-
-
                         SharedPreferences.Editor editor = sp.edit();
-                        editor.putInt("bedtime_end_hour", end_hour);
-                        editor.putInt("bedtime_end_minute", end_minute);
+                        editor.putInt("bedtime_end_hour", bedtimeEnd.getCurrentHour());
+                        editor.putInt("bedtime_end_minute", bedtimeEnd.getCurrentMinute());
                         editor.apply();
                     }
                 })
@@ -190,17 +166,6 @@ public class Settings extends AppCompatActivity {
 
         final NumberPicker timeGap = new NumberPicker(this);
 
-        int set_time_gap = 5;
-        int time_gap = sp.getInt("time_gap", 0);
-        if(String.valueOf(time_gap) == null){
-            SharedPreferences.Editor editor = sp.edit();
-            editor.putInt("time_gap", set_time_gap);
-            editor.apply();
-        }
-        else{
-            set_time_gap = time_gap;
-        }
-
         String[] time_gaps = new String[7];
         int i, gap;
         for(gap = 0, i = 0; gap < 31; i++, gap=gap+5){
@@ -209,7 +174,7 @@ public class Settings extends AppCompatActivity {
         timeGap.setMinValue(0);
         timeGap.setMaxValue(time_gaps.length-1);
         timeGap.setDisplayedValues(time_gaps);
-        timeGap.setValue(set_time_gap);
+        timeGap.setValue(sp.getInt("time_gap", 5));
         timeGap.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 
         AlertDialog.Builder timeGapBuilder = new AlertDialog.Builder(this);
@@ -220,10 +185,8 @@ public class Settings extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        int timeGapInt = timeGap.getValue();
-
                         SharedPreferences.Editor editor = sp.edit();
-                        editor.putInt("time_gap", timeGapInt);
+                        editor.putInt("time_gap", timeGap.getValue());
                         editor.apply();
                     }
                 })

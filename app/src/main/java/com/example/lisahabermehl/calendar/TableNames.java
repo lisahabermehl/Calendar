@@ -8,7 +8,7 @@ import android.provider.BaseColumns;
 
 public class TableNames {
 
-    public static final String DB_NAME = "myCalendar";
+    public static final String DB_NAME = "myCalendarActivity";
     public static final int DB_VERSION = 8;
 
     public class CalendarEntry implements BaseColumns {

@@ -7,18 +7,4 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="NewTheme" parent = "Theme.Design">
-
-
-        <item name="android:colorBackground">@color/common_google_signin_btn_text_dark_focused
-        </item>
-    </style>
-
-    <style name="Time_picker">
-        <item name="android:numbersTextColor" tools:targetApi="lollipop">#ffffff</item>
-        <item name="android:numbersBackgroundColor" tools:targetApi="lollipop">#643B85</item>
-        <item name="android:numbersSelectorColor" tools:targetApi="lollipop">#88000000</item>
-        <item name="android:headerBackground">#643B85</item>
-    </style>
-
 </resources>
