@@ -12,11 +12,7 @@
         android:orderInCategory="1"
         app:showAsAction="never"
         android:title="My Calendar"/>
-    <item
-        android:id="@+id/menu_todo"
-        android:orderInCategory="2"
-        app:showAsAction="never"
-        android:title="My Todo List"/>
+
     <item
         android:id="@+id/menu_settings"
         android:orderInCategory="3"

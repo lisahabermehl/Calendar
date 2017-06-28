@@ -30,7 +30,7 @@ public class Todo extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
     private TodoAdapter todoAdapter;
 
-    private ListView mTaskListView;
+    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +40,9 @@ public class Todo extends AppCompatActivity {
         databaseHelper = new DatabaseHelper(this);
 
         // initialize the list
-        mTaskListView = (ListView) findViewById(R.id.list_todo);
-        mTaskListView.setLongClickable(true);
-        mTaskListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        listView = (ListView) findViewById(R.id.list_todo);
+        listView.setLongClickable(true);
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view,
                                            int position, long id) {
@@ -65,13 +65,10 @@ public class Todo extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_add_task:
-                addTask();
+                addTodo();
                 return true;
             case R.id.menu_calendar:
                 startActivity(new Intent(this, MyCalendar.class));
-                return true;
-            case R.id.menu_todo:
-                startActivity(new Intent(this, Todo.class));
                 return true;
             case R.id.menu_settings:
                 startActivity(new Intent(this, Settings.class));
@@ -95,16 +92,16 @@ public class Todo extends AppCompatActivity {
         ArrayList<TodoObject> todoObject = new ArrayList<>();
 
         while (cursor.moveToNext()) {
-            int idx = cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE);
-            int idxx = cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DURATION);
-            int idxxx = cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DEADLINE);
-            TodoObject to = new TodoObject(cursor.getString(idx), cursor.getString(idxx), cursor.getString(idxxx));
+            String title = cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE));
+            String duration = cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DURATION));
+            String deadline = cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DEADLINE));
+            TodoObject to = new TodoObject(title, duration, deadline);
             todoObject.add(to);
         }
 
         if (todoAdapter == null) {
             todoAdapter = new TodoAdapter(this, 3, todoObject);
-            mTaskListView.setAdapter(todoAdapter);
+            listView.setAdapter(todoAdapter);
         } else {
             todoAdapter.clear();
             todoAdapter.addAll(todoObject);
@@ -114,10 +111,10 @@ public class Todo extends AppCompatActivity {
         db.close();
     }
 
-    private void addTask() {
+    private void addTodo() {
         LayoutInflater layoutInflater = LayoutInflater.from(this);
 
-        final View dialogView = layoutInflater.inflate(R.layout.alert_dialog, null);
+        final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_add_todo, null);
         final EditText description = (EditText) dialogView
                 .findViewById(R.id.new_todo);
         final EditText duration = (EditText) dialogView
@@ -202,7 +199,7 @@ public class Todo extends AppCompatActivity {
 
         LayoutInflater layoutInflater = LayoutInflater.from(this);
 
-        final View dialogView = layoutInflater.inflate(R.layout.alert_dialog, null);
+        final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_add_todo, null);
         final EditText title_edit_text = (EditText) dialogView
                 .findViewById(R.id.new_todo);
         title_edit_text.setText(title);

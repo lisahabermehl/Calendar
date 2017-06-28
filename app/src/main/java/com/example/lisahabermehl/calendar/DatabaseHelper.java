@@ -42,7 +42,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // on upgrade drop older tables
         db.execSQL("DROP TABLE IF EXISTS " + TableNames.CalendarEntry.TABLE_CALENDAR);
         db.execSQL("DROP TABLE IF EXISTS " + TableNames.TodoEntry.TABLE_TODO);
-        
+
         // create new tables
         onCreate(db);
     }

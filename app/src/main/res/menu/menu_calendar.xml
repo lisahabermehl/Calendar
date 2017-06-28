@@ -8,14 +8,13 @@
         app:showAsAction="always"
         android:icon="@drawable/refresh"
         android:title="Refresh"/>
-
     <item
-        android:id="@+id/menu_search"
+        android:id="@+id/search_by_title"
         app:showAsAction="always"
         android:icon="@drawable/search"
         android:title="Search"/>
     <item
-        android:id="@+id/menu_day"
+        android:id="@+id/search_by_date"
         android:icon="@drawable/calendar"
         android:title="Select date"
         app:showAsAction="always"/>

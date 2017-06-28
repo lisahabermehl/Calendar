@@ -6,10 +6,8 @@ package com.example.lisahabermehl.calendar;
  * Source code: http://www.viralandroid.com/2015/11/android-calendarview-example.html
  */
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -27,7 +25,6 @@ import android.widget.ListView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import java.sql.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -94,7 +91,6 @@ public class MyCalendar extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.refresh:
-
                 databaseHelper = new DatabaseHelper(this);
                 SQLiteDatabase db = databaseHelper.getWritableDatabase();
                 db.delete(TableNames.CalendarEntry.TABLE_CALENDAR, null, null);
@@ -104,9 +100,7 @@ public class MyCalendar extends AppCompatActivity {
                 extras.putString("zero", "get");
                 intent.putExtras(extras);
                 startActivity(intent);
-
-            case R.id.menu_search:
-
+            case R.id.search_by_title:
                 final EditText textView = new EditText(this);
 
                 final AlertDialog.Builder search_builder = new AlertDialog.Builder(this);
@@ -143,18 +137,16 @@ public class MyCalendar extends AppCompatActivity {
                         .show();
 
                 return true;
-            case R.id.menu_day:
-                LayoutInflater layoutInflaterDay = LayoutInflater.from(this);
-                final View dialogViewDay = layoutInflaterDay.inflate(R.layout.calendar_main, null);
+            case R.id.search_by_date:
+                final DatePicker datePicker = new DatePicker(this);
+                datePicker.setSpinnersShown(false);
 
                 AlertDialog.Builder builderDay = new AlertDialog.Builder(this);
                 builderDay
-                        .setView(dialogViewDay)
+                        .setView(datePicker)
                         .setPositiveButton("SELECT DATE", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                datePicker = (DatePicker) dialogViewDay.findViewById(R.id.search_by_date);
-
                                 String day = String.valueOf(datePicker.getDayOfMonth());
                                 String month = String.valueOf(datePicker.getMonth() + 1);
                                 String year = String.valueOf(datePicker.getYear());
@@ -164,7 +156,7 @@ public class MyCalendar extends AppCompatActivity {
                                 searchFor[0] = "date";
                                 searchFor[1] = date;
 
-                                updateUI(searchFor);
+//                                updateUI(searchFor);
                             }
                         })
                         .setNegativeButton("SHOW ALL DATES", new DialogInterface.OnClickListener() {
@@ -174,7 +166,7 @@ public class MyCalendar extends AppCompatActivity {
                                 searchFor[0] = "no";
                                 searchFor[1] = "no";
 
-                                updateUI(searchFor);
+//                                updateUI(searchFor);
                             }
                         })
                         .create()
@@ -182,7 +174,7 @@ public class MyCalendar extends AppCompatActivity {
                 return true;
             case R.id.insert_event:
                 LayoutInflater layoutInflater = LayoutInflater.from(this);
-                final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_insert_event, null);
+                final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_add_event, null);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder
