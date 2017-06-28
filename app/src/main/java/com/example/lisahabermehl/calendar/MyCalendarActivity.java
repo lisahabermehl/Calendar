@@ -33,36 +33,27 @@ import java.util.Calendar;
 
 public class MyCalendarActivity extends AppCompatActivity {
 
-    DatePicker datePicker;
-
     DatabaseHelper databaseHelper;
-
     MyCalendarAdapter myCalendarAdapter;
 
     // initialize a new calendarObject
     MyCalendarObject nextEvent;
 
     ListView calendarListView;
-    ListView todoListView;
 
-    int time_start, time_gap;
+    int time_start, time_gap, time_gap_morning, time_gap_evening, time_between_todos;
+    int currentTimeMin, currentTimeHour, currentTime, currentModulo, bedtime_start, bedtime_end;
+    int end_last_event_rise_ct, end_todo, duration, start_event;
     int time_end = 0;
     int time_end_old = 0;
     int i = 0;
-    int time_gap_morning;
-    int time_gap_evening;
-    int time_between_todos;
 
     String day;
 
     String[] searchFor = new String[2];
 
     String date_old = "nog niks";
-
-    int currentTimeMin, currentTimeHour, currentTime, currentModulo, bedtime_start, bedtime_end;
-
     String title_string, date_string, start_string, end_string, current_date, date_todo, begin, eind;
-    int end_last_event_rise_ct, end_todo, duration, start_event;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -321,14 +312,6 @@ public class MyCalendarActivity extends AppCompatActivity {
             time_gap_evening = Integer.valueOf(everythingToKnow[7]);
             time_gap_morning = Integer.valueOf(everythingToKnow[8]);
             date_todo = everythingToKnow[9];
-            Log.d("0", title_string);
-            Log.d("2", start_string);
-            Log.d("3", end_string);
-            Log.d("4", String.valueOf(end_last_event_rise_ct));
-            Log.d("5", current_date);
-            Log.d("6", String.valueOf(time_gap));
-            Log.d("7", String.valueOf(time_gap_evening));
-            Log.d("8", String.valueOf(time_gap_morning));
 
             // new is the new old, initialize here so it will be passed on the next nextEvent-call
             // date_old to determine if next event is on another day, hence to determine if the user will sleep in between
@@ -353,22 +336,11 @@ public class MyCalendarActivity extends AppCompatActivity {
                     end_todo = end_last_event_rise_ct + duration;
                     eind = convertToHour(end_todo);
 
-                    Log.d("TODO Title", todo_title_string);
-                    Log.d("TODO Date TD", date_todo);
-                    Log.d("TODO Begin", begin);
-                    Log.d("TODO Eind", eind);
-
                     MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_todo, begin, eind);
                     calendarObjects.add(todo);
                     time_gap = time_gap - (duration + time_between_todos);
                     // new is the new old
                     end_last_event_rise_ct = end_todo;
-                    Log.d("LAST EVENT END", String.valueOf(end_last_event_rise_ct));
-                    Log.d("END TODO", String.valueOf(end_todo));
-                    Log.d("TIME GAP BETWEEN TODOS", String.valueOf(time_between_todos));
-
-
-                    // is it a time gap that has a part 1 before bedtime and a part 2 after bedtime?
                 } else if (time_gap_evening > duration) {
                     // convert minutes to HH:mm
                     begin = convertToHour(end_last_event_rise_ct + time_between_todos);
@@ -376,9 +348,6 @@ public class MyCalendarActivity extends AppCompatActivity {
                     end_todo = end_last_event_rise_ct + duration;
                     eind = convertToHour(end_todo);
 
-                    Log.d("TODO Title", todo_title_string);
-                    Log.d("TODO Begin", begin);
-                    Log.d("TODO Eind", eind);
                     MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_todo, begin, eind);
                     calendarObjects.add(todo);
 
@@ -402,10 +371,6 @@ public class MyCalendarActivity extends AppCompatActivity {
                         end_todo = end_last_event_rise_ct + duration;
                         eind = convertToHour(end_todo);
                     }
-                    Log.d("TODO Title", todo_title_string);
-                    Log.d("TODO Date", date_string);
-                    Log.d("TODO Begin", begin);
-                    Log.d("TODO Eind", eind);
                     MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string, begin, eind);
                     calendarObjects.add(todo);
 
@@ -437,15 +402,6 @@ public class MyCalendarActivity extends AppCompatActivity {
                     time_gap = Integer.valueOf(everythingToKnow[6]);
                     time_gap_morning = Integer.valueOf(everythingToKnow[7]);
                     time_gap_evening = Integer.valueOf(everythingToKnow[8]);
-                    Log.d("0", title_string);
-                    Log.d("1", date_string);
-                    Log.d("2", start_string);
-                    Log.d("3", end_string);
-                    Log.d("4", String.valueOf(end_last_event_rise_ct));
-                    Log.d("5", current_date);
-                    Log.d("6", String.valueOf(time_gap));
-                    Log.d("7", String.valueOf(time_gap_evening));
-                    Log.d("8", String.valueOf(time_gap_morning));
 
                     // new is the new old
                     date_old = date_string;
@@ -457,9 +413,7 @@ public class MyCalendarActivity extends AppCompatActivity {
             calendarObjects.add(nextEvent);
 
             while (cursor.moveToNext()) {
-
                 everythingToKnow = nextEvent(cursor, date_old, time_end_old);
-
                 title_string = everythingToKnow[0];
                 date_string = everythingToKnow[1];
                 start_string = everythingToKnow[2];
@@ -539,11 +493,8 @@ public class MyCalendarActivity extends AppCompatActivity {
         if(currentModulo > 0 && currentModulo < 10){
             currentTimeMin = (currentTimeMin - currentModulo) + 10;
         }
-        Log.d("CURRENT MODULO", String.valueOf(currentModulo));
         currentTimeHour = Integer.valueOf(new SimpleDateFormat("HH").format(Calendar.getInstance().getTime()));
         currentTime = (currentTimeHour * 60) + currentTimeMin;
-        Log.d("CURRENT TIME", String.valueOf(currentTime));
-        Log.d("CURRENT REAL TIME", convertToHour(currentTime));
 
         if (!cursor.isAfterLast()){
 
@@ -553,25 +504,15 @@ public class MyCalendarActivity extends AppCompatActivity {
             date_string = cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_DATE));
             start_string = cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_START));
             end_string = cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_END));
-            Log.d("NE: TITLE", title_string);
-            Log.d("NE: DATE", date_string);
-            Log.d("CURRENT DATE", current_date);
-            Log.d("OLD DATE", date_old);
-            Log.d("NE: START", start_string);
-            Log.d("NE: END", end_string);
 
             time_end = convertToMins(end_string);
             time_start = convertToMins(start_string);
-            Log.d("START MIN", String.valueOf(time_start));
-            Log.d("END MIN", String.valueOf(time_end));
 
             // check if the next event is on the same day as the last event
             if (date_string.equals(date_old)) {
 
                 day = "same day";
                 date_todo = date_string;
-
-                Log.d("SAME SAME DAY", day);
 
                 time_gap = time_start - end_last_event_rise_ct;
                 // end_last_event stays the same
@@ -581,11 +522,8 @@ public class MyCalendarActivity extends AppCompatActivity {
             // so, check if the first event is today
             // what if the first event is tomorrow
             else if (date_string.equals(current_date) && date_old.equals("nog niks")){
-
                 day = "today";
                 date_todo = date_string;
-
-                Log.d("TODAY TODAY TODAY", day);
 
                 // check how much time there is between current time and start of next activity
                 time_gap = time_start - currentTime;
