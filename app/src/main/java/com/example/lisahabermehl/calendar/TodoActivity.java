@@ -131,9 +131,9 @@ public class TodoActivity extends AppCompatActivity {
                                 String task = String.valueOf(description.getText());
                                 String time = String.valueOf(duration.getText());
                                 int day = deadline.getDayOfMonth();
-                                int month = deadline.getMonth();
+                                int month = deadline.getMonth()+1;
                                 int year = deadline.getYear();
-                                String deadline = String.valueOf(year + "-" + month + "-" + day);
+                                String deadline = String.valueOf(year + "-0" + month + "-" + day);
 
                                 SQLiteDatabase db = databaseHelper.getWritableDatabase();
 
