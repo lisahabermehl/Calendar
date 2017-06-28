@@ -56,14 +56,11 @@ public class MyCalendar extends AppCompatActivity {
     String[] searchFor = new String[2];
 
     String date_old = "nog niks";
-    String date_new;
 
-    String currentDate;
     int currentTimeMin, currentTimeHour, currentTime, currentModulo;
 
-    String time_gap_string, title_string, date_string, start_string, end_string,
-            end_last_event_string, bedtime, move;
-    int end_last_event_rise_ct, end_todo, duration, start_event, time_gap_part1, time_gap_part2;
+    String title_string, date_string, start_string, end_string, current_date;
+    int end_last_event_rise_ct, end_todo, duration, start_event;
     int time_gap_between_todos = 0;
     int bedtime_start = (23*60);
     int bedtime_end = (7*60);
@@ -314,26 +311,13 @@ public class MyCalendar extends AppCompatActivity {
         todo_cursor.moveToFirst();
         todo_cursor.moveToPrevious();
 
-        // calculate current date
-        currentDate = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
-
-        // calculate current time and convert to int
-        // first minutes
-        currentTimeMin = Integer.valueOf(new SimpleDateFormat("mm").format(Calendar.getInstance().getTime())) ;
-
-        int currentModulo = currentTimeMin % 10;
-        if(currentModulo > 0 && currentModulo < 10){
-            currentTimeMin = (currentTimeMin - currentModulo) + 10;
-        }
-        Log.d("1 CURRENT MODULO", String.valueOf(currentModulo));
-        // then hour
-        currentTimeHour = Integer.valueOf(new SimpleDateFormat("HH").format(Calendar.getInstance().getTime()));
-        currentTime = (currentTimeHour * 60) + currentTimeMin;
-
         // if not looking for specific date or title
         if(search_for[0].equals("no")){
 
             int i = 0;
+
+            Log.d("DATE OLD", date_old);
+            Log.d("TIME END OLD", String.valueOf(time_end_old));
 
             // get details of next event
             String[] everythingToKnow = nextEvent(cursor, date_old, time_end_old);
@@ -345,23 +329,25 @@ public class MyCalendar extends AppCompatActivity {
             start_string = everythingToKnow[2];
             end_string = everythingToKnow[3];
             end_last_event_rise_ct = Integer.valueOf(everythingToKnow[4]);
-            bedtime = everythingToKnow[5];
+            current_date = everythingToKnow[5];
             time_gap = Integer.valueOf(everythingToKnow[6]);
             time_gap_evening = Integer.valueOf(everythingToKnow[7]);
             time_gap_morning = Integer.valueOf(everythingToKnow[8]);
-
-
-            Log.d("3 TITLE", title_string);
-            Log.d("3 TIME END OLD", String.valueOf(time_end_old));
-            Log.d("3 TIME GAP", time_gap_string);
-            Log.d("3 START", start_string);
-            Log.d("3 END", end_string);
+            Log.d("0", title_string);
+            Log.d("1", date_string);
+            Log.d("2", start_string);
+            Log.d("3", end_string);
+            Log.d("4", String.valueOf(end_last_event_rise_ct));
+            Log.d("5", current_date);
+            Log.d("6", String.valueOf(time_gap));
+            Log.d("7", String.valueOf(time_gap_evening));
+            Log.d("8", String.valueOf(time_gap_morning));
 
             // new is the new old, initialize here so it will be passed on the next nextEvent-call
             // date_old to determine if next event is on another day, hence to determine if the user will sleep in between
             date_old = date_string;
-
-            start_event = Integer.valueOf(convertToMins(start_string));
+            start_event = convertToMins(start_string);
+            Log.d("START EVENT", String.valueOf(start_event));
 
             // get todos one at a time, they are already organized on importance
             while(todo_cursor.moveToNext()) {
@@ -375,7 +361,7 @@ public class MyCalendar extends AppCompatActivity {
 
                 // calculate end of todo
                 end_todo = end_last_event_rise_ct + Integer.valueOf(todo_duration_string);
-                
+
                 // convert minutes to HH:mm
                 String begin = convertToHour(end_last_event_rise_ct);
                 String eind = convertToHour(end_todo);
@@ -384,36 +370,38 @@ public class MyCalendar extends AppCompatActivity {
                 end_last_event_rise_ct = end_todo;
 
                 // time_gap = start_activity - end_activity_rise_ct
-                if (time_gap > duration && currentTime > end_last_event_rise_ct) {
+                // is it a "normal" time gap
+                if (time_gap > duration) {
                     MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string, begin, eind);
                     calendarObjects.add(todo);
                     time_gap = time_gap - duration;
-                } else if (bedtime.equals("yes")) {
-                    if (time_gap_evening > duration) {
-                        MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string, begin, eind);
-                        calendarObjects.add(todo);
+                // is it a time gap that has a part 1 before bedtime and a part 2 after bedtime?
+                } else if (time_gap_evening > duration) {
 
-                        i = 0;
+                    MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string, begin, eind);
+                    calendarObjects.add(todo);
 
-                        time_gap_evening = time_gap_evening - duration;
-                    } else if (time_gap_morning > duration) {
-                        if (i == 0) {
+                    i = 0;
 
-                            String bed_start = convertToHour(bedtime_start);
-                            String bed_end = convertToHour(bedtime_end);
+                    time_gap_evening = time_gap_evening - duration;
+                    // if time gap after bedtime isn't filled yet
+                } else if (time_gap_morning > duration) {
+                    // first make sure that the bedtimes are printed in Calendar
+                    if (i == 0) {
 
-                            MyCalendarObject to2 = new MyCalendarObject("Bedtime", date_string + " +1", bed_start, bed_end);
-                            calendarObjects.add(to2);
-                        }
+                        String bed_start = convertToHour(bedtime_start);
+                        String bed_end = convertToHour(bedtime_end);
 
+                        MyCalendarObject to2 = new MyCalendarObject("Bedtime", date_string + " +1", bed_start, bed_end);
+                        calendarObjects.add(to2);
+                    }
 
-                        if (i == 0) {
-                            begin = convertToHour(bedtime_end);
-
-                            eind = convertToHour(bedtime_end + duration);
-
-                            end_last_event_rise_ct = bedtime_end;
-                        }
+                    // after that we can calculate the start time and end time of a todo
+                    if (i == 0) {
+                        begin = convertToHour(bedtime_end);
+                        eind = convertToHour(bedtime_end + duration);
+                        end_last_event_rise_ct = bedtime_end;
+                    }
 
                         MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string, begin, eind);
                         calendarObjects.add(todo);
@@ -421,33 +409,42 @@ public class MyCalendar extends AppCompatActivity {
                         i = i + 1;
 
                         time_gap_morning = time_gap_morning - duration;
-                    } else {
-                        // make sure cursor doesn't skip a to do
-                        todo_cursor.moveToPrevious();
+                    // else all the time gaps are filled and we should look for a next event
+                } else {
+                    // make sure cursor doesn't skip a to do
+                    todo_cursor.moveToPrevious();
 
-                        // gap is filled, so next event can be added
-                        nextEvent = new MyCalendarObject(title_string, date_string, start_string, end_string);
-                        calendarObjects.add(nextEvent);
+                    // gap is filled, so next event can be added
+                    nextEvent = new MyCalendarObject(title_string, date_string, start_string, end_string);
+                    calendarObjects.add(nextEvent);
 
-                        time_end_old = convertToMins(end_string);
+                    end_last_event_rise_ct = convertToMins(end_string);
 
-                        // look for the next event (and check how big the gap is)
-                        everythingToKnow = nextEvent(cursor, date_old, time_end_old);
+                    cursor.moveToNext();
+                    // look for the next event (and check how big the gap is)
+                    everythingToKnow = nextEvent(cursor, date_old, time_end_old);
 
-                        time_gap = Integer.valueOf(everythingToKnow[0]);
-                        Log.d("TIME GAP", String.valueOf(time_gap));
-                        title_string = everythingToKnow[1];
-                        date_string = everythingToKnow[2];
-                        start_string = everythingToKnow[3];
-                        end_string = everythingToKnow[4];
-                        bedtime = everythingToKnow[5];
-                        end_last_event_string = everythingToKnow[6];
+                    title_string = everythingToKnow[0];
+                    date_string = everythingToKnow[1];
+                    start_string = everythingToKnow[2];
+                    end_string = everythingToKnow[3];
+                    end_last_event_rise_ct = Integer.valueOf(everythingToKnow[4]);
+                    current_date = everythingToKnow[5];
+                    time_gap = Integer.valueOf(everythingToKnow[6]);
+                    time_gap_morning = Integer.valueOf(everythingToKnow[7]);
+                    time_gap_evening = Integer.valueOf(everythingToKnow[8]);
+                    Log.d("0", title_string);
+                    Log.d("1", date_string);
+                    Log.d("2", start_string);
+                    Log.d("3", end_string);
+                    Log.d("4", String.valueOf(end_last_event_rise_ct));
+//            Log.d("5", bedtime);
+                    Log.d("6", String.valueOf(time_gap));
+                    Log.d("7", String.valueOf(time_gap_evening));
+                    Log.d("8", String.valueOf(time_gap_morning));
 
-                        end_last_event_rise_ct = Integer.valueOf(end_last_event_string);
-
-                        // new is the new old
-                        date_old = date_string;
-                    }
+                    // new is the new old
+                    date_old = date_string;
                 }
             }
 
@@ -459,15 +456,10 @@ public class MyCalendar extends AppCompatActivity {
 
                 everythingToKnow = nextEvent(cursor, date_old, time_end_old);
 
-                title_string = everythingToKnow[1];
-                date_string = everythingToKnow[2];
-                start_string = everythingToKnow[3];
-                end_string = everythingToKnow[4];
-                Log.d("TITLE", title_string);
-                Log.d("TIME END OLD", String.valueOf(time_end_old));
-                Log.d("TIME GAP", time_gap_string);
-                Log.d("START", start_string);
-                Log.d("END", end_string);
+                title_string = everythingToKnow[0];
+                date_string = everythingToKnow[1];
+                start_string = everythingToKnow[2];
+                end_string = everythingToKnow[3];
 
                 nextEvent = new MyCalendarObject(title_string, date_string, start_string, end_string);
                 calendarObjects.add(nextEvent);
@@ -527,15 +519,15 @@ public class MyCalendar extends AppCompatActivity {
     private String[] nextEvent(Cursor cursor, String date_old, int time_end_old){
 
         String title_string, date_string, start_string, end_string, bedtime;
-        String end_last_event_string = String.valueOf(time_end_old);
 
         int bedtime_start = (23*60);
         int bedtime_end = (7*60);
-        int move = 0;
 
         bedtime = "no";
+        time_gap_evening = 0;
+        time_gap_morning = 0;
 
-        currentDate = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+        current_date = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
         currentTimeMin = Integer.valueOf(new SimpleDateFormat("mm").format(Calendar.getInstance().getTime()));
 
         currentModulo = currentTimeMin % 10;
@@ -548,10 +540,8 @@ public class MyCalendar extends AppCompatActivity {
         currentTimeHour = Integer.valueOf(new SimpleDateFormat("HH").format(Calendar.getInstance().getTime()));
         currentTime = (currentTimeHour * 60) + currentTimeMin;
 
-        while (convertToMins(cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_END))) < currentTime &&
-                currentDate.equals(cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_DATE)))){
-            cursor.moveToNext();
-        }
+        Log.d("CURRENT TIME", String.valueOf(currentTime));
+        Log.d("CURRENT REAL TIME", convertToHour(currentTime));
 
         if (!cursor.isAfterLast()){
 
@@ -561,24 +551,36 @@ public class MyCalendar extends AppCompatActivity {
             date_string = cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_DATE));
             start_string = cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_START));
             end_string = cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_END));
-            Log.d("TITLE", title_string);
+            Log.d("NE: TITLE", title_string);
+            Log.d("NE: DATE", date_string);
+            Log.d("CURRENT DATE", current_date);
+            Log.d("OLD DATE", date_old);
+            Log.d("NE: START", start_string);
+            Log.d("NE: END", end_string);
 
             time_end = convertToMins(end_string);
             time_start = convertToMins(start_string);
+            Log.d("START MIN", String.valueOf(time_start));
+            Log.d("END MIN", String.valueOf(time_end));
 
             // check if the next event is on the same day as the last event
             if (date_string.equals(date_old)) {
 
                 day = "same day";
+
+                Log.d("SAME SAME DAY", day);
+
                 time_gap = time_start - time_end_old;
                 end_last_event_rise_ct = time_end_old;
             }
             // it's also possible that date_old is empty, therefore it's impossible to be on the same date as date_new
             // so, check if the first event is today
             // what if the first event is tomorrow
-            else if (date_string.equals(currentDate) && date_old.equals("nog niks")){
+            else if (date_string.equals(current_date) && date_old.equals("nog niks")){
 
                 day = "today";
+
+                Log.d("TODAY TODAY TODAY", day);
 
                 // check how much time there is between current time and start of next activity
                 time_gap = time_start - currentTime;
@@ -589,6 +591,8 @@ public class MyCalendar extends AppCompatActivity {
             // but after filling this gap between the last and bedtime
             // we can also fill the gap between waking up and the next event
             else {
+
+                    Log.d("ELSE", bedtime);
                     bedtime = "yes";
                     time_gap_evening = bedtime_start - time_end_old;
                     time_gap = 0;
@@ -600,12 +604,13 @@ public class MyCalendar extends AppCompatActivity {
             sendBack[2] = start_string;
             sendBack[3] = end_string;
             sendBack[4] = String.valueOf(end_last_event_rise_ct);
-            sendBack[5] = bedtime;
+            sendBack[5] = current_date;
             sendBack[6] = String.valueOf(time_gap);
             sendBack[7] = String.valueOf(time_gap_evening);
             sendBack[8] = String.valueOf(time_gap_morning);
 //            sendBack[9] = String.valueOf(move);
 //            Log.d("MOVE MOVE MOVE", String.valueOf(move));
+
 
             return sendBack;
         }
