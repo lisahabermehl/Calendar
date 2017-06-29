@@ -8,6 +8,7 @@ This app originated from my own lack of planning in my daily life. There are so 
 
 ### My Calendar
 ![](https://github.com/lisahabermehl/Calendar/blob/master/docs/img/Calendar_1.jpg)
+
 The app will be connected to your own Google Calendar. The goal of this tool is to give you an overview of the events that you've already planned in your Google Calendar and suggestions for when you could do the items from you Todo list 
 
 ### Todo list
