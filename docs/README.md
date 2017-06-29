@@ -7,7 +7,7 @@
 This app originated from my own lack of planning in my daily life. There are so many times that I regret procrastinating my schoolwork and there are so many times that I plan on doing it different next time, but in the end I don't. So, this app might be handy for people who have a hard time planning their schoolwork (or are just too lazy to do it): what am I supposed to do, how much time do I have and what is the best way to spread this over the days while the events that are already planned in my calendar aren't forgotten. To help the user in all of these things the following tools are available in the app:
 
 ### My Calendar
-![](https://github.com/lisahabermehl/Calendar/blob/master/docs/img/Calendar_1.jpg) 
+![](https://github.com/lisahabermehl/Calendar/blob/master/docs/img/Calendar_1.jpg)
 The app will be connected to your own Google Calendar. The goal of this tool is to give you an overview of the events that you've already planned in your Google Calendar and suggestions for when you could do the items from you Todo list 
 
 ### Todo list
