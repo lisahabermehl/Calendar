@@ -14,16 +14,10 @@ This app originated from my own lack of planning in my daily life. There are so 
 
 2. An extra feature of this app is the Todo list. 
 
-![](https://github.com/lisahabermehl/Calendar/blob/master/docs/img/Calendar_3.jpg)
+![](https://github.com/lisahabermehl/Calendar/blob/master/docs/img/Calendar_4.jpg)
 
-* In the settings the user can install how much time he/she spends on reading one page or how much time he/she wants to spend on writing an essay and how many days should be planned for this. 
-
-### Visual sketch
-
-![](docs/img/image.jpg)
-
-### How does it work?
-Firstly there will be a login screen where the user can log in with Firebase. The idea for using this is that the Todo list items can be stored in Firebase's database. But since it's not really necessary and since it's also possible to do this with the SQLite database, I'll probably skip this login option. After logging in (or not  ;)) the user will end up in the Calendar. 
+3. In the settings the user can install how much time he/she spends on reading one page or how much time he/she wants to spend on writing an essay and how many days should be planned for this. 
+ 
 ##### My calendar
 * An overview of Google Calendar AND the items from the Todo list
 * The items from the Todo list will be added considering the following things: when the subitem has to be done, how time the user will probably spend doing it (looking at the amount of time spend on reading one page, how many pages have to be read), what activities are already on the calendar
