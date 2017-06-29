@@ -11,6 +11,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 /**
+ * To organize all the details of a single Todo item.
+ *
  * https://www.sitepoint.com/custom-data-layouts-with-your-own-android-arrayadapter/
  */
 

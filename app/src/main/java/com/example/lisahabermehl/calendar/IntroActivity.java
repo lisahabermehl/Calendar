@@ -1,7 +1,7 @@
 package com.example.lisahabermehl.calendar;
 
 /**
- * Everything that has to do with/is need to log a user in.
+ * This class makes it possible to show an intro screen which says "MY CALENDAR".
  */
 
 import android.content.Intent;
@@ -27,7 +27,7 @@ public class IntroActivity extends AppCompatActivity {
         animation.setFillAfter(true);
         animation.setDuration(4000);
 
-        //apply the animation ( fade In ) to your LAyout
+        // apply the animation (fade In) to the layout
         linearLayout.startAnimation(animation);
 
         int secondsDelayed = 5;

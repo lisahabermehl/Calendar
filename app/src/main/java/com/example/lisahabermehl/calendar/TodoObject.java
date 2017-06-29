@@ -2,6 +2,8 @@ package com.example.lisahabermehl.calendar;
 
 /**
  * Created by lisahabermehl on 14/06/2017.
+ *
+ * Makes it possible to get specific details of a single Todo item.
  */
 
 public class TodoObject {

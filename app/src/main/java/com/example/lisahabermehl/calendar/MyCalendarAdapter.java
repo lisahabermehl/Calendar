@@ -14,6 +14,8 @@ import java.util.ArrayList;
 
 /**
  * Created by lisahabermehl on 14/06/2017.
+ *
+ * To organize all the details of a single Calendar item.
  */
 
 public class MyCalendarAdapter extends ArrayAdapter<MyCalendarObject> {

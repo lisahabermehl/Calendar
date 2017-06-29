@@ -5,6 +5,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
+ * This class makes tables if a table doesn't exist, and has an option to drop a table and
+ * make a whole new one if a column is added or if a name is changed.
+ *
  * http://www.androidhive.info/2013/09/android-sqlite-database-with-multiple-tables/
  */
 

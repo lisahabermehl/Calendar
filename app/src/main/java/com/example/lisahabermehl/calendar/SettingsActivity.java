@@ -18,6 +18,11 @@ import android.widget.Toast;
 
 /**
  * Created by lisahabermehl on 09/06/2017.
+ *
+ * Everything that has to do with personalising the Todo suggestions to the user:
+ * what time does the user go to bed, what time does he/she wakes up,
+ * how much time does the user want to have between events and todo items,
+ * and for how many days does the user want to plan something.
  */
 
 public class SettingsActivity extends AppCompatActivity {

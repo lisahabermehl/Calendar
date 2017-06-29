@@ -50,6 +50,9 @@ import pub.devrel.easypermissions.EasyPermissions;
 /**
  * I used the following sample code to make this work:
  * https://developers.google.com/google-apps/calendar/quickstart/android
+ *
+ * With this class it's possible to fetch existing events from Google Calendar,
+ * and it's possible to add new events to Google Calendar.
  */
 
 public class GoogleCalendar extends Activity implements EasyPermissions.PermissionCallbacks {
@@ -336,8 +339,6 @@ public class GoogleCalendar extends Activity implements EasyPermissions.Permissi
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
                     Date startDate = simpleDateFormat.parse(params[2]);
                     Date endDate = simpleDateFormat.parse(params[3]);
-                    Log.d("Startdate", String.valueOf(startDate));
-                    Log.d("Enddate", String.valueOf(endDate));
 
                     return insertEvent(title, startDate, endDate);
                 } catch (ParseException e) {
@@ -429,7 +430,6 @@ public class GoogleCalendar extends Activity implements EasyPermissions.Permissi
 
             }
             return eventStrings;
-
         }
 
         private List<String> insertEvent(String des, Date startDate, Date endDate) {
@@ -451,21 +451,19 @@ public class GoogleCalendar extends Activity implements EasyPermissions.Permissi
                     .setStart(start)
                     .setEnd(end);
 
-            Log.d("Start date", String.valueOf(startDate));
-            Log.d("End date", String.valueOf(endDate));
-            Log.d("Start datetime", String.valueOf(startDateTime));
-            Log.d("End datetime", String.valueOf(endDateTime));
-
             String calendarId = "primary";
 
             if(mService!=null)
                 try {
-                    Log.d("Added?", "big chance");
                     mService.events().insert(calendarId, event).execute();
-                    Log.d("Added?", "bigger chance");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            try {
+                getDataFromApi();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return eventStrings;
         }
 
@@ -482,7 +480,6 @@ public class GoogleCalendar extends Activity implements EasyPermissions.Permissi
             if (output == null || output.size() == 0) {
                 mOutputText.setText("No results returned.");
             } else {
-//                mOutputText.setText(String.valueOf(output));
                 startActivity(new Intent(GoogleCalendar.this, MyCalendarActivity.class));
                 finish();
             }

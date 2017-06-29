@@ -4,6 +4,8 @@ import android.provider.BaseColumns;
 
 /**
  * Created by lisahabermehl on 24/06/2017.
+ *
+ * All the names of tables and colums are stored in this class, for consistency's sake.
  */
 
 public class TableNames {

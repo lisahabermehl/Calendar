@@ -24,6 +24,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 /**
+ * With this class the user can make Todo items which will be stored in a database.
+ * Besides this it's also possible to delete Todo items and edit these.
+ *
  * https://www.sitepoint.com/starting-android-development-creating-todo-app/
  */
 
@@ -80,8 +83,10 @@ public class TodoActivity extends AppCompatActivity {
         }
     }
 
-    // to see the updated data you need to call the updateUI method every time the underlying data of the app changes
-    // so we add it in two places: onCreate() and after adding a new task using the AlertDialog
+    /**
+     * To see the updated data you need to call the updateUI method every time the underlying data of the app changes.
+     * So we add it in two places: onCreate() and after adding a new task using the AlertDialog
+     */
     private void updateUI() {
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         Cursor cursor = db.query(TableNames.TodoEntry.TABLE_TODO,
@@ -137,7 +142,11 @@ public class TodoActivity extends AppCompatActivity {
                                 if ((deadline.getMonth()+1) > 0 & (deadline.getMonth()+1) < 10){
                                     month = "0" + month;
                                 }
-                                String deadline_string = String.valueOf(deadline.getYear() + "-" + month + "-" + deadline.getDayOfMonth());
+                                String day = String.valueOf(deadline.getDayOfMonth());
+                                if (deadline.getDayOfMonth() > 0 & deadline.getDayOfMonth() < 10){
+                                    day = "0" + day;
+                                }
+                                String deadline_string = String.valueOf(deadline.getYear() + "-" + month + "-" + day);
 
                                 if (todo.length() < 1){
                                     Toast.makeText(TodoActivity.this, "Please enter a title for this Todo item", Toast.LENGTH_SHORT).show();
@@ -230,20 +239,32 @@ public class TodoActivity extends AppCompatActivity {
                                 if ((deadline_edit_text.getMonth()+1) > 0 & (deadline_edit_text.getMonth()+1) < 10){
                                     month = "0" + month;
                                 }
-                                String deadline = String.valueOf(deadline_edit_text.getYear() + "-" + month + "-" + deadline_edit_text.getDayOfMonth());
+                                String day = String.valueOf(deadline_edit_text.getDayOfMonth());
+                                if (deadline_edit_text.getDayOfMonth() > 0 & deadline_edit_text.getDayOfMonth() < 10){
+                                    day = "0" + day;
+                                }
+                                String deadline = String.valueOf(deadline_edit_text.getYear() + "-" + month + "-" + day);
 
-                                SQLiteDatabase db = databaseHelper.getWritableDatabase();
+                                if (task.length() < 1){
+                                    Toast.makeText(TodoActivity.this, "Please enter a title for this Todo item", Toast.LENGTH_SHORT).show();
+                                }
+                                else if (time.length() < 1){
+                                    Toast.makeText(TodoActivity.this, "Please enter an estimated duration for this Todo item", Toast.LENGTH_SHORT).show();
+                                }
+                                else{
+                                    SQLiteDatabase db = databaseHelper.getWritableDatabase();
 
-                                ContentValues values = new ContentValues();
-                                values.put(TableNames.TodoEntry.COL_TODO_TITLE, task);
-                                values.put(TableNames.TodoEntry.COL_TODO_DURATION, time);
-                                values.put(TableNames.TodoEntry.COL_TODO_DEADLINE, deadline);
-                                db.update(TableNames.TodoEntry.TABLE_TODO,
-                                        values, TableNames.TodoEntry.COL_TODO_TITLE + "=?",
-                                        new String[]{todo_title_old});
-                                Log.d("TODO TITLE OLD", todo_title_old );
-                                db.close();
-                                updateUI();
+                                    ContentValues values = new ContentValues();
+                                    values.put(TableNames.TodoEntry.COL_TODO_TITLE, task);
+                                    values.put(TableNames.TodoEntry.COL_TODO_DURATION, time);
+                                    values.put(TableNames.TodoEntry.COL_TODO_DEADLINE, deadline);
+                                    db.update(TableNames.TodoEntry.TABLE_TODO,
+                                            values, TableNames.TodoEntry.COL_TODO_TITLE + "=?",
+                                            new String[]{todo_title_old});
+                                    Log.d("TODO TITLE OLD", todo_title_old );
+                                    db.close();
+                                    updateUI();
+                                }
                             }
                         })
                 .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
