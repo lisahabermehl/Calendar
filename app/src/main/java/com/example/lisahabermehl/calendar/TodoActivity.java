@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -132,10 +133,11 @@ public class TodoActivity extends AppCompatActivity {
                                 String todo = String.valueOf(description.getText());
                                 String time = String.valueOf(duration.getText());
 
-                                int day = deadline.getDayOfMonth();
-                                int month = deadline.getMonth()+1;
-                                int year = deadline.getYear();
-                                String deadline = String.valueOf(year + "-0" + month + "-" + day);
+                                String month = String.valueOf(deadline.getMonth()+1);
+                                if ((deadline.getMonth()+1) > 0 & (deadline.getMonth()+1) < 10){
+                                    month = "0" + month;
+                                }
+                                String deadline_string = String.valueOf(deadline.getYear() + "-" + month + "-" + deadline.getDayOfMonth());
 
                                 if (todo.length() < 1){
                                     Toast.makeText(TodoActivity.this, "Please enter a title for this Todo item", Toast.LENGTH_SHORT).show();
@@ -149,7 +151,7 @@ public class TodoActivity extends AppCompatActivity {
                                     ContentValues values = new ContentValues();
                                     values.put(TableNames.TodoEntry.COL_TODO_TITLE, todo);
                                     values.put(TableNames.TodoEntry.COL_TODO_DURATION, time);
-                                    values.put(TableNames.TodoEntry.COL_TODO_DEADLINE, deadline);
+                                    values.put(TableNames.TodoEntry.COL_TODO_DEADLINE, deadline_string);
                                     db.insertWithOnConflict(TableNames.TodoEntry.TABLE_TODO,
                                             null,
                                             values,
@@ -239,6 +241,7 @@ public class TodoActivity extends AppCompatActivity {
                                 db.update(TableNames.TodoEntry.TABLE_TODO,
                                         values, TableNames.TodoEntry.COL_TODO_TITLE + "=?",
                                         new String[]{todo_title_old});
+                                Log.d("TODO TITLE OLD", todo_title_old );
                                 db.close();
                                 updateUI();
                             }
