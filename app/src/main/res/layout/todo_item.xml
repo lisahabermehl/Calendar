@@ -12,7 +12,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/task_title"
+            android:id="@+id/todo_title"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:layout_gravity="left"
@@ -22,7 +22,7 @@
             android:longClickable="true"/>
 
         <TextView
-            android:id="@+id/task_duration"
+            android:id="@+id/todo_duration"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:layout_gravity="left"
@@ -30,7 +30,7 @@
             android:longClickable="true"/>
 
         <TextView
-            android:id="@+id/task_deadline"
+            android:id="@+id/todo_deadline"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:layout_gravity="left"
@@ -41,7 +41,7 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/task_edit"
+        android:id="@+id/todo_edit"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"

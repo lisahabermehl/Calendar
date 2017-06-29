@@ -120,7 +120,7 @@ public class TodoActivity extends AppCompatActivity {
         final EditText duration = (EditText) dialogView
                 .findViewById(R.id.time_needed);
         final DatePicker deadline = (DatePicker) dialogView
-                .findViewById(R.id.task_deadline);
+                .findViewById(R.id.todo_deadline);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder
@@ -161,7 +161,7 @@ public class TodoActivity extends AppCompatActivity {
 
     public void deleteTask(View view) {
         View parent = (View) view.getParent();
-        TextView taskTextView = (TextView) parent.findViewById(R.id.task_title);
+        TextView taskTextView = (TextView) parent.findViewById(R.id.todo_title);
         String task = String.valueOf(taskTextView.getText());
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         db.delete(TableNames.TodoEntry.TABLE_TODO,
@@ -173,8 +173,8 @@ public class TodoActivity extends AppCompatActivity {
 
     public void editTask(View view){
         View parent = (View) view.getParent();
-        TextView taskTextView = (TextView) parent.findViewById(R.id.task_title);
-        final String task_title_old = String.valueOf(taskTextView.getText());
+        TextView todoTextView = (TextView) parent.findViewById(R.id.todo_title);
+        final String todo_title_old = String.valueOf(todoTextView.getText());
 
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         Cursor cursor = db.query(TableNames.TodoEntry.TABLE_TODO,
@@ -189,7 +189,7 @@ public class TodoActivity extends AppCompatActivity {
         String deadline = null;
 
         while (cursor.moveToNext()) {
-            if(cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE)).equals(task_title_old)){
+            if(cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE)).equals(todo_title_old)){
                 title = cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE));
                 duration = cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DURATION));
                 deadline = cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DEADLINE));
@@ -207,7 +207,7 @@ public class TodoActivity extends AppCompatActivity {
                 .findViewById(R.id.time_needed);
         duration_edit_text.setText(duration);
         final DatePicker deadline_edit_text = (DatePicker) dialogView
-                .findViewById(R.id.task_deadline);
+                .findViewById(R.id.todo_deadline);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder
@@ -230,7 +230,7 @@ public class TodoActivity extends AppCompatActivity {
                                 values.put(TableNames.TodoEntry.COL_TODO_DEADLINE, deadline);
                                 db.update(TableNames.TodoEntry.TABLE_TODO,
                                         values, TableNames.TodoEntry.COL_TODO_TITLE + "=?",
-                                        new String[]{task_title_old});
+                                        new String[]{todo_title_old});
                                 db.close();
                                 updateUI();
                             }

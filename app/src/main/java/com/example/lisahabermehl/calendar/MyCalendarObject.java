@@ -5,21 +5,21 @@ package com.example.lisahabermehl.calendar;
  */
 
 public class MyCalendarObject {
-    private String activity;
+    private String event;
     private String date;
     private String start;
     private String end;
 
-    public MyCalendarObject(String activity, String date, String start, String end) {
-        this.activity = activity;
+    public MyCalendarObject(String event, String date, String start, String end) {
+        this.event = event;
         this.date = date;
         this.start = start;
         this.end = end;
     }
 
     // getters
-    public String getActivity() {
-        return activity;
+    public String getEvent() {
+        return event;
     }
 
     public String getDate() {

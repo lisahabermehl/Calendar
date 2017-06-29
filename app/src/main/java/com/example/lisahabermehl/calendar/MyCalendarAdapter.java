@@ -22,9 +22,6 @@ public class MyCalendarAdapter extends ArrayAdapter<MyCalendarObject> {
     int layoutResourceId;
     ArrayList<MyCalendarObject> data = null;
 
-    String dateOne = "nogniks";
-    String dateTwo;
-
     public MyCalendarAdapter(Context context, int layoutResourceId, ArrayList<MyCalendarObject> data) {
         super(context, layoutResourceId, data);
         this.layoutResourceId = layoutResourceId;
@@ -39,15 +36,15 @@ public class MyCalendarAdapter extends ArrayAdapter<MyCalendarObject> {
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.calendar_item, null);
 
-        TextView activity = (TextView) view.findViewById(R.id.calendar_activity);
         TextView date = (TextView) view.findViewById(R.id.calendar_date);
         TextView start = (TextView) view.findViewById(R.id.calendar_start);
         TextView end = (TextView) view.findViewById(R.id.calendar_end);
+        TextView event = (TextView) view.findViewById(R.id.calendar_event);
 
         date.setText(myCalendarObject.getDate());
-        activity.setText(myCalendarObject.getActivity());
         start.setText(myCalendarObject.getStart());
         end.setText(myCalendarObject.getEnd());
+        event.setText(myCalendarObject.getEvent());
 
         return view;
     }

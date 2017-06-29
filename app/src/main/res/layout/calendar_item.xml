@@ -58,7 +58,7 @@ android:layout_gravity="center_vertical">
         </LinearLayout>
 
         <TextView
-            android:id="@+id/calendar_activity"
+            android:id="@+id/calendar_event"
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:layout_gravity="left"

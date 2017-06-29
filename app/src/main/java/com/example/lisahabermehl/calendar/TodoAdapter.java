@@ -34,11 +34,11 @@ public class TodoAdapter extends ArrayAdapter<TodoObject> {
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.todo_item, null);
 
-        TextView description = (TextView) view.findViewById(R.id.task_title);
-        TextView duration = (TextView) view.findViewById(R.id.task_duration);
-        TextView deadline = (TextView) view.findViewById(R.id.task_deadline);
+        TextView description = (TextView) view.findViewById(R.id.todo_title);
+        TextView duration = (TextView) view.findViewById(R.id.todo_duration);
+        TextView deadline = (TextView) view.findViewById(R.id.todo_deadline);
 
-        description.setText(todoObject.getTask());
+        description.setText(todoObject.getTodo());
         duration.setText(todoObject.getDuration() + " minutes");
         deadline.setText(todoObject.getDeadline());
 

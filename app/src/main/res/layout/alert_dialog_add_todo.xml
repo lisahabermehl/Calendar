@@ -38,17 +38,10 @@
         android:text="When is the deadline?"/>
 
     <DatePicker
-        android:id="@+id/task_deadline"
+        android:id="@+id/todo_deadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:calendarViewShown="false"
         android:datePickerMode="spinner"/>
-
-    <!--<Spinner-->
-        <!--android:id="@+id/category"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:paddingTop="5dp"/>-->
-
 
 </LinearLayout>

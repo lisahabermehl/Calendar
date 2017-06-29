@@ -6,19 +6,19 @@ package com.example.lisahabermehl.calendar;
 
 public class TodoObject {
 
-    private String task;
+    private String todo;
     private String duration;
     private String deadline;
 
-    public TodoObject(String task, String duration, String deadline) {
-        this.task = task;
+    public TodoObject(String todo, String duration, String deadline) {
+        this.todo = todo;
         this.duration = duration;
         this.deadline = deadline;
     }
 
     // getters
-    public String getTask() {
-        return task;
+    public String getTodo() {
+        return todo;
     }
 
     public String getDuration() {
