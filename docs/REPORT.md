@@ -44,4 +44,11 @@ Also decided on not using a CalendarView anymore when adding an event to Google 
 
 This brings us to *the fourth week*. This is where I kinda realised that implementing the different “do-not-disturb” times could lead to some difficulties. Because while trying to make this work I was adjusting the whole algorithm that I had to plan the Todos. After two days of trying to make it work, I decided to let it go. And just work with what I had. Since this was one day before the deadline. 
 
-Of course I’d rather keep these functionalities, but because the development of this app had to be done in four weeks it seemed better to just move on and… let it go. 
+Of course I’d rather keep these functionalities, but because the development of this app had to be done in four weeks it seemed better to just move on and… let it go. A couple of things that I would love to spend more time on are 
+* The way that the user gets a notification about the fact that some Todo item can't be done in time based on the events that are already planned and the deadline that is set for this item. Right now it's just a Toast that the user gets to see: "Ohnoo you won't be able to finish * in time!"
+* I would've made sure that the user wouldn't be able to make a new event if there is an existing event at the same time and on the same day. 
+* When new event is added and this interferes with finishing a Todo item on time, I would’ve given the user the option to reset the deadline for this Todo item to another date, and the option to cancel the event that he/she is about to add.
+* I would've the layout different. Because right now it's just a simple ListView, but I'd rather have one of those fancy looking weekviews that Google has for example. 
+* I would've used id’s instead of the title of a task to edit a todo or delete a todo. I realised too late that it's better to use id's, because right now when an Todo item gets deleted it deletes all the Todo items with the same name. 
+
+But what I have right now is just the base of what can be. It's not perfect, and it has some flaws, but it will work better once I spent more time on it. And the funny thing is, I don't think it will ever be done, there is always a better algorithm, a better way of planning Todos in a Calendar.
