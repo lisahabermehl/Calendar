@@ -1,11 +1,11 @@
 # My Calendar
-## Planning suggestions for poor planners
+#### Planning suggestions for poor planners
 Have you ever been in a situation where you wish you started earlier with studying for a test or started earlier with writing an essay? The goal of this app is to give you an overview of when you can do something in a short period of time to make sure you’ll be done in time. There are two main functions. Firstly, a Todo List where you can make a list of what needs to be done (read chapter 1, write your essay), how much time you think to spend on this specific Todo Item and when the deadline is. Secondly, a Calendar that imports the events that you’ve already planned in your Google Calendar and that gives suggestions of when you can do a Todo Item. The events that are shown in your Calendar are determined by either the Time Span that you’ve chosen in in the Settings or the default Time Span of 14 days. How much time you’ll have between Events and Todo Items is determined by the Time Gap that you’ve set in the Settings or by the default Time Gap of 15 minutes. Besides this it’s also possible to set your Bedtime in the Settings to make sure that Todo Items won’t be planned while you’re in dreamland. 
 
-### How is this app different from other Planner/Todo/Calendar apps?
+## How is this app different from other Planner/Todo/Calendar apps?
 I think that the visible part of my app will be the same as other Planner/Todo list apps. But the thing that distinguishes my app is the fact that my app will calculate and give suggestions for when you can do a Todo item from your list to make sure that you’ll be done in time with reading articles or writing an essay. 
 
-### Behind the app
+## Behind the app
 Let’s get technical. As you can deduce from the description above, the app consists of three activities: Calendar, Todo and Settings. 
 
 #### Calendar
@@ -19,7 +19,7 @@ Besides this, both Calendar and Todo use the DatabaseHelper (that creates and dr
 #### Settings
 All the values that are set in this activity are stored in SharedPreferences. Values include: start of bedtime, end of bedtime, time span and time gap. 
 
-### Process
+## Process
 Whilst developing this app I’ve ran into some minor problems. Nothing too big, but some time consuming functionalities that I’ve left out for stress’s sake. One of the “things to keep in mind” that I’ve set before starting developing this app was: if something seems to take more time than expected, replace it by something simpler. A lot of functionalities seemed to be more time consuming than expected. 
 
 *The first week* I took time to figure syncing with Google Calendar out. I researched logging in with your FireBase account and to link this with giving permission to access your Google Calendar from the email address that you used to register with FireBase. In the end I decided on not giving the user the option to log in since this isn’t really necessary. It might be when the user is going to use another phone in the time he/she is planning Todos but since the goal of this app is short term planning, the chance that a user will get another phone in this short period is small. Other focus points of this week were displaying the Calendar and Todo list properly. At first I wanted to show a week overview like Google Calendar has. But this seemed to be too difficult and time consuming. Thought it might be possible with a GridView? But didn’t spend much time looking into this. After this I thought about just using a CalendarView and giving an overview of what has to be done on a specific day when the user clicks on a date. 
