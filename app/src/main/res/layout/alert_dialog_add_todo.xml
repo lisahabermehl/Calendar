@@ -3,39 +3,47 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:paddingLeft="10dip" >
+    android:paddingBottom="@dimen/activity_horizontal_margin"
+    android:paddingLeft="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_vertical_margin"
+    android:paddingTop="@dimen/activity_horizontal_margin" >
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16dp"
+        android:textSize="@dimen/text_size_medium"
         android:textStyle="bold"
-        android:text="What TODO?"/>
+        android:text="@string/add_todo_question" />
 
     <EditText
         android:id="@+id/new_todo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16dp" />
+        android:singleLine="true"
+        android:maxLength="25"
+        android:textSize="@dimen/text_size_small" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16dp"
+        android:textSize="@dimen/text_size_small"
         android:textStyle="bold"
-        android:text="How much time do you need?"/>
+        android:text="@string/add_todo_duration"/>
 
     <EditText
         android:id="@+id/time_needed"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:inputType="number"
+        android:textSize="@dimen/text_size_small"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16dp"
+        android:textSize="@dimen/text_size_small"
         android:textStyle="bold"
-        android:text="When is the deadline?"/>
+        android:text="@string/add_todo_deadline"/>
 
     <DatePicker
         android:id="@+id/todo_deadline"

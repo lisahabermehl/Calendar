@@ -15,6 +15,8 @@
         android:theme="@style/Theme.Design.Light">
         <activity android:name=".IntroActivity"
             android:label="Intro"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Design.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,18 +27,26 @@
 
         <activity android:name=".MyCalendarActivity"
             android:label=" "
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Design.Light" />
 
         <activity android:name=".GoogleCalendar"
             android:label=" "
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Design.Light" />
 
         <activity android:name=".TodoActivity"
             android:label=" "
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Design.Light" />
 
         <activity android:name=".SettingsActivity"
             android:label=" "
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Design.Light" />
 
     </application>

@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Calendar</string>
+    <string name="add_todo_question">What TODO?</string>
+    <string name="add_todo_duration">How much time do you need?</string>
+    <string name="add_todo_deadline">When is the deadline?</string>
+    <string name="add_event_title">Title event</string>
+    <string name="add_event_start">START</string>
+    <string name="add_event_end">END</string>
+    <string name="add_event_date">DATE</string>
 </resources>

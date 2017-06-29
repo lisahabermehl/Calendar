@@ -18,6 +18,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -128,25 +129,34 @@ public class TodoActivity extends AppCompatActivity {
                 .setPositiveButton("ADD",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                String task = String.valueOf(description.getText());
+                                String todo = String.valueOf(description.getText());
                                 String time = String.valueOf(duration.getText());
+
                                 int day = deadline.getDayOfMonth();
                                 int month = deadline.getMonth()+1;
                                 int year = deadline.getYear();
                                 String deadline = String.valueOf(year + "-0" + month + "-" + day);
 
-                                SQLiteDatabase db = databaseHelper.getWritableDatabase();
+                                if (todo.length() < 1){
+                                    Toast.makeText(TodoActivity.this, "Please enter a title for this Todo item", Toast.LENGTH_SHORT).show();
+                                }
+                                else if (time.length() < 1){
+                                    Toast.makeText(TodoActivity.this, "Please enter an estimated duration for this Todo item", Toast.LENGTH_SHORT).show();
+                                }
+                                else{
+                                    SQLiteDatabase db = databaseHelper.getWritableDatabase();
 
-                                ContentValues values = new ContentValues();
-                                values.put(TableNames.TodoEntry.COL_TODO_TITLE, task);
-                                values.put(TableNames.TodoEntry.COL_TODO_DURATION, time);
-                                values.put(TableNames.TodoEntry.COL_TODO_DEADLINE, deadline);
-                                db.insertWithOnConflict(TableNames.TodoEntry.TABLE_TODO,
-                                        null,
-                                        values,
-                                        SQLiteDatabase.CONFLICT_REPLACE);
-                                db.close();
-                                updateUI();
+                                    ContentValues values = new ContentValues();
+                                    values.put(TableNames.TodoEntry.COL_TODO_TITLE, todo);
+                                    values.put(TableNames.TodoEntry.COL_TODO_DURATION, time);
+                                    values.put(TableNames.TodoEntry.COL_TODO_DEADLINE, deadline);
+                                    db.insertWithOnConflict(TableNames.TodoEntry.TABLE_TODO,
+                                            null,
+                                            values,
+                                            SQLiteDatabase.CONFLICT_REPLACE);
+                                    db.close();
+                                    updateUI();
+                                }
                             }
                         })
                 .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {

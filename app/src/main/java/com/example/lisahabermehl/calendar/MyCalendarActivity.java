@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -30,6 +31,7 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.logging.Handler;
 
 public class MyCalendarActivity extends AppCompatActivity {
 
@@ -38,17 +40,19 @@ public class MyCalendarActivity extends AppCompatActivity {
     MyCalendarObject nextEvent;
 
     ListView calendarListView;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     int time_start, time_gap, time_gap_morning, time_gap_evening, time_between_todos;
-    int currentTimeMin, currentTime, currentModulo, bedtime_start, bedtime_end;
+    int current_time_min, current_time, current_modulo, bedtime_start, bedtime_end;
     int end_last_event_rise_ct, end_todo, duration;
     int time_end = 0;
     int time_end_old = 0;
     int i = 0;
 
     String[] searchFor = new String[2];
-    String date_old = "nog niks";
+    String date_old = "no date yet";
     String title_string, date_string, current_date, date_todo, begin, eind;
+    String todo_title_string, todo_deadline_string;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,12 +60,25 @@ public class MyCalendarActivity extends AppCompatActivity {
         setContentView(R.layout.calendar_list);
 
         calendarListView = (ListView) findViewById(R.id.list_calendar);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
+
         databaseHelper = new DatabaseHelper(this);
 
         searchFor[0] = "no";
         searchFor[1] = "no";
 
         updateUI(searchFor);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefreshLayout.setRefreshing(true);
+                time_end = 0;
+                time_end_old = 0;
+                date_old = "no date yet";
+                updateUI(searchFor);
+            }
+        });
     }
 
     @Override
@@ -75,141 +92,17 @@ public class MyCalendarActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.refresh:
-                SQLiteDatabase db = new DatabaseHelper(this).getWritableDatabase();
-                db.delete(TableNames.CalendarEntry.TABLE_CALENDAR, null, null);
-
-                Intent intent = new Intent(this, GoogleCalendar.class);
-                Bundle extras = new Bundle();
-                extras.putString("zero", "get");
-                intent.putExtras(extras);
-                startActivity(intent);
+                refreshGoogleCalendar();
+                return true;
             case R.id.search_by_title:
-                final EditText textView = new EditText(this);
-                final AlertDialog.Builder search_builder = new AlertDialog.Builder(this);
-                search_builder
-                        .setView(textView)
-                        .setTitle("SEARCH BY TITLE")
-                        .setPositiveButton("SEARCH", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                String title = textView.getText().toString();
-                                searchFor[0] = "title";
-                                searchFor[1] = title;
-                                updateUI(searchFor);
-                            }
-                        })
-                        .setNegativeButton("SHOW EVERYTHING", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                searchFor[0] = "no";
-                                searchFor[1] = "no";
-                                updateUI(searchFor);
-                            }
-                        })
-                        .create()
-                        .show();
-
+                searchByTitle();
                 return true;
             case R.id.search_by_date:
-                final DatePicker datePicker = new DatePicker(this);
-                datePicker.setSpinnersShown(false);
-                AlertDialog.Builder builderDay = new AlertDialog.Builder(this);
-                builderDay
-                        .setView(datePicker)
-                        .setTitle("SEARCH BY DATE")
-                        .setPositiveButton("SELECT DATE", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                String date = String.valueOf(datePicker.getYear())
-                                        + "-0" + String.valueOf(datePicker.getMonth() + 1)
-                                        + "-" + String.valueOf(datePicker.getDayOfMonth());
-                                searchFor[0] = "date";
-                                searchFor[1] = date;
-                                updateUI(searchFor);
-                            }
-                        })
-                        .setNegativeButton("SHOW ALL DATES", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                searchFor[0] = "no";
-                                searchFor[1] = "no";
-                                updateUI(searchFor);
-                            }
-                        })
-                        .create()
-                        .show();
+                searchByDate();
                 return true;
             case R.id.insert_event:
-                LayoutInflater layoutInflater = LayoutInflater.from(this);
-                final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_add_event, null);
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder
-                        .setView(dialogView)
-                        .setTitle("Add event")
-                        .setPositiveButton("INSERT EVENT", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                EditText editText = (EditText) dialogView.findViewById(R.id.event_title);
-                                String title = editText.getText().toString();
-
-                                DatePicker datePicker = (DatePicker) dialogView.findViewById(R.id.event_date_start);
-                                String date = String.valueOf(datePicker.getYear()) + "-" +
-                                        String.valueOf(datePicker.getMonth() + 1) + "-" +
-                                        String.valueOf(datePicker.getDayOfMonth());
-
-                                TimePicker startTime = (TimePicker) dialogView.findViewById(R.id.event_time_start);
-                                TimePicker endTime = (TimePicker) dialogView.findViewById(R.id.event_time_end);
-
-                                String startHour, startMinute, endHour, endMinute;
-
-                                if(startTime.getCurrentHour() > -1 && startTime.getCurrentHour() < 10){
-                                    startHour = "0" + String.valueOf(startTime.getCurrentHour());
-                                }
-                                else{
-                                    startHour = String.valueOf(startTime.getCurrentHour());
-                                }
-                                if(startTime.getCurrentMinute() > -1 && startTime.getCurrentMinute() < 10){
-                                    startMinute = "0" + String.valueOf(startTime.getCurrentMinute());
-                                }
-                                else{
-                                    startMinute = String.valueOf(startTime.getCurrentMinute());
-
-                                }
-                                if(endTime.getCurrentHour() > -1 && endTime.getCurrentHour() < 10){
-                                    endHour = "0" + String.valueOf(endTime.getCurrentHour());
-                                }
-                                else{
-                                    endHour = String.valueOf(endTime.getCurrentHour());
-                                }
-                                if(endTime.getCurrentMinute() > -1 & endTime.getCurrentMinute() < 10){
-                                    endMinute = "0" + String.valueOf(endTime.getCurrentMinute());
-                                }
-                                else{
-                                    endMinute = String.valueOf(endTime.getCurrentMinute());
-                                }
-
-                                String start = date + " " + startHour + ":" + startMinute;
-                                String end = date + " " + endHour + ":" + endMinute;
-
-                                // startActivity to show activities on a specific day
-                                Bundle extras = new Bundle();
-                                extras.putString("zero", "add");
-                                extras.putString("one", title);
-                                extras.putString("two", start);
-                                extras.putString("three", end);
-                                startActivity(new Intent(getApplicationContext(), GoogleCalendar.class)
-                                        .putExtras(extras));
-                            }
-                        })
-                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                            }
-                        })
-                        .create()
-                        .show();
+                addNewEvent();
+                refreshGoogleCalendar();
                 return true;
             case R.id.menu_todo:
                 startActivity(new Intent(this, TodoActivity.class));
@@ -266,24 +159,24 @@ public class MyCalendarActivity extends AppCompatActivity {
             time_gap_evening = Integer.valueOf(everythingToKnow[7]);
             time_gap_morning = Integer.valueOf(everythingToKnow[8]);
             date_todo = everythingToKnow[9];
-            currentTime = Integer.valueOf(everythingToKnow[10]);
+            current_time = Integer.valueOf(everythingToKnow[10]);
 
-            while (time_end < currentTime & date_string.equals(current_date)){
+            while (time_end < current_time & date_string.equals(current_date)){
                 cursor.moveToNext();
                 everythingToKnow = nextEvent(cursor, date_old, time_end_old);
                 date_string = everythingToKnow[1];
                 time_end = Integer.valueOf(everythingToKnow[3]);
                 current_date = everythingToKnow[5];
-                currentTime = Integer.valueOf(everythingToKnow[10]);
+                current_time = Integer.valueOf(everythingToKnow[10]);
             }
             date_old = date_string;
 
             while (todo_cursor.moveToNext()) {
-                String todo_title_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE));
+                todo_title_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE));
                 duration = Integer.valueOf(todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DURATION)));
-                String todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DEADLINE));
+                todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DEADLINE));
 
-                if (time_gap > duration) {
+                if (time_gap > duration | time_gap_evening > duration) {
                     begin = convertToHour(end_last_event_rise_ct + time_between_todos);
                     end_todo = end_last_event_rise_ct + duration;
                     eind = convertToHour(end_todo);
@@ -294,59 +187,48 @@ public class MyCalendarActivity extends AppCompatActivity {
                     else{
                         MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_todo, begin, eind);
                         calendarObjects.add(todo);
-                        time_gap = time_gap - (duration + time_between_todos);
-                        // new is the new old
-                        end_last_event_rise_ct = end_todo;
-                    }
-                } else if (time_gap_evening > duration) {
-                    begin = convertToHour(end_last_event_rise_ct + time_between_todos);
-                    end_todo = end_last_event_rise_ct + duration;
-                    eind = convertToHour(end_todo);
+                        if (time_gap == 0){
+                            i = 0;
 
-                    if(todo_deadline_string.equals(date_todo)){
-                        Toast.makeText(this, "Oops you can't finish " + todo_title_string + " on time!", Toast.LENGTH_LONG).show();
-                    }
-                    else{
-                        MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_todo, begin, eind);
-                        calendarObjects.add(todo);
-
-                        i = 0;
-
-                        time_gap_evening = time_gap_evening - (duration + time_between_todos);
-                        end_last_event_rise_ct = end_todo;
+                            time_gap_evening = time_gap_evening - (duration + time_between_todos);
+                            end_last_event_rise_ct = end_last_event_rise_ct + duration;
+                        }
+                        else if (time_gap_evening == 0){
+                            time_gap = time_gap - (duration + time_between_todos);
+                            // new is the new old
+                            end_last_event_rise_ct = end_todo;
+                        }
                     }
                 } else if (time_gap_morning > duration) {
-                    if (i == 0) {
-                        begin = convertToHour(bedtime_end + time_between_todos);
-                        end_todo = bedtime_end + duration;
-                        eind = convertToHour(end_todo);
-
-                        time_gap_evening = 0;
-                    }
-                    else{
-                        begin = convertToHour(end_last_event_rise_ct + time_between_todos);
-                        end_todo = end_last_event_rise_ct + duration;
-                        eind = convertToHour(end_todo);
-                    }
-
                     if(todo_deadline_string.equals(date_string)){
                         Toast.makeText(this, "Oops you can't finish " + todo_title_string + " on time!", Toast.LENGTH_LONG).show();
                     }
                     else{
-                        MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string, begin, eind);
-                        calendarObjects.add(todo);
-
-                        i = i + 1;
-
+                        if (i == 0){
+                            MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string,
+                                    convertToHour(bedtime_end + time_between_todos),
+                                    convertToHour(bedtime_end + duration));
+                            calendarObjects.add(todo);
+                            end_last_event_rise_ct = bedtime_end + duration;
+                            time_gap_evening = 0;
+                        }
+                        else{
+                            MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string,
+                                    convertToHour(end_last_event_rise_ct + time_between_todos),
+                                    convertToHour(end_last_event_rise_ct + duration));
+                            calendarObjects.add(todo);
+                            end_last_event_rise_ct = end_last_event_rise_ct + duration;
+                        }
                         time_gap_morning = time_gap_morning - (duration + time_between_todos);
-                        end_last_event_rise_ct = end_todo;
+                        i = i + 1;
                     }
                 } else {
                     // make sure cursor doesn't skip a to do
                     todo_cursor.moveToPrevious();
 
                     // gap is filled, so next event can be added
-                    nextEvent = new MyCalendarObject(title_string, date_string, convertToHour(time_start), convertToHour(time_end));
+                    nextEvent = new MyCalendarObject(title_string, date_string,
+                            convertToHour(time_start), convertToHour(time_end));
                     calendarObjects.add(nextEvent);
 
                     end_last_event_rise_ct = time_end;
@@ -369,7 +251,8 @@ public class MyCalendarActivity extends AppCompatActivity {
                 }
             }
             // there are no more todos left
-            nextEvent = new MyCalendarObject(title_string, date_string, convertToHour(time_start), convertToHour(time_end));
+            nextEvent = new MyCalendarObject(title_string, date_string,
+                    convertToHour(time_start), convertToHour(time_end));
             calendarObjects.add(nextEvent);
 
             while (cursor.moveToNext()) {
@@ -379,7 +262,8 @@ public class MyCalendarActivity extends AppCompatActivity {
                 time_start = Integer.valueOf(everythingToKnow[2]);
                 time_end = Integer.valueOf(everythingToKnow[3]);
 
-                nextEvent = new MyCalendarObject(title_string, date_string, convertToHour(time_start), convertToHour(time_end));
+                nextEvent = new MyCalendarObject(title_string, date_string,
+                        convertToHour(time_start), convertToHour(time_end));
                 calendarObjects.add(nextEvent);
 
                 // new is the new old
@@ -406,9 +290,11 @@ public class MyCalendarActivity extends AppCompatActivity {
         cursor.close();
         todo_cursor.close();
         db.close();
+
+        swipeRefreshLayout.setRefreshing(false);
     }
 
-    private int convertToMins (String startTime) {
+    private int convertToMins(String startTime) {
 
         String[] original = startTime.split(":");
         int time_in_mins = (Integer.valueOf(original[0]) * 60) + Integer.valueOf(original[1]);
@@ -416,7 +302,7 @@ public class MyCalendarActivity extends AppCompatActivity {
         return time_in_mins;
     }
 
-    private String convertToHour (int timeInMins) {
+    private String convertToHour(int timeInMins) {
 
         int hours = 0;
 
@@ -434,6 +320,150 @@ public class MyCalendarActivity extends AppCompatActivity {
         return time_in_hours;
     }
 
+    private void refreshGoogleCalendar(){
+        SQLiteDatabase db = new DatabaseHelper(this).getWritableDatabase();
+        db.delete(TableNames.CalendarEntry.TABLE_CALENDAR, null, null);
+
+        Intent intent = new Intent(this, GoogleCalendar.class);
+        Bundle extras = new Bundle();
+        extras.putString("zero", "get");
+        intent.putExtras(extras);
+        startActivity(intent);
+    }
+
+    private void addNewEvent(){
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_add_event, null);
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder
+                .setView(dialogView)
+                .setTitle("Add event")
+                .setPositiveButton("INSERT EVENT", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        EditText editText = (EditText) dialogView.findViewById(R.id.event_title);
+                        String title = editText.getText().toString();
+
+                        DatePicker datePicker = (DatePicker) dialogView.findViewById(R.id.event_date_start);
+                        String date = String.valueOf(datePicker.getYear()) + "-" +
+                                String.valueOf(datePicker.getMonth() + 1) + "-" +
+                                String.valueOf(datePicker.getDayOfMonth());
+
+                        TimePicker startTime = (TimePicker) dialogView.findViewById(R.id.event_time_start);
+                        TimePicker endTime = (TimePicker) dialogView.findViewById(R.id.event_time_end);
+
+                        String startHour, startMinute, endHour, endMinute;
+
+                        if(startTime.getCurrentHour() > -1 && startTime.getCurrentHour() < 10){
+                            startHour = "0" + String.valueOf(startTime.getCurrentHour());
+                        }
+                        else{
+                            startHour = String.valueOf(startTime.getCurrentHour());
+                        }
+                        if(startTime.getCurrentMinute() > -1 && startTime.getCurrentMinute() < 10){
+                            startMinute = "0" + String.valueOf(startTime.getCurrentMinute());
+                        }
+                        else{
+                            startMinute = String.valueOf(startTime.getCurrentMinute());
+
+                        }
+                        if(endTime.getCurrentHour() > -1 && endTime.getCurrentHour() < 10){
+                            endHour = "0" + String.valueOf(endTime.getCurrentHour());
+                        }
+                        else{
+                            endHour = String.valueOf(endTime.getCurrentHour());
+                        }
+                        if(endTime.getCurrentMinute() > -1 & endTime.getCurrentMinute() < 10){
+                            endMinute = "0" + String.valueOf(endTime.getCurrentMinute());
+                        }
+                        else{
+                            endMinute = String.valueOf(endTime.getCurrentMinute());
+                        }
+
+                        String start = date + " " + startHour + ":" + startMinute;
+                        String end = date + " " + endHour + ":" + endMinute;
+
+                        // startActivity to show activities on a specific day
+                        Bundle extras = new Bundle();
+                        extras.putString("zero", "add");
+                        extras.putString("one", title);
+                        extras.putString("two", start);
+                        extras.putString("three", end);
+                        startActivity(new Intent(getApplicationContext(), GoogleCalendar.class)
+                                .putExtras(extras));
+                    }
+                })
+                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create()
+                .show();
+    }
+
+    private void searchByTitle(){
+        final EditText textView = new EditText(this);
+        final AlertDialog.Builder search_builder = new AlertDialog.Builder(this);
+        search_builder
+                .setView(textView)
+                .setTitle("SEARCH BY TITLE")
+                .setPositiveButton("SEARCH", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String title = textView.getText().toString();
+                        searchFor[0] = "title";
+                        searchFor[1] = title;
+                        updateUI(searchFor);
+                    }
+                })
+                .setNegativeButton("SHOW EVERYTHING", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        searchFor[0] = "no";
+                        searchFor[1] = "no";
+                        updateUI(searchFor);
+                    }
+                })
+                .create()
+                .show();
+
+    }
+
+    private void searchByDate(){
+        final DatePicker datePicker = new DatePicker(this);
+        datePicker.setSpinnersShown(false);
+        AlertDialog.Builder builderDay = new AlertDialog.Builder(this);
+        builderDay
+                .setView(datePicker)
+                .setTitle("SEARCH BY DATE")
+                .setPositiveButton("SELECT DATE", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String date = String.valueOf(datePicker.getYear())
+                                + "-0" + String.valueOf(datePicker.getMonth() + 1)
+                                + "-" + String.valueOf(datePicker.getDayOfMonth());
+                        searchFor[0] = "date";
+                        searchFor[1] = date;
+                        updateUI(searchFor);
+                    }
+                })
+                .setNegativeButton("SHOW ALL DATES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        searchFor[0] = "no";
+                        searchFor[1] = "no";
+                        updateUI(searchFor);
+                    }
+                })
+                .create()
+                .show();
+    }
+
     private String[] nextEvent(Cursor cursor, String date_old, int end_last_event_rise_ct){
 
         String title_string, date_string;
@@ -447,14 +477,14 @@ public class MyCalendarActivity extends AppCompatActivity {
         time_gap_morning = 0;
 
         current_date = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
-        currentTimeMin = Integer.valueOf(new SimpleDateFormat("mm").format(Calendar.getInstance().getTime()));
+        current_time_min = Integer.valueOf(new SimpleDateFormat("mm").format(Calendar.getInstance().getTime()));
 
-        currentModulo = currentTimeMin % 10;
-        if(currentModulo > 0 && currentModulo < 10){
-            currentTimeMin = (currentTimeMin - currentModulo) + 10;
+        current_modulo = current_time_min % 10;
+        if(current_modulo > 0 && current_modulo < 10){
+            current_time_min = (current_time_min - current_modulo) + 10;
         }
-        currentTime = (Integer.valueOf(new SimpleDateFormat("HH").format(Calendar.getInstance().getTime())) * 60)
-                + currentTimeMin;
+        current_time = (Integer.valueOf(new SimpleDateFormat("HH").format(Calendar.getInstance().getTime())) * 60)
+                + current_time_min;
 
         if (!cursor.isAfterLast()){
             String[] sendBack = new String[11];
@@ -469,21 +499,23 @@ public class MyCalendarActivity extends AppCompatActivity {
                 time_gap = time_start - end_last_event_rise_ct;
                 // end_last_event stays the same
             }
-            else if (date_string.equals(current_date) && date_old.equals("nog niks")){
+            else if (date_string.equals(current_date) && date_old.equals("no date yet")){
                 date_todo = date_string;
 
-                time_gap = time_start - currentTime;
-                end_last_event_rise_ct = currentTime;
+                time_gap = time_start - current_time;
+                end_last_event_rise_ct = current_time;
+                Log.d("TODAY", String.valueOf(end_last_event_rise_ct));
             }
-            else if (time_end_old == 0 && date_old.equals("nog niks")){
+            else if (time_end_old == 0 && date_old.equals("no date yet")){
                 date_todo = current_date;
-                time_gap_evening = bedtime_start - currentTime;
-                end_last_event_rise_ct = currentTime;
+                time_gap_evening = bedtime_start - current_time;
+                end_last_event_rise_ct = current_time;
                 time_gap = 0;
                 time_gap_morning = time_start - bedtime_end;
             }
             else{
                 date_todo = date_old;
+                Log.d("ELSE", String.valueOf(end_last_event_rise_ct));
                 time_gap_evening = bedtime_start - time_end_old;
                 time_gap = 0;
                 time_gap_morning = time_start - bedtime_end;
@@ -499,7 +531,7 @@ public class MyCalendarActivity extends AppCompatActivity {
             sendBack[7] = String.valueOf(time_gap_evening);
             sendBack[8] = String.valueOf(time_gap_morning);
             sendBack[9] = date_todo;
-            sendBack[10] = String.valueOf(currentTime);
+            sendBack[10] = String.valueOf(current_time);
 
             return sendBack;
         }
