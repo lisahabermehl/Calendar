@@ -1,11 +1,13 @@
 [![BCH compliance](https://bettercodehub.com/edge/badge/lisahabermehl/Calendar?branch=master)](https://bettercodehub.com/)
 
-## Project proposal
+## My Calendar
+#### An app for the poor planners.
 
-### Goal
-This app might be handy for people who have a hard time planning their schoolwork: what am I supposed to do, how much time do I have and what is the best way to spread this over the days while ik rekening houd met wat ik al op de planning heb staan. To help the user in all of these things the following tools are available in the app:
-* The app will be connected to your own Google Calendar. It's not possible to edit activities in the Google Calendar whilst your in the app, the goal of the app is simply to give an overview of everything that is on the Todo list but still has to be fit into the existing calendar.
-* An extra feature of this app is the Todo list. This list exists of the so called main items (course) and subitems (the different things that have to be done for this course - reading a chapter, reading articles, writing an essay). When adding all these subitems, the user has the option to give an estimation of time to spend on this subitem (or the user can enter how many pages he/she is has to read)
+### Why?
+This app originated from my own lack of planning in my daily life. There are so many times that I regret procrastinating my schoolwork and there are so many times that I plan on doing it different next time, but in the end I don't. So, this app might be handy for people who have a hard time planning their schoolwork (or are just too lazy to do it): what am I supposed to do, how much time do I have and what is the best way to spread this over the days while the events that are already planned in my calendar aren't forgotten. To help the user in all of these things the following tools are available in the app:
+* The app will be connected to your own Google Calendar. The goal of the app is to give an overview of everything that is in the Todo list but still has to fit into the existing calendar.
+![alt text](docs/img/Calendar_1.jpg)
+* An extra feature of this app is the Todo list. 
 * In the settings the user can install how much time he/she spends on reading one page or how much time he/she wants to spend on writing an essay and how many days should be planned for this. 
 
 ### Visual sketch
