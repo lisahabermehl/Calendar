@@ -250,8 +250,222 @@ public class MyCalendarActivity extends AppCompatActivity {
         } else if (search_for[0].equals("date")) {
             // look for specific date in table and print details while looking for gaps and filling these gaps with todos
             // only add to calendarObjects when date_string == search_for[1]
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putInt("old_end_time", (time_end_old));
+            editor.apply();
+
+            String[] everythingToKnow = nextEvent(cursor, date_old);
+
+            title_string = everythingToKnow[0];
+            date_string = everythingToKnow[1];
+            time_start = Integer.valueOf(everythingToKnow[2]);
+            time_end = Integer.valueOf(everythingToKnow[3]);
+            end_last_event_rise_ct = Integer.valueOf(everythingToKnow[4]);
+            current_date = everythingToKnow[5];
+            time_gap = Integer.valueOf(everythingToKnow[6]);
+            time_gap_evening = Integer.valueOf(everythingToKnow[7]);
+            time_gap_morning = Integer.valueOf(everythingToKnow[8]);
+            date_todo = everythingToKnow[9];
+            current_time = Integer.valueOf(everythingToKnow[10]);
+
+            while (time_end < current_time & date_string.equals(current_date)) {
+                cursor.moveToNext();
+
+                editor = sp.edit();
+                editor.putInt("old_end_time", (time_end_old));
+                editor.apply();
+
+                everythingToKnow = nextEvent(cursor, date_old);
+                date_string = everythingToKnow[1];
+                time_end = Integer.valueOf(everythingToKnow[3]);
+                current_date = everythingToKnow[5];
+                current_time = Integer.valueOf(everythingToKnow[10]);
+            }
+            date_old = date_string;
+            time_end_old = time_end;
+
+            while (todo_cursor.moveToNext()) {
+                todo_title_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE));
+                duration = Integer.valueOf(todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DURATION)));
+                todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DEADLINE));
+
+                if (time_gap > duration | time_gap_evening > duration | time_gap_morning > duration) {
+
+                    if (date_string.equals(search_for[1])){
+                        calendarObjects = addTodos(calendarObjects);
+                    }
+                } else {
+                    // make sure cursor doesn't skip a to do
+                    todo_cursor.moveToPrevious();
+
+                    // gap is filled, so next event can be added
+                    nextEvent = new MyCalendarObject(title_string, date_string,
+                            convertToHour(time_start), convertToHour(time_end));
+                    calendarObjects.add(nextEvent);
+
+                    end_last_event_rise_ct = time_end;
+
+                    cursor.moveToNext();
+
+                    editor = sp.edit();
+                    editor.putInt("old_end_time", (end_last_event_rise_ct));
+                    editor.apply();
+
+                    everythingToKnow = nextEvent(cursor, date_old);
+
+                    title_string = everythingToKnow[0];
+                    date_string = everythingToKnow[1];
+                    time_start = Integer.valueOf(everythingToKnow[2]);
+                    time_end = Integer.valueOf(everythingToKnow[3]);
+                    end_last_event_rise_ct = Integer.valueOf(everythingToKnow[4]);
+                    current_date = everythingToKnow[5];
+                    time_gap = Integer.valueOf(everythingToKnow[6]);
+                    time_gap_morning = Integer.valueOf(everythingToKnow[7]);
+                    time_gap_evening = Integer.valueOf(everythingToKnow[8]);
+
+                    // new is the new old
+                    date_old = date_string;
+                }
+            }
+            // there are no more todos left
+            nextEvent = new MyCalendarObject(title_string, date_string,
+                    convertToHour(time_start), convertToHour(time_end));
+            if (date_string.equals(search_for[1])){
+                calendarObjects.add(nextEvent);
+            }
+
+            while (cursor.moveToNext()) {
+
+                editor = sp.edit();
+                editor.putInt("old_end_time", (time_end_old));
+                editor.apply();
+
+                everythingToKnow = nextEvent(cursor, date_old);
+                title_string = everythingToKnow[0];
+                date_string = everythingToKnow[1];
+                time_start = Integer.valueOf(everythingToKnow[2]);
+                time_end = Integer.valueOf(everythingToKnow[3]);
+
+                nextEvent = new MyCalendarObject(title_string, date_string,
+                        convertToHour(time_start), convertToHour(time_end));
+                if (date_string.equals(search_for[1])) {
+                    calendarObjects.add(nextEvent);
+                }
+
+                // new is the new old
+                date_old = date_string;
+                time_end_old = time_end;
+            }
         } else if (search_for[0].equals("title")) {
             // only add to calendarObjects when title_string == search_for[1]
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putInt("old_end_time", (time_end_old));
+            editor.apply();
+
+            String[] everythingToKnow = nextEvent(cursor, date_old);
+
+            title_string = everythingToKnow[0];
+            date_string = everythingToKnow[1];
+            time_start = Integer.valueOf(everythingToKnow[2]);
+            time_end = Integer.valueOf(everythingToKnow[3]);
+            end_last_event_rise_ct = Integer.valueOf(everythingToKnow[4]);
+            current_date = everythingToKnow[5];
+            time_gap = Integer.valueOf(everythingToKnow[6]);
+            time_gap_evening = Integer.valueOf(everythingToKnow[7]);
+            time_gap_morning = Integer.valueOf(everythingToKnow[8]);
+            date_todo = everythingToKnow[9];
+            current_time = Integer.valueOf(everythingToKnow[10]);
+
+            while (time_end < current_time & date_string.equals(current_date)) {
+                cursor.moveToNext();
+
+                editor = sp.edit();
+                editor.putInt("old_end_time", (time_end_old));
+                editor.apply();
+
+                everythingToKnow = nextEvent(cursor, date_old);
+                date_string = everythingToKnow[1];
+                time_end = Integer.valueOf(everythingToKnow[3]);
+                current_date = everythingToKnow[5];
+                current_time = Integer.valueOf(everythingToKnow[10]);
+            }
+            date_old = date_string;
+            time_end_old = time_end;
+
+            while (todo_cursor.moveToNext()) {
+                todo_title_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE));
+                duration = Integer.valueOf(todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DURATION)));
+                todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DEADLINE));
+
+                if (time_gap > duration | time_gap_evening > duration | time_gap_morning > duration) {
+
+                    if (title_string.equals(search_for[1])){
+                        calendarObjects = addTodos(calendarObjects);
+                    }
+                } else {
+                    // make sure cursor doesn't skip a to do
+                    todo_cursor.moveToPrevious();
+
+                    // gap is filled, so next event can be added
+                    nextEvent = new MyCalendarObject(title_string, date_string,
+                            convertToHour(time_start), convertToHour(time_end));
+                    if (title_string.equals(search_for[1])){
+                        calendarObjects.add(nextEvent);
+                    }
+
+                    end_last_event_rise_ct = time_end;
+
+                    cursor.moveToNext();
+
+                    editor = sp.edit();
+                    editor.putInt("old_end_time", (end_last_event_rise_ct));
+                    editor.apply();
+
+                    everythingToKnow = nextEvent(cursor, date_old);
+
+                    title_string = everythingToKnow[0];
+                    date_string = everythingToKnow[1];
+                    time_start = Integer.valueOf(everythingToKnow[2]);
+                    time_end = Integer.valueOf(everythingToKnow[3]);
+                    end_last_event_rise_ct = Integer.valueOf(everythingToKnow[4]);
+                    current_date = everythingToKnow[5];
+                    time_gap = Integer.valueOf(everythingToKnow[6]);
+                    time_gap_morning = Integer.valueOf(everythingToKnow[7]);
+                    time_gap_evening = Integer.valueOf(everythingToKnow[8]);
+
+                    // new is the new old
+                    date_old = date_string;
+                }
+            }
+            // there are no more todos left
+            nextEvent = new MyCalendarObject(title_string, date_string,
+                    convertToHour(time_start), convertToHour(time_end));
+            if (title_string.equals(search_for[1])){
+                calendarObjects.add(nextEvent);
+            }
+
+            while (cursor.moveToNext()) {
+
+                editor = sp.edit();
+                editor.putInt("old_end_time", (time_end_old));
+                editor.apply();
+
+                everythingToKnow = nextEvent(cursor, date_old);
+                title_string = everythingToKnow[0];
+                date_string = everythingToKnow[1];
+                time_start = Integer.valueOf(everythingToKnow[2]);
+                time_end = Integer.valueOf(everythingToKnow[3]);
+
+                nextEvent = new MyCalendarObject(title_string, date_string,
+                        convertToHour(time_start), convertToHour(time_end));
+                if (title_string.equals(search_for[1])) {
+                    calendarObjects.add(nextEvent);
+                }
+
+                // new is the new old
+                date_old = date_string;
+                time_end_old = time_end;
+            }
         }
 
         if (myCalendarAdapter == null) {
@@ -480,6 +694,7 @@ public class MyCalendarActivity extends AppCompatActivity {
                 date_todo = current_date;
                 time_gap_evening = bedtime_start - current_time;
                 end_last_event_rise_ct = current_time;
+                Log.d("END LAST EVENT", convertToHour(current_time));
                 time_gap = 0;
                 time_gap_morning = time_start - bedtime_end;
             } else if (time_end_old == 0) {
