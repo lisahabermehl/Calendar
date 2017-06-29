@@ -9,7 +9,7 @@ This app originated from my own lack of planning in my daily life. There are so 
 ### My Calendar
 ![](https://github.com/lisahabermehl/Calendar/blob/master/docs/img/Calendar_1.jpg)
 
-The app will be connected to your own Google Calendar. The goal of this tool is to give you an overview of the events that you've already planned in your Google Calendar and suggestions for when you could do the items from you Todo list 
+The app will be connected to your own Google Calendar. The goal of this tool is to give you an overview of the events that you've already planned in your Google Calendar and suggestions for when you could do the items from you Todo list. As you can see there are a couple of options up top. Firstly a refresh button with which the app will sync with Google Calendar and fetch the latest changes. Secondly an option to search the Calendar and Todo items by title of events/todo item. Thirdly an option to search the Calendar and Todo items by date. Fourthly a button to add new events to the Calendar (and these will automatically be added to Google Calendar).
 
 ### Todo list
 ![](https://github.com/lisahabermehl/Calendar/blob/master/docs/img/Calendar_2.jpg) ![](https://github.com/lisahabermehl/Calendar/blob/master/docs/img/Calendar_3.jpg)
