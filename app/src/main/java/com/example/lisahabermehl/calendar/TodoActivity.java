@@ -47,7 +47,7 @@ public class TodoActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view,
                                            int position, long id) {
-                deleteTask(view);
+                deleteTodo(view);
                 return true;
             }
         });
@@ -169,7 +169,7 @@ public class TodoActivity extends AppCompatActivity {
                 .show();
     }
 
-    public void deleteTask(View view) {
+    public void deleteTodo(View view) {
         View parent = (View) view.getParent();
         TextView taskTextView = (TextView) parent.findViewById(R.id.todo_title);
         String task = String.valueOf(taskTextView.getText());
@@ -181,7 +181,7 @@ public class TodoActivity extends AppCompatActivity {
         updateUI();
     }
 
-    public void editTask(View view){
+    public void editTodo(View view){
         View parent = (View) view.getParent();
         TextView todoTextView = (TextView) parent.findViewById(R.id.todo_title);
         final String todo_title_old = String.valueOf(todoTextView.getText());
@@ -196,16 +196,17 @@ public class TodoActivity extends AppCompatActivity {
 
         String title = null;
         String duration = null;
-        String deadline = null;
 
         while (cursor.moveToNext()) {
             if(cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE)).equals(todo_title_old)){
                 title = cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE));
                 duration = cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DURATION));
-                deadline = cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DEADLINE));
             }
         }
+        replaceTodo(title, duration, todo_title_old);
+    }
 
+    public void replaceTodo(String title, String duration, final String todo_title_old){
         LayoutInflater layoutInflater = LayoutInflater.from(this);
 
         final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_add_todo, null);
@@ -226,10 +227,11 @@ public class TodoActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int id) {
                                 String task = String.valueOf(title_edit_text.getText());
                                 String time = String.valueOf(duration_edit_text.getText());
-                                int day = deadline_edit_text.getDayOfMonth();
-                                int month = deadline_edit_text.getMonth();
-                                int year = deadline_edit_text.getYear();
-                                String deadline = String.valueOf(year + "-0" + month + "-" + day);
+                                String month = String.valueOf(deadline_edit_text.getMonth()+1);
+                                if ((deadline_edit_text.getMonth()+1) > 0 & (deadline_edit_text.getMonth()+1) < 10){
+                                    month = "0" + month;
+                                }
+                                String deadline = String.valueOf(deadline_edit_text.getYear() + "-" + month + "-" + deadline_edit_text.getDayOfMonth());
 
                                 SQLiteDatabase db = databaseHelper.getWritableDatabase();
 

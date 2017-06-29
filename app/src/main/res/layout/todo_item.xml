@@ -46,6 +46,6 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:text="EDIT"
-        android:onClick="editTask"/>
+        android:onClick="editTodo"/>
 
 </RelativeLayout>

@@ -424,9 +424,6 @@ public class MyCalendarActivity extends AppCompatActivity {
         bedtime_end = (sp.getInt("bedtime_end_hour", 7) * 60) + sp.getInt("bedtime_end_minute", 0);
         time_between_todos = sp.getInt("time_gap", 1);
 
-        Log.d("BEDTIME START", convertToHour(bedtime_start));
-        Log.d("BEDTIME END", convertToHour(bedtime_end));
-
         time_gap_evening = 0;
         time_gap_morning = 0;
 
@@ -468,7 +465,6 @@ public class MyCalendarActivity extends AppCompatActivity {
                 date_todo = date_old;
                 Log.d("ELSE", String.valueOf(end_last_event_rise_ct));
                 time_gap_evening = bedtime_start - time_end_old;
-
                 time_gap = 0;
                 time_gap_morning = time_start - bedtime_end;
             }
@@ -486,8 +482,6 @@ public class MyCalendarActivity extends AppCompatActivity {
             sendBack[10] = String.valueOf(current_time);
 
             return sendBack;
-        } else {
-            Log.d("PROBLEMOOO", "JUP");
         }
         return null;
     }
