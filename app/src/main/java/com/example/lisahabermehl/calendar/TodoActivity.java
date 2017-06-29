@@ -204,7 +204,6 @@ public class TodoActivity extends AppCompatActivity {
                 duration = cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DURATION));
                 deadline = cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DEADLINE));
             }
-
         }
 
         LayoutInflater layoutInflater = LayoutInflater.from(this);
@@ -230,7 +229,7 @@ public class TodoActivity extends AppCompatActivity {
                                 int day = deadline_edit_text.getDayOfMonth();
                                 int month = deadline_edit_text.getMonth();
                                 int year = deadline_edit_text.getYear();
-                                String deadline = String.valueOf(year + "-" + month + "-" + day);
+                                String deadline = String.valueOf(year + "-0" + month + "-" + day);
 
                                 SQLiteDatabase db = databaseHelper.getWritableDatabase();
 

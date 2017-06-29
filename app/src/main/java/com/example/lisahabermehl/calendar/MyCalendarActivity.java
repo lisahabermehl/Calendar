@@ -134,7 +134,7 @@ public class MyCalendarActivity extends AppCompatActivity {
                         TableNames.TodoEntry.COL_TODO_TITLE,
                         TableNames.TodoEntry.COL_TODO_DURATION,
                         TableNames.TodoEntry.COL_TODO_DEADLINE},
-                null, null, null, null, TableNames.TodoEntry.COL_TODO_DEADLINE + " ASC "+ ", " +
+                null, null, null, null, TableNames.TodoEntry.COL_TODO_DEADLINE + " ASC " + ", " +
                         TableNames.TodoEntry.COL_TODO_DURATION + " DESC");
 
         SharedPreferences sp = getSharedPreferences("shared_preferences", Activity.MODE_PRIVATE);
@@ -146,7 +146,7 @@ public class MyCalendarActivity extends AppCompatActivity {
         todo_cursor.moveToFirst();
         todo_cursor.moveToPrevious();
 
-        if(search_for[0].equals("no")){
+        if (search_for[0].equals("no")) {
             String[] everythingToKnow = nextEvent(cursor, date_old, time_end_old);
 
             title_string = everythingToKnow[0];
@@ -161,7 +161,7 @@ public class MyCalendarActivity extends AppCompatActivity {
             date_todo = everythingToKnow[9];
             current_time = Integer.valueOf(everythingToKnow[10]);
 
-            while (time_end < current_time & date_string.equals(current_date)){
+            while (time_end < current_time & date_string.equals(current_date)) {
                 cursor.moveToNext();
                 everythingToKnow = nextEvent(cursor, date_old, time_end_old);
                 date_string = everythingToKnow[1];
@@ -170,58 +170,15 @@ public class MyCalendarActivity extends AppCompatActivity {
                 current_time = Integer.valueOf(everythingToKnow[10]);
             }
             date_old = date_string;
+            time_end_old = time_end;
 
             while (todo_cursor.moveToNext()) {
                 todo_title_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_TITLE));
                 duration = Integer.valueOf(todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DURATION)));
                 todo_deadline_string = todo_cursor.getString(todo_cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DEADLINE));
 
-                if (time_gap > duration | time_gap_evening > duration) {
-                    begin = convertToHour(end_last_event_rise_ct + time_between_todos);
-                    end_todo = end_last_event_rise_ct + duration;
-                    eind = convertToHour(end_todo);
-
-                    if(todo_deadline_string.equals(date_todo)){
-                        Toast.makeText(this, "Oops you can't finish " + todo_title_string + " on time!", Toast.LENGTH_LONG).show();
-                    }
-                    else{
-                        MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_todo, begin, eind);
-                        calendarObjects.add(todo);
-                        if (time_gap == 0){
-                            i = 0;
-
-                            time_gap_evening = time_gap_evening - (duration + time_between_todos);
-                            end_last_event_rise_ct = end_last_event_rise_ct + duration;
-                        }
-                        else if (time_gap_evening == 0){
-                            time_gap = time_gap - (duration + time_between_todos);
-                            // new is the new old
-                            end_last_event_rise_ct = end_todo;
-                        }
-                    }
-                } else if (time_gap_morning > duration) {
-                    if(todo_deadline_string.equals(date_string)){
-                        Toast.makeText(this, "Oops you can't finish " + todo_title_string + " on time!", Toast.LENGTH_LONG).show();
-                    }
-                    else{
-                        if (i == 0){
-                            MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string,
-                                    convertToHour(bedtime_end + time_between_todos),
-                                    convertToHour(bedtime_end + duration));
-                            calendarObjects.add(todo);
-                            end_last_event_rise_ct = bedtime_end + duration;
-                            time_gap_evening = 0;
-                        }
-                        else{
-                            MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string,
-                                    convertToHour(end_last_event_rise_ct + time_between_todos),
-                                    convertToHour(end_last_event_rise_ct + duration));
-                            calendarObjects.add(todo);
-                            end_last_event_rise_ct = end_last_event_rise_ct + duration;
-                        }
-                        time_gap_morning = time_gap_morning - (duration + time_between_todos);
-                        i = i + 1;
-                    }
+                if (time_gap > duration | time_gap_evening > duration | time_gap_morning > duration) {
+                    calendarObjects = addTodos(calendarObjects);
                 } else {
                     // make sure cursor doesn't skip a to do
                     todo_cursor.moveToPrevious();
@@ -270,12 +227,10 @@ public class MyCalendarActivity extends AppCompatActivity {
                 date_old = date_string;
                 time_end_old = time_end;
             }
-        }
-        else if (search_for[0].equals("date")){
+        } else if (search_for[0].equals("date")) {
             // look for specific date in table and print details while looking for gaps and filling these gaps with todos
             // only add to calendarObjects when date_string == search_for[1]
-        }
-        else if(search_for[0].equals("title")){
+        } else if (search_for[0].equals("title")) {
             // only add to calendarObjects when title_string == search_for[1]
         }
 
@@ -306,21 +261,21 @@ public class MyCalendarActivity extends AppCompatActivity {
 
         int hours = 0;
 
-        while(timeInMins > 59) {
+        while (timeInMins > 59) {
             timeInMins = timeInMins - 60;
             hours = hours + 1;
         }
 
         String time_in_hours = String.valueOf(hours) + ":" + String.valueOf(timeInMins);
 
-        if(timeInMins >= 0 && timeInMins <= 9){
+        if (timeInMins >= 0 && timeInMins <= 9) {
             time_in_hours = String.valueOf(hours) + ":0" + String.valueOf(timeInMins);
         }
 
         return time_in_hours;
     }
 
-    private void refreshGoogleCalendar(){
+    private void refreshGoogleCalendar() {
         SQLiteDatabase db = new DatabaseHelper(this).getWritableDatabase();
         db.delete(TableNames.CalendarEntry.TABLE_CALENDAR, null, null);
 
@@ -331,7 +286,7 @@ public class MyCalendarActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void addNewEvent(){
+    private void addNewEvent() {
         LayoutInflater layoutInflater = LayoutInflater.from(this);
         final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_add_event, null);
 
@@ -357,29 +312,25 @@ public class MyCalendarActivity extends AppCompatActivity {
 
                         String startHour, startMinute, endHour, endMinute;
 
-                        if(startTime.getCurrentHour() > -1 && startTime.getCurrentHour() < 10){
+                        if (startTime.getCurrentHour() > -1 && startTime.getCurrentHour() < 10) {
                             startHour = "0" + String.valueOf(startTime.getCurrentHour());
-                        }
-                        else{
+                        } else {
                             startHour = String.valueOf(startTime.getCurrentHour());
                         }
-                        if(startTime.getCurrentMinute() > -1 && startTime.getCurrentMinute() < 10){
+                        if (startTime.getCurrentMinute() > -1 && startTime.getCurrentMinute() < 10) {
                             startMinute = "0" + String.valueOf(startTime.getCurrentMinute());
-                        }
-                        else{
+                        } else {
                             startMinute = String.valueOf(startTime.getCurrentMinute());
 
                         }
-                        if(endTime.getCurrentHour() > -1 && endTime.getCurrentHour() < 10){
+                        if (endTime.getCurrentHour() > -1 && endTime.getCurrentHour() < 10) {
                             endHour = "0" + String.valueOf(endTime.getCurrentHour());
-                        }
-                        else{
+                        } else {
                             endHour = String.valueOf(endTime.getCurrentHour());
                         }
-                        if(endTime.getCurrentMinute() > -1 & endTime.getCurrentMinute() < 10){
+                        if (endTime.getCurrentMinute() > -1 & endTime.getCurrentMinute() < 10) {
                             endMinute = "0" + String.valueOf(endTime.getCurrentMinute());
-                        }
-                        else{
+                        } else {
                             endMinute = String.valueOf(endTime.getCurrentMinute());
                         }
 
@@ -406,7 +357,7 @@ public class MyCalendarActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void searchByTitle(){
+    private void searchByTitle() {
         final EditText textView = new EditText(this);
         final AlertDialog.Builder search_builder = new AlertDialog.Builder(this);
         search_builder
@@ -434,7 +385,7 @@ public class MyCalendarActivity extends AppCompatActivity {
 
     }
 
-    private void searchByDate(){
+    private void searchByDate() {
         final DatePicker datePicker = new DatePicker(this);
         datePicker.setSpinnersShown(false);
         AlertDialog.Builder builderDay = new AlertDialog.Builder(this);
@@ -464,14 +415,17 @@ public class MyCalendarActivity extends AppCompatActivity {
                 .show();
     }
 
-    private String[] nextEvent(Cursor cursor, String date_old, int end_last_event_rise_ct){
+    private String[] nextEvent(Cursor cursor, String date_old, int end_last_event_rise_ct) {
 
         String title_string, date_string;
 
         SharedPreferences sp = getSharedPreferences("shared_preferences", Activity.MODE_PRIVATE);
-        bedtime_start = (sp.getInt("bedtime_start_hour", 23)*60) + sp.getInt("bedtime_start_minute", 0);
-        bedtime_end = (sp.getInt("bedtime_end_hour", 7)*60) + sp.getInt("bedtime_end_minute", 0);
+        bedtime_start = (sp.getInt("bedtime_start_hour", 23) * 60) + sp.getInt("bedtime_start_minute", 0);
+        bedtime_end = (sp.getInt("bedtime_end_hour", 7) * 60) + sp.getInt("bedtime_end_minute", 0);
         time_between_todos = sp.getInt("time_gap", 1);
+
+        Log.d("BEDTIME START", convertToHour(bedtime_start));
+        Log.d("BEDTIME END", convertToHour(bedtime_end));
 
         time_gap_evening = 0;
         time_gap_morning = 0;
@@ -480,13 +434,13 @@ public class MyCalendarActivity extends AppCompatActivity {
         current_time_min = Integer.valueOf(new SimpleDateFormat("mm").format(Calendar.getInstance().getTime()));
 
         current_modulo = current_time_min % 10;
-        if(current_modulo > 0 && current_modulo < 10){
+        if (current_modulo > 0 && current_modulo < 10) {
             current_time_min = (current_time_min - current_modulo) + 10;
         }
         current_time = (Integer.valueOf(new SimpleDateFormat("HH").format(Calendar.getInstance().getTime())) * 60)
                 + current_time_min;
 
-        if (!cursor.isAfterLast()){
+        if (!cursor.isAfterLast()) {
             String[] sendBack = new String[11];
             title_string = cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_TITLE));
             date_string = cursor.getString(cursor.getColumnIndex(TableNames.CalendarEntry.COL_CAL_DATE));
@@ -498,25 +452,23 @@ public class MyCalendarActivity extends AppCompatActivity {
                 date_todo = date_string;
                 time_gap = time_start - end_last_event_rise_ct;
                 // end_last_event stays the same
-            }
-            else if (date_string.equals(current_date) && date_old.equals("no date yet")){
+            } else if (date_string.equals(current_date) && date_old.equals("no date yet")) {
                 date_todo = date_string;
 
                 time_gap = time_start - current_time;
                 end_last_event_rise_ct = current_time;
                 Log.d("TODAY", String.valueOf(end_last_event_rise_ct));
-            }
-            else if (time_end_old == 0 && date_old.equals("no date yet")){
+            } else if (time_end_old == 0 && date_old.equals("no date yet")) {
                 date_todo = current_date;
                 time_gap_evening = bedtime_start - current_time;
                 end_last_event_rise_ct = current_time;
                 time_gap = 0;
                 time_gap_morning = time_start - bedtime_end;
-            }
-            else{
+            } else if (time_end_old == 0) {
                 date_todo = date_old;
                 Log.d("ELSE", String.valueOf(end_last_event_rise_ct));
                 time_gap_evening = bedtime_start - time_end_old;
+
                 time_gap = 0;
                 time_gap_morning = time_start - bedtime_end;
             }
@@ -534,11 +486,57 @@ public class MyCalendarActivity extends AppCompatActivity {
             sendBack[10] = String.valueOf(current_time);
 
             return sendBack;
-        }
-        else{
+        } else {
             Log.d("PROBLEMOOO", "JUP");
         }
         return null;
+    }
+
+    private ArrayList<MyCalendarObject> addTodos(ArrayList<MyCalendarObject> calendarObjects) {
+        if (time_gap > duration | time_gap_evening > duration) {
+            begin = convertToHour(end_last_event_rise_ct + time_between_todos);
+            end_todo = end_last_event_rise_ct + duration;
+            eind = convertToHour(end_todo);
+
+            if (todo_deadline_string.equals(date_todo)) {
+                Toast.makeText(this, "Oops you can't finish " + todo_title_string + " on time!", Toast.LENGTH_LONG).show();
+            } else {
+                MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_todo, begin, eind);
+                calendarObjects.add(todo);
+                if (time_gap == 0) {
+                    i = 0;
+
+                    time_gap_evening = time_gap_evening - (duration + time_between_todos);
+                    end_last_event_rise_ct = end_last_event_rise_ct + duration;
+                } else if (time_gap_evening == 0) {
+                    time_gap = time_gap - (duration + time_between_todos);
+                    // new is the new old
+                    end_last_event_rise_ct = end_todo;
+                }
+            }
+        } else if (time_gap_morning > duration) {
+            if (todo_deadline_string.equals(date_string)) {
+                Toast.makeText(this, "Oops you can't finish " + todo_title_string + " on time!", Toast.LENGTH_LONG).show();
+            } else {
+                if (i == 0) {
+                    MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string,
+                            convertToHour(bedtime_end + time_between_todos),
+                            convertToHour(bedtime_end + duration));
+                    calendarObjects.add(todo);
+                    end_last_event_rise_ct = bedtime_end + duration;
+                    time_gap_evening = 0;
+                } else {
+                    MyCalendarObject todo = new MyCalendarObject(todo_title_string, date_string,
+                            convertToHour(end_last_event_rise_ct + time_between_todos),
+                            convertToHour(end_last_event_rise_ct + duration));
+                    calendarObjects.add(todo);
+                    end_last_event_rise_ct = end_last_event_rise_ct + duration;
+                }
+                time_gap_morning = time_gap_morning - (duration + time_between_todos);
+                i = i + 1;
+            }
+        }
+        return calendarObjects;
     }
 }
 
