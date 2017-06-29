@@ -203,10 +203,7 @@ public class TodoActivity extends AppCompatActivity {
                 duration = cursor.getString(cursor.getColumnIndex(TableNames.TodoEntry.COL_TODO_DURATION));
             }
         }
-        replaceTodo(title, duration, todo_title_old);
-    }
 
-    public void replaceTodo(String title, String duration, final String todo_title_old){
         LayoutInflater layoutInflater = LayoutInflater.from(this);
 
         final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_add_todo, null);

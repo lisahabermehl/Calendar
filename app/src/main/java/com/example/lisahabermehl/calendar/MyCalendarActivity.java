@@ -147,7 +147,12 @@ public class MyCalendarActivity extends AppCompatActivity {
         todo_cursor.moveToPrevious();
 
         if (search_for[0].equals("no")) {
-            String[] everythingToKnow = nextEvent(cursor, date_old, time_end_old);
+
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putInt("old_end_time", (time_end_old));
+            editor.apply();
+
+            String[] everythingToKnow = nextEvent(cursor, date_old);
 
             title_string = everythingToKnow[0];
             date_string = everythingToKnow[1];
@@ -163,7 +168,12 @@ public class MyCalendarActivity extends AppCompatActivity {
 
             while (time_end < current_time & date_string.equals(current_date)) {
                 cursor.moveToNext();
-                everythingToKnow = nextEvent(cursor, date_old, time_end_old);
+
+                editor = sp.edit();
+                editor.putInt("old_end_time", (time_end_old));
+                editor.apply();
+
+                everythingToKnow = nextEvent(cursor, date_old);
                 date_string = everythingToKnow[1];
                 time_end = Integer.valueOf(everythingToKnow[3]);
                 current_date = everythingToKnow[5];
@@ -191,7 +201,12 @@ public class MyCalendarActivity extends AppCompatActivity {
                     end_last_event_rise_ct = time_end;
 
                     cursor.moveToNext();
-                    everythingToKnow = nextEvent(cursor, date_old, end_last_event_rise_ct);
+
+                    editor = sp.edit();
+                    editor.putInt("old_end_time", (end_last_event_rise_ct));
+                    editor.apply();
+
+                    everythingToKnow = nextEvent(cursor, date_old);
 
                     title_string = everythingToKnow[0];
                     date_string = everythingToKnow[1];
@@ -213,7 +228,12 @@ public class MyCalendarActivity extends AppCompatActivity {
             calendarObjects.add(nextEvent);
 
             while (cursor.moveToNext()) {
-                everythingToKnow = nextEvent(cursor, date_old, time_end_old);
+
+                editor = sp.edit();
+                editor.putInt("old_end_time", (time_end_old));
+                editor.apply();
+
+                everythingToKnow = nextEvent(cursor, date_old);
                 title_string = everythingToKnow[0];
                 date_string = everythingToKnow[1];
                 time_start = Integer.valueOf(everythingToKnow[2]);
@@ -415,13 +435,14 @@ public class MyCalendarActivity extends AppCompatActivity {
                 .show();
     }
 
-    private String[] nextEvent(Cursor cursor, String date_old, int end_last_event_rise_ct) {
+    private String[] nextEvent(Cursor cursor, String date_old) {
 
         String title_string, date_string;
 
         SharedPreferences sp = getSharedPreferences("shared_preferences", Activity.MODE_PRIVATE);
         bedtime_start = (sp.getInt("bedtime_start_hour", 23) * 60) + sp.getInt("bedtime_start_minute", 0);
         bedtime_end = (sp.getInt("bedtime_end_hour", 7) * 60) + sp.getInt("bedtime_end_minute", 0);
+        end_last_event_rise_ct = sp.getInt("old_end_time", 0);
         time_between_todos = sp.getInt("time_gap", 1);
 
         time_gap_evening = 0;
