@@ -1,5 +1,5 @@
-#### My Calendar
-### Planning suggestions for poor planners
+# My Calendar
+## Planning suggestions for poor planners
 Have you ever been in a situation where you wish you started earlier with studying for a test or started earlier with writing an essay? The goal of this app is to give you an overview of when you can do something in a short period of time to make sure you’ll be done in time. There are two main functions. Firstly, a Todo List where you can make a list of what needs to be done (read chapter 1, write your essay), how much time you think to spend on this specific Todo Item and when the deadline is. Secondly, a Calendar that imports the events that you’ve already planned in your Google Calendar and that gives suggestions of when you can do a Todo Item. The events that are shown in your Calendar are determined by either the Time Span that you’ve chosen in in the Settings or the default Time Span of 14 days. How much time you’ll have between Events and Todo Items is determined by the Time Gap that you’ve set in the Settings or by the default Time Gap of 15 minutes. Besides this it’s also possible to set your Bedtime in the Settings to make sure that Todo Items won’t be planned while you’re in dreamland. 
 
 ### How is this app different from other Planner/Todo/Calendar apps?
@@ -8,15 +8,15 @@ I think that the visible part of my app will be the same as other Planner/Todo l
 ### Behind the app
 Let’s get technical. As you can deduce from the description above, the app consists of three activities: Calendar, Todo and Settings. 
 
-## Calendar
+#### Calendar
 This class uses three other classes. (1) A class that fetches events from Google Calendar with an AsyncTask, that saves all the events in the SQLite Database. But that also adds an event to Google Calendar. (2) A MyCalendarObject that consists of the title, date, starttime and endtime of the event. (3) A MyCalendarAdapter that makes sure that all these details of the MyCalendarObject will end up on the right spot in the list. 
 
-## Todo
+#### Todo
 This class uses other classes as well. (2) A TodoObject that consists of the title, duration and deadline of the Todo Item. (3) A TodoAdapter that makes sure that all the details of the TodoObject will end up on the right spot in the list. 
 
 Besides this, both Calendar and Todo use the DatabaseHelper (that creates and drops tables when called) and TableNames (where all the names of tables and columns are defined for consistency). 
 
-## Settings
+#### Settings
 All the values that are set in this activity are stored in SharedPreferences. Values include: start of bedtime, end of bedtime, time span and time gap. 
 
 ### Process
